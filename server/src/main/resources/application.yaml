@@ -1,0 +1,14 @@
+ktor:
+  deployment:
+    host: "$API_HOST:localhost"
+    port: "$API_PORT:8080"
+  application:
+    modules:
+      - com.github.projektmagma.magmaquiz.server.ApplicationKt.mainModule
+
+database:
+  host: "$DB_HOST:localhost"
+  port: "$DB_PORT:5432"
+  user: "$DB_USER:postgres"
+  password: "$DB_PASSWORD:"
+  database: "$DB_DATABASE:"
