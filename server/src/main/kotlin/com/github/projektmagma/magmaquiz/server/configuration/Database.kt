@@ -1,10 +1,11 @@
 package com.github.projektmagma.magmaquiz.server.configuration
 
-import com.github.projektmagma.magmaquiz.server.data.daos.QuestionsTable
-import com.github.projektmagma.magmaquiz.server.data.daos.QuizzesTable
+import com.github.projektmagma.magmaquiz.server.data.tables.AnswersTable
+import com.github.projektmagma.magmaquiz.server.data.tables.QuestionsTable
+import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesTable
+import com.github.projektmagma.magmaquiz.server.data.tables.UsersTable
 import com.github.projektmagma.magmaquiz.server.data.util.DatabaseConfig
-import com.github.projektmagma.magmaquiz.server.data.daos.UsersTable
-import io.ktor.server.application.Application
+import io.ktor.server.application.*
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -21,8 +22,17 @@ fun Application.configureDatabase() {
     )
 
     transaction {
-        SchemaUtils.create(UsersTable)
-        SchemaUtils.create(QuizzesTable)
-        SchemaUtils.create(QuestionsTable)
+        SchemaUtils.create(
+            UsersTable,
+            QuizzesTable,
+            QuestionsTable,
+            AnswersTable
+        )
+        SchemaUtils.addMissingColumnsStatements(
+            UsersTable,
+            QuizzesTable,
+            QuestionsTable,
+            AnswersTable
+        )
     }
 }

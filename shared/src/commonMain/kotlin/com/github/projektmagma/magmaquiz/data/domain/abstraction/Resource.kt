@@ -1,4 +1,4 @@
-package com.github.projektmagma.magmaquiz.data.domain
+package com.github.projektmagma.magmaquiz.data.domain.abstraction
 
 sealed interface Resource<out D, out E> {
     data class Success<out D>(val data: D) : Resource<D, Nothing>

@@ -1,18 +1,23 @@
 package com.github.projektmagma.magmaquiz.server.data.util
 
-import com.github.projektmagma.magmaquiz.data.domain.Resource
-import io.ktor.http.HttpStatusCode
-import io.ktor.server.response.respond
-import io.ktor.server.routing.RoutingCall
+import com.github.projektmagma.magmaquiz.data.domain.abstraction.NetworkResource
+import io.ktor.server.application.*
+import io.ktor.server.response.*
 
-suspend inline fun RoutingCall.respondToResource(resource: Resource<Any, HttpStatusCode>) {
-    when (resource) {
-        is Resource.Error -> {
-            this.respond(resource.error)
+suspend inline fun ApplicationCall.respondToResource(networkResource: NetworkResource<Any>) {
+    when (networkResource) {
+        is NetworkResource.Error -> {
+            this.respond(
+                message = networkResource.errorDescription,
+                status = networkResource.statusCode
+            )
         }
 
-        is Resource.Success -> {
-            this.respond(message = resource.data, status = HttpStatusCode.OK)
+        is NetworkResource.Success -> {
+            this.respond(
+                message = networkResource.data,
+                status = networkResource.statusCode
+            )
         }
     }
 }

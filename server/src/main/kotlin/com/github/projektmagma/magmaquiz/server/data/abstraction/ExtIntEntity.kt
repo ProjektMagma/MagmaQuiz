@@ -1,6 +1,5 @@
-package com.github.projektmagma.magmaquiz.server.data.entities
+package com.github.projektmagma.magmaquiz.server.data.abstraction
 
-import com.github.projektmagma.magmaquiz.server.data.daos.ExtIntIdTable
 import org.jetbrains.exposed.dao.EntityBatchUpdate
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.id.EntityID

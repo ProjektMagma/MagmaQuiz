@@ -7,4 +7,6 @@ data class User(
     val userId: Int? = null,
     val userName: String,
     val userEmail: String,
+    val mustChangePassword: Boolean,
+    val userProfilePicture: ByteArray? = null
 )

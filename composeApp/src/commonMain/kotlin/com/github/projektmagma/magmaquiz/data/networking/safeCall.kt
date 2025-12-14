@@ -1,12 +1,11 @@
 package com.github.projektmagma.magmaquiz.data.networking
 
-import com.github.projektmagma.magmaquiz.data.domain.Resource
+import com.github.projektmagma.magmaquiz.data.domain.abstraction.Resource
 import com.github.projektmagma.magmaquiz.domain.NetworkError
-import io.ktor.client.statement.HttpResponse
-import io.ktor.util.network.UnresolvedAddressException
+import io.ktor.client.statement.*
+import io.ktor.util.network.*
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
-import java.lang.Exception
 
 suspend inline fun <reified T> safeCall(
     execute: () -> HttpResponse

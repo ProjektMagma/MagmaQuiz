@@ -1,6 +1,6 @@
 package com.github.projektmagma.magmaquiz.server.routes
 
-import com.github.projektmagma.magmaquiz.data.domain.Resource
+import com.github.projektmagma.magmaquiz.data.domain.abstraction.NetworkResource
 import com.github.projektmagma.magmaquiz.data.rest.values.ChangePasswordValue
 import com.github.projektmagma.magmaquiz.data.rest.values.CreateUserValue
 import com.github.projektmagma.magmaquiz.data.rest.values.LoginUserValue
@@ -20,14 +20,14 @@ fun Application.authRoutes(userDataController: UserDataController) {
         route("/user") {
             post("/login") {
                 if (call.sessions.get<UserSession>() != null) {
-                    call.respond(HttpStatusCode.Conflict)
+                    call.respondToResource(NetworkResource.Error(HttpStatusCode.Conflict))
                     return@post
                 }
                 val loginUserValue = call.receive<LoginUserValue>()
 
                 val resource = userDataController.tryLoginUser(loginUserValue)
 
-                if (resource is Resource.Success) {
+                if (resource is NetworkResource.Success) {
                     call.sessions.set(UserSession(resource.data.userId!!, resource.data.userName))
                 }
 
@@ -50,7 +50,7 @@ fun Application.authRoutes(userDataController: UserDataController) {
                 get("/whoami") {
                     val session = call.sessions.get<UserSession>()!!
 
-                    call.respondToResource(userDataController.tryFindUser(session.userId))
+                    call.respondToResource(userDataController.tryFindUser(session))
                 }
 
                 post("/changePassword") {
@@ -59,7 +59,7 @@ fun Application.authRoutes(userDataController: UserDataController) {
 
 
                     call.respondToResource(
-                        userDataController.tryChangePassword(
+                        userDataController.changePassword(
                             session, postContent
                         )
                     )
@@ -68,6 +68,12 @@ fun Application.authRoutes(userDataController: UserDataController) {
                 get("/logout") {
                     call.sessions.clear<UserSession>()
                     call.respond(HttpStatusCode.OK)
+                }
+
+                get("/delete") {
+                    val session = call.sessions.get<UserSession>()!!
+                    call.sessions.clear<UserSession>()
+                    call.respondToResource(userDataController.changeActiveStatus(session, false))
                 }
             }
         }
