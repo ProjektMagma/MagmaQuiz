@@ -17,6 +17,7 @@ class AnswerEntity(id: EntityID<Int>) : ExtIntEntity(id, AnswersTable), DomainCa
     override fun toDomain(): Answer {
         return transaction {
             Answer(
+                id = super.id.value,
                 answerContent = answerContent,
                 isCorrect = isCorrect
             )

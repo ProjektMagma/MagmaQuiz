@@ -39,7 +39,17 @@ fun Application.quizRoutes(quizDataController: QuizDataController) {
                     )
                 }
 
+                post("/modify") {
+                    val postContent = call.receive<CreateOrModifyQuizValue>()
+                    val session = call.sessions.get<UserSession>()!!
 
+                    call.respondToResource(
+                        quizDataController.tryModifyQuiz(
+                            postContent,
+                            session
+                        )
+                    )
+                }
             }
         }
     }

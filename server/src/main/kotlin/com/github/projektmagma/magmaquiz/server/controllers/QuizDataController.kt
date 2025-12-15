@@ -7,9 +7,12 @@ import com.github.projektmagma.magmaquiz.server.data.entities.AnswerEntity
 import com.github.projektmagma.magmaquiz.server.data.entities.QuestionEntity
 import com.github.projektmagma.magmaquiz.server.data.entities.QuizEntity
 import com.github.projektmagma.magmaquiz.server.data.entities.UserEntity
+import com.github.projektmagma.magmaquiz.server.data.tables.AnswersTable
+import com.github.projektmagma.magmaquiz.server.data.tables.QuestionsTable
 import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesTable
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import io.ktor.http.*
+import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.lowerCase
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -58,7 +61,112 @@ class QuizDataController {
             }
         }
         return NetworkResource.Success(Unit)
+    }
 
+    // TODO: Sprawdzić czy na pewno działa
+    fun tryModifyQuiz(
+        createOrModifyQuizValue: CreateOrModifyQuizValue,
+        session: UserSession
+    ): NetworkResource<Unit> {
+
+        val postQuiz = createOrModifyQuizValue.quiz
+
+        val modifiedQuiz = transaction { QuizEntity.findById(postQuiz.id!!) }
+
+        if (modifiedQuiz == null)
+            return NetworkResource.Error(HttpStatusCode.NotFound)
+
+        if (transaction { modifiedQuiz.quizCreator.id.value } != session.userId)
+            return NetworkResource.Error(HttpStatusCode.Forbidden)
+
+        val isNameAlreadyTaken = transaction {
+            !QuizEntity.find { QuizzesTable.quizName eq postQuiz.quizName }.empty()
+        }
+
+        if (isNameAlreadyTaken && transaction { postQuiz.quizName != modifiedQuiz.quizName })
+            return NetworkResource.Error(HttpStatusCode.Conflict)
+
+        transaction {
+
+            QuizEntity.findByIdAndUpdate(modifiedQuiz.id.value) {
+                it.quizName = postQuiz.quizName
+                it.quizDescription = postQuiz.quizDescription
+                it.quizImage = postQuiz.quizImage
+                it.isPublic = postQuiz.isPublic
+            }
+
+            val existingQuestions = mutableListOf<EntityID<Int>>()
+            val existingAnswers = mutableListOf<EntityID<Int>>()
+
+            postQuiz.questionList?.forEach { postQuestion ->
+                if (postQuestion.id != null) { // modyfikacja starych pytania
+                    val q = transaction {
+                        QuestionEntity.findByIdAndUpdate(postQuestion.id!!) {
+                            it.questionNumber = postQuestion.questionNumber
+                            it.questionContent = postQuestion.questionContent
+                            it.questionImage = postQuestion.questionImage
+                        }!!
+                    }
+                    existingQuestions.add(q.id)
+                    postQuestion.answerList?.forEach { postAnswer -> // modyfikacja starych odpowiedzi
+                        if (postAnswer.id != null) {
+                            val a = transaction {
+                                AnswerEntity.findByIdAndUpdate(postAnswer.id!!) {
+                                    it.answerContent = postAnswer.answerContent
+                                    it.isCorrect = postAnswer.isCorrect
+                                }!!
+                            }
+                            existingAnswers.add(a.id)
+                        } else {
+                            val a = transaction {
+                                AnswerEntity.new { // nowe odpowiedzi do starego pytania
+                                    question = q
+                                    answerContent = postAnswer.answerContent
+                                    isCorrect = postAnswer.isCorrect
+                                }
+                            }
+                            existingAnswers.add(a.id)
+                        }
+                    }
+                } else {
+                    val q = transaction {
+                        QuestionEntity.new { // nowe pytanie
+                            quiz = modifiedQuiz
+                            questionNumber = postQuestion.questionNumber
+                            questionContent = postQuestion.questionContent
+                            questionImage = postQuestion.questionImage
+                        }
+                    }
+                    existingQuestions.add(q.id)
+
+                    postQuestion.answerList?.forEach { answer -> // nowe odpowiedzi
+                        val a = transaction {
+                            AnswerEntity.new {
+                                question = q
+                                answerContent = answer.answerContent
+                                isCorrect = answer.isCorrect
+                            }
+                        }
+                        existingAnswers.add(a.id)
+                    }
+                }
+            }
+
+            transaction {
+                QuestionEntity.wrapRows( // Usuń nieaktywne pytania razem z odpowiedziami
+                    QuestionsTable.select(QuestionsTable.columns)
+                        .where { QuestionsTable.id notInList existingQuestions and (QuestionsTable.quiz eq QuestionsTable.id) })
+                    .forEach { q ->
+                        q.isActive = false
+                        q.answerList.forEach { a -> a.isActive = false }
+                    }
+                AnswerEntity.wrapRows( // Usuń nieaktywne odpowiedzi
+                    AnswersTable.select(AnswersTable.columns)
+                        .where { AnswersTable.id notInList existingAnswers and (AnswersTable.question inList existingAnswers) })
+                    .forEach { it.isActive = false }
+            }
+        }
+        return NetworkResource.Success(Unit)
     }
 
     fun findQuizzesByName(stringToSearch: String): NetworkResource<List<Quiz>> {
@@ -89,10 +197,10 @@ class QuizDataController {
             QuizEntity.findById(quizId)
         }
 
-        if (dbQuiz == null || !dbQuiz.isActive)
+        if (dbQuiz == null || transaction { !dbQuiz.isActive })
             return NetworkResource.Error(HttpStatusCode.NotFound)
 
-        if (!dbQuiz.isPublic && dbQuiz.quizCreator != dbUser)
+        if (transaction { !dbQuiz.isPublic && dbQuiz.quizCreator.id != dbUser.id })
             return NetworkResource.Error(HttpStatusCode.Forbidden)
 
         return NetworkResource.Success(dbQuiz.toDomainWithChildren())
