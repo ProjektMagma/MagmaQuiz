@@ -1,6 +1,8 @@
 package com.github.projektmagma.magmaquiz.data.domain.abstraction
 
-sealed interface Resource<out D, out E> {
+typealias RootError = Error
+
+sealed interface Resource<out D, out E: RootError> {
     data class Success<out D>(val data: D) : Resource<D, Nothing>
-    data class Error<out E>(val error: E) : Resource<Nothing, E>
+    data class Error<out E: RootError>(val error: E) : Resource<Nothing, E>
 }
