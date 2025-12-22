@@ -16,6 +16,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.lowerCase
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.util.*
 
 class QuizDataController {
 
@@ -60,7 +61,7 @@ class QuizDataController {
                 }
             }
         }
-        return NetworkResource.Success(Unit)
+        return NetworkResource.Success(Unit, HttpStatusCode.Created)
     }
 
     // TODO: Sprawdzić czy na pewno działa
@@ -95,8 +96,8 @@ class QuizDataController {
                 it.isPublic = postQuiz.isPublic
             }
 
-            val existingQuestions = mutableListOf<EntityID<Int>>()
-            val existingAnswers = mutableListOf<EntityID<Int>>()
+            val existingQuestions = mutableListOf<EntityID<UUID>>()
+            val existingAnswers = mutableListOf<EntityID<UUID>>()
 
             postQuiz.questionList?.forEach { postQuestion ->
                 if (postQuestion.id != null) { // modyfikacja starych pytania
@@ -180,11 +181,12 @@ class QuizDataController {
         }
 
         return NetworkResource.Success(
-            quizzesList
+            quizzesList,
+            HttpStatusCode.PartialContent
         )
     }
 
-    fun tryGetQuizData(quizId: Int?, session: UserSession): NetworkResource<Quiz> {
+    fun tryGetQuizData(quizId: UUID?, session: UserSession): NetworkResource<Quiz> {
 
         if (quizId == null)
             return NetworkResource.Error(HttpStatusCode.BadRequest)
@@ -203,6 +205,6 @@ class QuizDataController {
         if (transaction { !dbQuiz.isPublic && dbQuiz.quizCreator.id != dbUser.id })
             return NetworkResource.Error(HttpStatusCode.Forbidden)
 
-        return NetworkResource.Success(dbQuiz.toDomainWithChildren())
+        return NetworkResource.Success(dbQuiz.toDomainWithChildren(), HttpStatusCode.Found)
     }
 }

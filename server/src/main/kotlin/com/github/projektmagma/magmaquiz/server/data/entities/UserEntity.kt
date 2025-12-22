@@ -2,15 +2,16 @@ package com.github.projektmagma.magmaquiz.server.data.entities
 
 import com.github.projektmagma.magmaquiz.data.domain.User
 import com.github.projektmagma.magmaquiz.server.data.abstraction.DomainCapable
-import com.github.projektmagma.magmaquiz.server.data.abstraction.ExtIntEntity
+import com.github.projektmagma.magmaquiz.server.data.abstraction.ExtUUIDEntity
 import com.github.projektmagma.magmaquiz.server.data.tables.UsersTable
-import org.jetbrains.exposed.dao.IntEntityClass
+import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
+import java.util.*
 
-class UserEntity(id: EntityID<Int>) : ExtIntEntity(id, UsersTable), DomainCapable<User> {
-    companion object : IntEntityClass<UserEntity>(UsersTable)
+class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapable<User> {
+    companion object : UUIDEntityClass<UserEntity>(UsersTable)
 
     var userPassword by UsersTable.userPassword
         private set

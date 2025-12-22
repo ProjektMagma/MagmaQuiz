@@ -9,6 +9,7 @@ import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
+import java.util.*
 
 fun Application.quizRoutes(quizDataController: QuizDataController) {
     routing {
@@ -16,7 +17,7 @@ fun Application.quizRoutes(quizDataController: QuizDataController) {
             route("/quiz") {
                 get("/{id}") {
                     val session = call.sessions.get<UserSession>()!!
-                    val quizId = call.parameters["id"]!!.toIntOrNull()
+                    val quizId = UUID.fromString(call.parameters["id"]!!)
                     call.respondToResource(quizDataController.tryGetQuizData(quizId, session))
 
                 }

@@ -71,7 +71,7 @@ class UserDataController {
 
         dbUser.setHashedPassword(createUserValue.userPassword)
 
-        return NetworkResource.Success(dbUser.toDomain())
+        return NetworkResource.Success(dbUser.toDomain(), HttpStatusCode.Created)
     }
 
     fun changePassword(
@@ -106,6 +106,6 @@ class UserDataController {
 
         transaction { dbUser.isActive = isActive }
 
-        return NetworkResource.Success(Unit)
+        return NetworkResource.Success(Unit, HttpStatusCode.Found)
     }
 }

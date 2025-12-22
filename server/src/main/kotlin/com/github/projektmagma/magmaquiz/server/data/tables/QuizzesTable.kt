@@ -1,8 +1,8 @@
 package com.github.projektmagma.magmaquiz.server.data.tables
 
-import com.github.projektmagma.magmaquiz.server.data.abstraction.ExtIntIdTable
+import com.github.projektmagma.magmaquiz.server.data.abstraction.ExtUUIDTable
 
-object QuizzesTable : ExtIntIdTable("quizzes", "quiz_id") {
+object QuizzesTable : ExtUUIDTable("quizzes", "quiz_id") {
     val quizCreator = reference("user_id", UsersTable)
     val quizName = varchar("quiz_name", 255)
     val quizDescription = text("quiz_description").nullable()

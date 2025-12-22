@@ -1,11 +1,12 @@
 package com.github.projektmagma.magmaquiz.server.data.abstraction
 
 import org.jetbrains.exposed.dao.EntityBatchUpdate
-import org.jetbrains.exposed.dao.IntEntity
+import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.id.EntityID
 import java.time.Instant
+import java.util.*
 
-abstract class ExtIntEntity(id: EntityID<Int>, table: ExtIntIdTable) : IntEntity(id) {
+abstract class ExtUUIDEntity(id: EntityID<UUID>, table: ExtUUIDTable) : UUIDEntity(id) {
     var isActive by table.isActive
     var createdAt by table.createdAt
     var modifiedAt by table.modifiedAt
