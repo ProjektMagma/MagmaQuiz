@@ -5,25 +5,24 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.projektmagma.magmaquiz.presentation.model.AuthCommand
 import com.github.projektmagma.magmaquiz.presentation.model.AuthEvent
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun LoginScreen(
-    navigateToRegister: () -> Unit,
-    navigateToHome: () -> Unit
+fun HomeScreen(
+    navigateToLogin: () -> Unit
 ) {
-
     val viewModel = koinViewModel<AuthViewModel>()
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    val user = viewModel.user.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
-
 
     LaunchedEffect(viewModel.authChannel) {
         viewModel.authChannel.collect { event ->
@@ -33,52 +32,28 @@ fun LoginScreen(
                 }
 
                 AuthEvent.Success -> {
-                    navigateToHome()
+                    navigateToLogin()
                 }
             }
         }
     }
-    Scaffold(
-        snackbarHost = {
-            SnackbarHost(
-                hostState = snackbarHostState,
-            )
-        }
-    ) { innerPadding ->
-
+    Scaffold(snackbarHost = {
+        SnackbarHost(hostState = snackbarHostState)
+    }) { innerPadding ->
         Column(
             modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize(),
+                .padding(innerPadding).fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text = "Login")
 
-            TextField(
-                value = email,
-                onValueChange = {
-                    email = it
-                    viewModel.onCommand(AuthCommand.EmailChanged(email))
-                }
-            )
 
-            TextField(
-                value = password,
-                onValueChange = {
-                    password = it
-                    viewModel.onCommand(AuthCommand.PasswordChanged(password))
-                }
-            )
+            Text("Hello ${user.value?.userName}!")
 
             Button(onClick = {
-                viewModel.onCommand(AuthCommand.Login)
+                viewModel.onCommand(AuthCommand.Logout)
             }) {
-                Text(text = "Zaloguj")
-            }
-
-            Button(onClick = { navigateToRegister() }) {
-                Text(text = "Do registera")
+                Text(text = "Wyloguj")
             }
         }
     }

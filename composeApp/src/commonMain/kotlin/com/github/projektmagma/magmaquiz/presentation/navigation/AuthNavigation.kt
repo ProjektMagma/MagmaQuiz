@@ -8,6 +8,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
+import com.github.projektmagma.magmaquiz.presentation.HomeScreen
 import com.github.projektmagma.magmaquiz.presentation.LoginScreen
 import com.github.projektmagma.magmaquiz.presentation.RegisterScreen
 import kotlinx.serialization.modules.SerializersModule
@@ -16,11 +17,12 @@ import kotlinx.serialization.modules.polymorphic
 @Composable
 fun AuthNavigation() {
     val authBackStack = rememberNavBackStack(
-        configuration = SavedStateConfiguration { 
-            serializersModule = SerializersModule { 
+        configuration = SavedStateConfiguration {
+            serializersModule = SerializersModule {
                 polymorphic(NavKey::class) {
                     subclass(Route.Auth.Login::class, Route.Auth.Login.serializer())
                     subclass(Route.Auth.Register::class, Route.Auth.Register.serializer())
+                    subclass(Route.Main.Home::class, Route.Main.Home.serializer())
                 }
             }
         },
@@ -33,16 +35,26 @@ fun AuthNavigation() {
             rememberSaveableStateHolderNavEntryDecorator(),
             rememberViewModelStoreNavEntryDecorator()
         ),
-        entryProvider = entryProvider { 
+        entryProvider = entryProvider {
             entry<Route.Auth.Login> {
                 LoginScreen(
                     navigateToRegister = {
                         authBackStack.add(Route.Auth.Register)
+                    },
+                    navigateToHome = {
+                        authBackStack.add(Route.Main.Home)
                     }
                 )
             }
             entry<Route.Auth.Register> {
                 RegisterScreen(
+                    navigateToLogin = {
+                        authBackStack.add(Route.Auth.Login)
+                    }
+                )
+            }
+            entry<Route.Main.Home> { // TODO: Potem to wynieść do innego back stacku
+                HomeScreen(
                     navigateToLogin = {
                         authBackStack.add(Route.Auth.Login)
                     }

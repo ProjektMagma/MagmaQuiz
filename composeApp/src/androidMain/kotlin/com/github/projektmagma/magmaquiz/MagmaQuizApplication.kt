@@ -7,7 +7,7 @@ import org.koin.android.ext.koin.androidContext
 class MagmaQuizApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        initKoin { 
+        initKoin {
             androidContext(this@MagmaQuizApplication)
         }
     }

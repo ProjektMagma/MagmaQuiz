@@ -6,4 +6,5 @@ sealed interface AuthCommand {
     data class RepeatedPasswordChanged(val repeatedPassword: String) : AuthCommand
     data object Login : AuthCommand
     data object Register : AuthCommand
+    data object Logout : AuthCommand
 }

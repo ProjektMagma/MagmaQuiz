@@ -40,7 +40,13 @@ fun Application.authRoutes(userDataController: UserDataController) {
             post("/register") {
                 val postContent = call.receive<CreateUserValue>()
 
-                call.respondToResource(userDataController.tryRegisterUser(postContent))
+                val resource = userDataController.tryRegisterUser(postContent)
+
+                if (resource is NetworkResource.Success) {
+                    call.sessions.set(UserSession(resource.data.userId!!, resource.data.userName))
+                }
+
+                call.respondToResource(resource)
 
 
             }
