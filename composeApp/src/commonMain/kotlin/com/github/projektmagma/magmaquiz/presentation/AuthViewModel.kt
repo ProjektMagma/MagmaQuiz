@@ -36,8 +36,9 @@ class AuthViewModel(
 
     fun onCommand(command: AuthCommand) {
         when (command) {
-            is AuthCommand.EmailChanged -> state = state.copy(email = command.email)
-            is AuthCommand.PasswordChanged -> state = state.copy(password = command.password)
+            is AuthCommand.UsernameChanged -> state = state.copy(username = command.username, usernameError = null)
+            is AuthCommand.EmailChanged -> state = state.copy(email = command.email, emailError = null)
+            is AuthCommand.PasswordChanged -> state = state.copy(password = command.password, passwordError = null)
             AuthCommand.Login -> loginUser(state.email, state.password)
             AuthCommand.Register -> registerUser(state.username, state.email, state.password)
             AuthCommand.Logout -> logoutUser()

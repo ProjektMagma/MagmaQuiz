@@ -19,6 +19,7 @@ fun NavRoot(modifier: Modifier = Modifier) {
             serializersModule = SerializersModule {
                 polymorphic(NavKey::class) {
                     subclass(Route.Auth::class, Route.Auth.serializer())
+                    subclass(Route.Main::class, Route.Main.serializer())
                 }
             }
         },
@@ -34,9 +35,21 @@ Route.Auth
         ),
         entryProvider = entryProvider { 
             entry<Route.Auth> {
-                AuthNavigation()
+                AuthNavigation(
+                    navigateToMain = {
+                        rootBackStack.clear()
+                        rootBackStack.add(Route.Main)
+                    }
+                )
+            }
+            entry<Route.Main> {
+                MainNavigation(
+                    navigateToAuth = {
+                        rootBackStack.clear()
+                        rootBackStack.add(Route.Auth)
+                    }
+                )
             }
         }
     )
-
 }

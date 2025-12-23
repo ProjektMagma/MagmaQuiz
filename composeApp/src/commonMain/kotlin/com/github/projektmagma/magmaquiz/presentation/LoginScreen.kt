@@ -3,13 +3,20 @@ package com.github.projektmagma.magmaquiz.presentation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.github.projektmagma.magmaquiz.presentation.components.EmailTextField
+import com.github.projektmagma.magmaquiz.presentation.components.PasswordTextField
 import com.github.projektmagma.magmaquiz.presentation.model.AuthCommand
 import com.github.projektmagma.magmaquiz.presentation.model.AuthEvent
+import com.github.projektmagma.magmaquiz.util.SnackbarController
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -17,19 +24,14 @@ fun LoginScreen(
     navigateToRegister: () -> Unit,
     navigateToHome: () -> Unit
 ) {
-
     val viewModel = koinViewModel<AuthViewModel>()
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-
-    val snackbarHostState = remember { SnackbarHostState() }
-
+    val state = viewModel.state
 
     LaunchedEffect(viewModel.authChannel) {
         viewModel.authChannel.collect { event ->
             when (event) {
                 is AuthEvent.Failure -> {
-                    snackbarHostState.showSnackbar(event.networkError.name)
+                    SnackbarController.onEvent(event.networkError.name)
                 }
 
                 AuthEvent.Success -> {
@@ -38,48 +40,40 @@ fun LoginScreen(
             }
         }
     }
-    Scaffold(
-        snackbarHost = {
-            SnackbarHost(
-                hostState = snackbarHostState,
-            )
-        }
-    ) { innerPadding ->
+    Column(
+        modifier = Modifier
+            .padding(horizontal = 32.dp)
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
+    ) {
+        Text(text = "Login")
 
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+        EmailTextField(
+            emailText = state.email,
+            emailError = state.emailError
         ) {
-            Text(text = "Login")
+            viewModel.onCommand(AuthCommand.EmailChanged(it))
+        }
 
-            TextField(
-                value = email,
-                onValueChange = {
-                    email = it
-                    viewModel.onCommand(AuthCommand.EmailChanged(email))
-                }
-            )
+        PasswordTextField(
+            passwordText = state.password,
+            passwordError = state.passwordError
+        ) {
+            viewModel.onCommand(AuthCommand.PasswordChanged(it))
+        }
 
-            TextField(
-                value = password,
-                onValueChange = {
-                    password = it
-                    viewModel.onCommand(AuthCommand.PasswordChanged(password))
-                }
-            )
-
-            Button(onClick = {
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
                 viewModel.onCommand(AuthCommand.Login)
-            }) {
-                Text(text = "Zaloguj")
             }
+        ) {
+            Text(text = "Zaloguj")
+        }
 
-            Button(onClick = { navigateToRegister() }) {
-                Text(text = "Do registera")
-            }
+        Button(onClick = { navigateToRegister() }) {
+            Text(text = "Do registera")
         }
     }
 }
