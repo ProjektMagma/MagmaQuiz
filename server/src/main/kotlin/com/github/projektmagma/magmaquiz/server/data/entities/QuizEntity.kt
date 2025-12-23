@@ -18,6 +18,7 @@ class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable), DomainWi
     var quizDescription by QuizzesTable.quizDescription
     var quizImage by QuizzesTable.quizImage
     var isPublic by QuizzesTable.isPublic
+    var likesCount by QuizzesTable.likesCount
     val questionList by QuestionEntity referrersOn QuestionsTable.quiz
 
     override fun toDomain(): Quiz {
@@ -29,6 +30,7 @@ class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable), DomainWi
                 quizImage = quizImage,
                 isPublic = isPublic,
                 quizCreatorName = quizCreator.userName,
+                likesCount = likesCount,
                 createdAt = createdAt.epochSecond,
                 modifiedAt = modifiedAt.epochSecond,
             )
@@ -44,6 +46,7 @@ class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable), DomainWi
                 quizImage = quizImage,
                 isPublic = isPublic,
                 quizCreatorName = quizCreator.userName,
+                likesCount = likesCount,
                 createdAt = createdAt.epochSecond,
                 modifiedAt = modifiedAt.epochSecond,
                 questionList = questionList.map { it.toDomain() }

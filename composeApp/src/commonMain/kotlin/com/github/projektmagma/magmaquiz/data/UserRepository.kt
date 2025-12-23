@@ -21,7 +21,7 @@ class UserRepository(
 
     suspend fun registerUser(username: String, email: String, password: String): Resource<User, NetworkError> {
         return safeCall<User> {
-            httpClient.post("${url}/user/register") {
+            httpClient.post("${url}/auth/register") {
                 contentType(ContentType.Application.Json)
                 setBody(CreateUserValue(username, email, password))
             }
@@ -30,7 +30,7 @@ class UserRepository(
 
     suspend fun loginUser(email: String, password: String): Resource<User, NetworkError> {
         return safeCall<User> {
-            httpClient.post("${url}/user/login") {
+            httpClient.post("${url}/auth/login") {
                 contentType(ContentType.Application.Json)
                 setBody(LoginUserValue(email, password))
             }
@@ -39,7 +39,7 @@ class UserRepository(
 
     suspend fun logoutUser(): Resource<Unit, NetworkError> {
         return safeCall<Unit> {
-            httpClient.get("${url}/user/logout")
+            httpClient.get("${url}/auth/logout")
         }
     }
 }
