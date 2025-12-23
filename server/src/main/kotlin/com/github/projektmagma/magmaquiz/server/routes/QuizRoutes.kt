@@ -18,14 +18,15 @@ fun Application.quizRoutes(quizDataController: QuizDataController) {
                 get("/{id}") {
                     val session = call.sessions.get<UserSession>()!!
                     val quizId = UUID.fromString(call.parameters["id"]!!)
-                    call.respondToResource(quizDataController.tryGetQuizData(quizId, session))
+                    call.respondToResource(quizDataController.quizFromId(quizId, session))
 
                 }
 
                 get("/find/{stringToSearch}") {
+                    val session = call.sessions.get<UserSession>()!!
                     val stringToSearch = call.parameters["stringToSearch"]!!
 
-                    call.respondToResource(quizDataController.findQuizzesByName(stringToSearch))
+                    call.respondToResource(quizDataController.quizFindByName(stringToSearch, session))
                 }
 
                 post("/create") {
@@ -33,7 +34,7 @@ fun Application.quizRoutes(quizDataController: QuizDataController) {
                     val session = call.sessions.get<UserSession>()!!
 
                     call.respondToResource(
-                        quizDataController.tryCreateQuiz(
+                        quizDataController.quizCreate(
                             postContent,
                             session
                         )
@@ -45,11 +46,22 @@ fun Application.quizRoutes(quizDataController: QuizDataController) {
                     val session = call.sessions.get<UserSession>()!!
 
                     call.respondToResource(
-                        quizDataController.tryModifyQuiz(
+                        quizDataController.quizModify(
                             postContent,
                             session
                         )
                     )
+                }
+
+                get("/changeFavoriteStatus/{id}") {
+                    val session = call.sessions.get<UserSession>()!!
+                    val quizId = UUID.fromString(call.parameters["id"]!!)
+                    call.respondToResource(quizDataController.quizChangeFavoriteStatus(quizId, session))
+                }
+
+                get("/myFavorites") {
+                    val session = call.sessions.get<UserSession>()!!
+                    call.respondToResource(quizDataController.quizMyFavorites(session))
                 }
             }
         }

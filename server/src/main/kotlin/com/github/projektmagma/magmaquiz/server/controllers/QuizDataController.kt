@@ -3,11 +3,9 @@ package com.github.projektmagma.magmaquiz.server.controllers
 import com.github.projektmagma.magmaquiz.data.domain.Quiz
 import com.github.projektmagma.magmaquiz.data.domain.abstraction.NetworkResource
 import com.github.projektmagma.magmaquiz.data.rest.values.CreateOrModifyQuizValue
-import com.github.projektmagma.magmaquiz.server.data.entities.AnswerEntity
-import com.github.projektmagma.magmaquiz.server.data.entities.QuestionEntity
-import com.github.projektmagma.magmaquiz.server.data.entities.QuizEntity
-import com.github.projektmagma.magmaquiz.server.data.entities.UserEntity
+import com.github.projektmagma.magmaquiz.server.data.entities.*
 import com.github.projektmagma.magmaquiz.server.data.tables.AnswersTable
+import com.github.projektmagma.magmaquiz.server.data.tables.FavoriteQuizzesTable
 import com.github.projektmagma.magmaquiz.server.data.tables.QuestionsTable
 import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesTable
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
@@ -15,12 +13,13 @@ import io.ktor.http.*
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.lowerCase
+import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
 class QuizDataController {
 
-    fun tryCreateQuiz(
+    fun quizCreate(
         createOrModifyQuizValue: CreateOrModifyQuizValue,
         session: UserSession
     ): NetworkResource<Unit> {
@@ -65,7 +64,7 @@ class QuizDataController {
     }
 
     // TODO: Sprawdzić czy na pewno działa
-    fun tryModifyQuiz(
+    fun quizModify(
         createOrModifyQuizValue: CreateOrModifyQuizValue,
         session: UserSession
     ): NetworkResource<Unit> {
@@ -170,14 +169,26 @@ class QuizDataController {
         return NetworkResource.Success(Unit)
     }
 
-    fun findQuizzesByName(stringToSearch: String): NetworkResource<List<Quiz>> {
+    fun quizFindByName(stringToSearch: String, session: UserSession): NetworkResource<List<Quiz>> {
+        val dbUser = transaction {
+            UserEntity.findById(session.userId)
+        }!!
+
         val quizzesList = transaction {
 
             val query = QuizzesTable.select(QuizzesTable.columns)
                 .where {
                     QuizzesTable.quizName.lowerCase() like "%${stringToSearch.lowercase()}%" and QuizzesTable.isActive and QuizzesTable.isPublic
                 }
-            QuizEntity.wrapRows(query).map { it.toDomain() }
+            QuizEntity.wrapRows(query).map { dbQuiz ->
+                dbQuiz.toDomain().apply {
+                    val favoriteStatus = transaction {
+                        FavoriteQuizzesEntity.find { FavoriteQuizzesTable.user eq dbUser.id and (FavoriteQuizzesTable.quiz eq dbQuiz.id) }
+                    }.firstOrNull()
+
+                    this.likedByYou = favoriteStatus != null && favoriteStatus.isActive
+                }
+            }
         }
 
         return NetworkResource.Success(
@@ -186,10 +197,8 @@ class QuizDataController {
         )
     }
 
-    fun tryGetQuizData(quizId: UUID?, session: UserSession): NetworkResource<Quiz> {
+    fun quizFromId(quizId: UUID, session: UserSession): NetworkResource<Quiz> {
 
-        if (quizId == null)
-            return NetworkResource.Error(HttpStatusCode.BadRequest)
 
         val dbUser = transaction {
             UserEntity.findById(session.userId)
@@ -199,12 +208,84 @@ class QuizDataController {
             QuizEntity.findById(quizId)
         }
 
-        if (dbQuiz == null || transaction { !dbQuiz.isActive })
+        if (dbQuiz == null ||
+            transaction {
+                !dbQuiz.isActive || !dbQuiz.isPublic && dbQuiz.quizCreator.id != dbUser.id
+            }
+        )
             return NetworkResource.Error(HttpStatusCode.NotFound)
 
-        if (transaction { !dbQuiz.isPublic && dbQuiz.quizCreator.id != dbUser.id })
-            return NetworkResource.Error(HttpStatusCode.Forbidden)
 
-        return NetworkResource.Success(dbQuiz.toDomainWithChildren(), HttpStatusCode.Found)
+        return NetworkResource.Success(transaction {
+            dbQuiz.toDomainWithChildren()
+                .apply {
+                    val favoriteStatus = transaction {
+                        FavoriteQuizzesEntity.find { FavoriteQuizzesTable.user eq dbUser.id and (FavoriteQuizzesTable.quiz eq dbQuiz.id) }
+                    }.firstOrNull()
+
+                    this.likedByYou = favoriteStatus != null && favoriteStatus.isActive
+                }
+        }, HttpStatusCode.Found)
+    }
+
+    fun quizChangeFavoriteStatus(quizId: UUID, session: UserSession): NetworkResource<Unit> {
+        val dbUser = transaction {
+            UserEntity.findById(session.userId)
+        }!!
+
+        val dbQuiz = transaction {
+            QuizEntity.findById(quizId)
+        }
+
+        if (dbQuiz == null ||
+            transaction {
+                !dbQuiz.isActive || !dbQuiz.isPublic && dbQuiz.quizCreator.id != dbUser.id
+            }
+        )
+            return NetworkResource.Error(HttpStatusCode.NotFound)
+
+        val favoriteStatus = transaction {
+            FavoriteQuizzesEntity.find { FavoriteQuizzesTable.user eq dbUser.id and (FavoriteQuizzesTable.quiz eq dbQuiz.id) }
+                .firstOrNull()
+        }
+
+        if (favoriteStatus == null) {
+            transaction {
+                FavoriteQuizzesEntity.new {
+                    user = dbUser
+                    quiz = dbQuiz
+                }
+                dbQuiz.likesCount++
+            }
+        } else transaction {
+            favoriteStatus.isActive = !favoriteStatus.isActive
+            if (favoriteStatus.isActive) dbQuiz.likesCount++ else dbQuiz.likesCount--
+        }
+        return NetworkResource.Success(Unit)
+    }
+
+    fun quizMyFavorites(session: UserSession): NetworkResource<List<Quiz>> {
+        val dbUser = transaction {
+            UserEntity.findById(session.userId)
+        }!!
+
+        val quizzesList = transaction {
+            val favorites =
+                FavoriteQuizzesEntity.find {
+                    FavoriteQuizzesTable.user eq dbUser.id and
+                            (FavoriteQuizzesTable.isActive)
+                }
+                    .map { it.quiz.id }
+
+            QuizEntity.find {
+                QuizzesTable.isActive eq true and
+                        (QuizzesTable.isPublic eq true or (QuizzesTable.quizCreator eq dbUser.id)) and
+                        (QuizzesTable.id inList (favorites))
+            }.map { dbQuiz ->
+                dbQuiz.toDomain().apply { this.likedByYou = true }
+            }
+        }
+
+        return NetworkResource.Success(quizzesList)
     }
 }
