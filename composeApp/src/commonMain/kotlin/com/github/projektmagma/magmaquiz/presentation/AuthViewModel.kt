@@ -8,6 +8,10 @@ import androidx.lifecycle.viewModelScope
 import com.github.projektmagma.magmaquiz.data.UserRepository
 import com.github.projektmagma.magmaquiz.data.domain.User
 import com.github.projektmagma.magmaquiz.data.domain.abstraction.Resource
+import com.github.projektmagma.magmaquiz.domain.validator.validateEmail
+import com.github.projektmagma.magmaquiz.domain.validator.validateIsEmptyPassword
+import com.github.projektmagma.magmaquiz.domain.validator.validatePassword
+import com.github.projektmagma.magmaquiz.domain.validator.validateUsername
 import com.github.projektmagma.magmaquiz.presentation.model.AuthCommand
 import com.github.projektmagma.magmaquiz.presentation.model.AuthEvent
 import com.github.projektmagma.magmaquiz.presentation.model.AuthState
@@ -34,7 +38,6 @@ class AuthViewModel(
         when (command) {
             is AuthCommand.EmailChanged -> state = state.copy(email = command.email)
             is AuthCommand.PasswordChanged -> state = state.copy(password = command.password)
-            is AuthCommand.RepeatedPasswordChanged -> state = state.copy(repeatedPassword = command.repeatedPassword)
             AuthCommand.Login -> loginUser(state.email, state.password)
             AuthCommand.Register -> registerUser(state.username, state.email, state.password)
             AuthCommand.Logout -> logoutUser()
@@ -42,6 +45,16 @@ class AuthViewModel(
     }
 
     private fun loginUser(email: String, password: String) {
+        state = state.copy(
+            emailError = validateEmail(email),
+            passwordError = validateIsEmptyPassword(password)
+        )
+        
+        if (listOf(
+            state.emailError,
+            state.passwordError
+        ).any { it != null }) return
+        
         viewModelScope.launch {
             when (val result = repository.loginUser(
                 email = email,
@@ -60,6 +73,18 @@ class AuthViewModel(
     }
 
     private fun registerUser(username: String, email: String, password: String) {
+        state = state.copy(
+            usernameError = validateUsername(username),
+            emailError = validateEmail(email),
+            passwordError = validatePassword(password),
+        )
+        
+        if (listOf(
+            state.usernameError,
+            state.emailError,
+            state.passwordError,
+        ).any { it != null}) return
+        
         viewModelScope.launch {
             when (val result = repository.registerUser(
                 username = username,

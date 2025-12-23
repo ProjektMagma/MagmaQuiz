@@ -20,6 +20,10 @@ fun validatePassword(password: String): PasswordError? {
     return null
 }
 
+fun validateIsEmptyPassword(password: String): PasswordError? {
+    return PasswordError.IS_EMPTY.takeIf { password.isEmpty() }
+}
+
 enum class PasswordError: Error {
     IS_EMPTY,
     TOO_SHORT,
