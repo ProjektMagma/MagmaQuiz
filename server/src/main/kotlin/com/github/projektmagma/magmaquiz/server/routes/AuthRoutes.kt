@@ -6,9 +6,11 @@ import com.github.projektmagma.magmaquiz.data.rest.values.LoginUserValue
 import com.github.projektmagma.magmaquiz.server.controllers.AuthDataController
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import com.github.projektmagma.magmaquiz.server.data.util.respondToResource
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.request.*
+import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 
@@ -50,6 +52,11 @@ fun Application.authRoutes(authDataController: AuthDataController) {
                     val session = call.sessions.get<UserSession>()!!
 
                     call.respondToResource(authDataController.authWhoami(session))
+                }
+
+                get("/logout") {
+                    call.sessions.clear<UserSession>()
+                    call.respond(HttpStatusCode.OK)
                 }
             }
         }

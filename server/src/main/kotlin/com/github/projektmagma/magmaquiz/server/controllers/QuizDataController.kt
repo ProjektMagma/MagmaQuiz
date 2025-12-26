@@ -3,6 +3,7 @@ package com.github.projektmagma.magmaquiz.server.controllers
 import com.github.projektmagma.magmaquiz.data.domain.Quiz
 import com.github.projektmagma.magmaquiz.data.domain.abstraction.NetworkResource
 import com.github.projektmagma.magmaquiz.data.rest.values.CreateOrModifyQuizValue
+import com.github.projektmagma.magmaquiz.server.data.conversion.HasChildrenConversionCommand
 import com.github.projektmagma.magmaquiz.server.data.entities.*
 import com.github.projektmagma.magmaquiz.server.data.tables.AnswersTable
 import com.github.projektmagma.magmaquiz.server.data.tables.FavoriteQuizzesTable
@@ -153,16 +154,17 @@ class QuizDataController {
             }
 
             transaction {
-                QuestionEntity.wrapRows( // Usuń nieaktywne pytania razem z odpowiedziami
-                    QuestionsTable.select(QuestionsTable.columns)
-                        .where { QuestionsTable.id notInList existingQuestions and (QuestionsTable.quiz eq QuestionsTable.id) })
+                QuestionEntity.find { // Usuń nieaktywne pytania razem z odpowiedziami
+                    QuestionsTable.id notInList existingQuestions and (QuestionsTable.quiz eq QuestionsTable.id)
+                }
                     .forEach { q ->
                         q.isActive = false
                         q.answerList.forEach { a -> a.isActive = false }
                     }
-                AnswerEntity.wrapRows( // Usuń nieaktywne odpowiedzi
-                    AnswersTable.select(AnswersTable.columns)
-                        .where { AnswersTable.id notInList existingAnswers and (AnswersTable.question inList existingAnswers) })
+
+                AnswerEntity.find { // Usuń nieaktywne odpowiedzi
+                    AnswersTable.id notInList existingAnswers and (AnswersTable.question inList existingAnswers)
+                }
                     .forEach { it.isActive = false }
             }
         }
@@ -175,20 +177,22 @@ class QuizDataController {
         }!!
 
         val quizzesList = transaction {
-
-            val query = QuizzesTable.select(QuizzesTable.columns)
-                .where {
-                    QuizzesTable.quizName.lowerCase() like "%${stringToSearch.lowercase()}%" and QuizzesTable.isActive and QuizzesTable.isPublic
-                }
-            QuizEntity.wrapRows(query).map { dbQuiz ->
-                dbQuiz.toDomain().apply {
-                    val favoriteStatus = transaction {
-                        FavoriteQuizzesEntity.find { FavoriteQuizzesTable.user eq dbUser.id and (FavoriteQuizzesTable.quiz eq dbQuiz.id) }
-                    }.firstOrNull()
-
-                    this.likedByYou = favoriteStatus != null && favoriteStatus.isActive
-                }
+            QuizEntity.find {
+                QuizzesTable.quizName.lowerCase() like "%${stringToSearch.lowercase()}%" and
+                        QuizzesTable.isActive and QuizzesTable.isPublic
             }
+                .map { dbQuiz ->
+                    dbQuiz.toDomain(HasChildrenConversionCommand.NoChildren).apply {
+                        val favoriteStatus = transaction {
+                            FavoriteQuizzesEntity.find {
+                                FavoriteQuizzesTable.user eq dbUser.id and
+                                        (FavoriteQuizzesTable.quiz eq dbQuiz.id)
+                            }
+                        }.firstOrNull()
+
+                        this.likedByYou = favoriteStatus != null && favoriteStatus.isActive
+                    }
+                }
         }
 
         return NetworkResource.Success(
@@ -217,7 +221,7 @@ class QuizDataController {
 
 
         return NetworkResource.Success(transaction {
-            dbQuiz.toDomainWithChildren()
+            dbQuiz.toDomain(HasChildrenConversionCommand.WithChildren)
                 .apply {
                     val favoriteStatus = transaction {
                         FavoriteQuizzesEntity.find { FavoriteQuizzesTable.user eq dbUser.id and (FavoriteQuizzesTable.quiz eq dbQuiz.id) }
@@ -282,7 +286,7 @@ class QuizDataController {
                         (QuizzesTable.isPublic eq true or (QuizzesTable.quizCreator eq dbUser.id)) and
                         (QuizzesTable.id inList (favorites))
             }.map { dbQuiz ->
-                dbQuiz.toDomain().apply { this.likedByYou = true }
+                dbQuiz.toDomain(HasChildrenConversionCommand.NoChildren).apply { this.likedByYou = true }
             }
         }
 

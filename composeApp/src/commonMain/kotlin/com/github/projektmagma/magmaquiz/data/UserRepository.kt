@@ -1,6 +1,6 @@
 package com.github.projektmagma.magmaquiz.data
 
-import com.github.projektmagma.magmaquiz.data.domain.User
+import com.github.projektmagma.magmaquiz.data.domain.ThisUser
 import com.github.projektmagma.magmaquiz.data.domain.abstraction.Resource
 import com.github.projektmagma.magmaquiz.data.networking.safeCall
 import com.github.projektmagma.magmaquiz.data.rest.values.CreateUserValue
@@ -17,10 +17,10 @@ class UserRepository(
 
     private val url = "http://192.168.1.149:8080" // TODO: MOCNO TYMCZASOWE
 
-    val user = MutableStateFlow<User?>(null)
+    val thisUser = MutableStateFlow<ThisUser?>(null)
 
-    suspend fun registerUser(username: String, email: String, password: String): Resource<User, NetworkError> {
-        return safeCall<User> {
+    suspend fun registerUser(username: String, email: String, password: String): Resource<ThisUser, NetworkError> {
+        return safeCall<ThisUser> {
             httpClient.post("${url}/auth/register") {
                 contentType(ContentType.Application.Json)
                 setBody(CreateUserValue(username, email, password))
@@ -28,8 +28,8 @@ class UserRepository(
         }
     }
 
-    suspend fun loginUser(email: String, password: String): Resource<User, NetworkError> {
-        return safeCall<User> {
+    suspend fun loginUser(email: String, password: String): Resource<ThisUser, NetworkError> {
+        return safeCall<ThisUser> {
             httpClient.post("${url}/auth/login") {
                 contentType(ContentType.Application.Json)
                 setBody(LoginUserValue(email, password))

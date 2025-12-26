@@ -5,11 +5,9 @@ import com.github.projektmagma.magmaquiz.data.rest.values.ImageValue
 import com.github.projektmagma.magmaquiz.server.controllers.SettingsDataController
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import com.github.projektmagma.magmaquiz.server.data.util.respondToResource
-import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.request.*
-import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 
@@ -39,11 +37,6 @@ fun Application.settingsRoutes(settingsDataController: SettingsDataController) {
                             session, postContent
                         )
                     )
-                }
-
-                get("/logout") {
-                    call.sessions.clear<UserSession>()
-                    call.respond(HttpStatusCode.OK)
                 }
 
                 get("/delete") {
