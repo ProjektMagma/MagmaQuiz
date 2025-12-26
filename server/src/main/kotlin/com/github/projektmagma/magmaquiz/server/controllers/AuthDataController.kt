@@ -1,9 +1,10 @@
 package com.github.projektmagma.magmaquiz.server.controllers
 
-import com.github.projektmagma.magmaquiz.data.domain.User
 import com.github.projektmagma.magmaquiz.data.domain.abstraction.NetworkResource
+import com.github.projektmagma.magmaquiz.data.domain.abstraction.User
 import com.github.projektmagma.magmaquiz.data.rest.values.CreateUserValue
 import com.github.projektmagma.magmaquiz.data.rest.values.LoginUserValue
+import com.github.projektmagma.magmaquiz.server.data.conversion.UserConversionCommand
 import com.github.projektmagma.magmaquiz.server.data.entities.UserEntity
 import com.github.projektmagma.magmaquiz.server.data.tables.UsersTable
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
@@ -43,7 +44,7 @@ class AuthDataController {
         }
 
 
-        val domainUser = transaction { dbUser.toDomain() }
+        val domainUser = transaction { dbUser.toDomain(UserConversionCommand.ThisUser) }
 
         return NetworkResource.Success(domainUser)
     }
@@ -70,7 +71,7 @@ class AuthDataController {
 
         dbUser.setHashedPassword(createUserValue.userPassword)
 
-        return NetworkResource.Success(dbUser.toDomain(), HttpStatusCode.Created)
+        return NetworkResource.Success(dbUser.toDomain(UserConversionCommand.ThisUser), HttpStatusCode.Created)
     }
 
 
@@ -81,6 +82,6 @@ class AuthDataController {
 
         if (dbUser == null) return NetworkResource.Error(HttpStatusCode.NotFound)
 
-        return NetworkResource.Success(dbUser.toDomain())
+        return NetworkResource.Success(dbUser.toDomain(UserConversionCommand.ThisUser))
     }
 }

@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.projektmagma.magmaquiz.data.UserRepository
-import com.github.projektmagma.magmaquiz.data.domain.User
+import com.github.projektmagma.magmaquiz.data.domain.ThisUser
 import com.github.projektmagma.magmaquiz.data.domain.abstraction.Resource
 import com.github.projektmagma.magmaquiz.domain.validator.validateEmail
 import com.github.projektmagma.magmaquiz.domain.validator.validateIsEmptyPassword
@@ -25,8 +25,8 @@ class AuthViewModel(
     private val repository: UserRepository
 ) : ViewModel() {
 
-    private val _user: MutableStateFlow<User?> = repository.user
-    val user = _user.asStateFlow()
+    private val _thisUser: MutableStateFlow<ThisUser?> = repository.thisUser
+    val user = _thisUser.asStateFlow()
 
     var state by mutableStateOf(AuthState())
 
@@ -66,7 +66,7 @@ class AuthViewModel(
                 }
 
                 is Resource.Success -> {
-                    _user.value = result.data
+                    _thisUser.value = result.data
                     _authChannel.trySend(AuthEvent.Success)
                 }
             }
@@ -97,7 +97,7 @@ class AuthViewModel(
                 }
 
                 is Resource.Success -> {
-                    _user.value = result.data
+                    _thisUser.value = result.data
                     _authChannel.trySend(AuthEvent.Success)
                 }
             }
@@ -112,7 +112,7 @@ class AuthViewModel(
                 }
 
                 is Resource.Success -> {
-                    _user.value = null
+                    _thisUser.value = null
                     _authChannel.trySend(AuthEvent.Success)
                 }
             }
