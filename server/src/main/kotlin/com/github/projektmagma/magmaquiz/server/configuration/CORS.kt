@@ -9,5 +9,6 @@ fun Application.configureCORS() {
         anyHost()
         allowHeader(HttpHeaders.ContentType)
         allowHeader(HttpHeaders.SetCookie)
+        allowHeader("user_session")
     }
 }
