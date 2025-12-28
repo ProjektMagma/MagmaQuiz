@@ -24,7 +24,7 @@ fun UsernameTextField(
         shape = MaterialTheme.shapes.large,
         placeholder = {
             Text(
-                text = "Email",
+                text = "Username",
                 style = MaterialTheme.typography.labelMedium
             )
         },

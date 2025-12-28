@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -13,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.github.projektmagma.magmaquiz.presentation.components.EmailTextField
+import com.github.projektmagma.magmaquiz.presentation.components.NavigationAuthText
 import com.github.projektmagma.magmaquiz.presentation.components.PasswordTextField
 import com.github.projektmagma.magmaquiz.presentation.components.UsernameTextField
 import com.github.projektmagma.magmaquiz.presentation.model.AuthCommand
@@ -43,7 +45,8 @@ fun RegisterScreen(
     Column(
         modifier = Modifier
             .padding(horizontal = 32.dp)
-            .fillMaxSize(),
+            .fillMaxSize()
+            .widthIn(max = 512.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
     ) {
@@ -73,14 +76,17 @@ fun RegisterScreen(
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
-                viewModel.onCommand(AuthCommand.Login)
+                viewModel.onCommand(AuthCommand.Register)
             }
         ) {
-            Text(text = "Zaloguj")
+            Text(text = "Zarejestruj")
         }
 
-        Button(onClick = { navigateToLogin() }) {
-            Text(text = "Do Logina")
+        NavigationAuthText(
+            text1 = "Masz juz konto?",
+            text2 = "Zaloguj sie"
+        ) {
+            navigateToLogin()
         }
     }
 }

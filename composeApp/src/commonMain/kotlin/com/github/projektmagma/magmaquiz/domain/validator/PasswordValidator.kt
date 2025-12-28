@@ -14,7 +14,7 @@ fun validatePassword(password: String): PasswordError? {
     }
     
     val regex = Regex("[!@#$%&^*]+")
-    if (!password.matches(regex)){
+    if (!password.contains(regex)){
         return PasswordError.NO_SPECIAL
     }
     return null

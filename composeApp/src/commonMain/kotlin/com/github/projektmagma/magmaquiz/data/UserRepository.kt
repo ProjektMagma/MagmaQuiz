@@ -6,16 +6,19 @@ import com.github.projektmagma.magmaquiz.data.networking.safeCall
 import com.github.projektmagma.magmaquiz.data.rest.values.CreateUserValue
 import com.github.projektmagma.magmaquiz.data.rest.values.LoginUserValue
 import com.github.projektmagma.magmaquiz.domain.NetworkError
-import io.ktor.client.*
-import io.ktor.client.request.*
-import io.ktor.http.*
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class UserRepository(
     private val httpClient: HttpClient
 ) {
 
-    private val url = "http://192.168.1.149:8080" // TODO: MOCNO TYMCZASOWE
+    private val url = "http://10.0.2.2:8080" // TODO: MOCNO TYMCZASOWE
 
     val thisUser = MutableStateFlow<ThisUser?>(null)
 
@@ -36,10 +39,18 @@ class UserRepository(
             }
         }
     }
+    
+    suspend fun whoAmI(): Resource<ThisUser, NetworkError>{
+        return safeCall<ThisUser> { 
+            val result = httpClient.get("${url}/auth/whoami")
+            println("TAG: $result")
+            result
+        }
+    }
 
     suspend fun logoutUser(): Resource<Unit, NetworkError> {
         return safeCall<Unit> {
-            httpClient.get("${url}/auth/logout")
+            httpClient.get("${url}/settings/logout")
         }
     }
 }
