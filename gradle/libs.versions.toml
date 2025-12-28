@@ -4,6 +4,7 @@ android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "36"
 androidx-activity = "1.12.1"
+datastore = "1.2.0"
 exposed = "0.61.0"
 exposed-migration = "1.0.0-rc-4"
 #junit = "4.13.2"
@@ -56,6 +57,9 @@ androidx-navigation3-runtime = { module="androidx.navigation3:navigation3-runtim
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref="nav3Core"}
 androidx-navigation3-adaptive = { module = "androidx.compose.material3.adaptive:adaptive-navigation3", version.ref="nav3Material"}
 androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycleViewmodel" }
+
+androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 
 material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "material-icons" }
 slf4j-android = { module = "org.slf4j:slf4j-android", version.ref = "slf4j" }

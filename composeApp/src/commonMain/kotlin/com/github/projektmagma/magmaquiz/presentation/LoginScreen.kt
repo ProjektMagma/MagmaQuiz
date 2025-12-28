@@ -1,11 +1,6 @@
 package com.github.projektmagma.magmaquiz.presentation
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -74,6 +69,15 @@ fun LoginScreen(
             }
         ) {
             Text(text = "Zaloguj")
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+                viewModel.onCommand(AuthCommand.WhoAmI)
+            }
+        ) {
+            Text(text = "Whoami")
         }
 
         NavigationAuthText(

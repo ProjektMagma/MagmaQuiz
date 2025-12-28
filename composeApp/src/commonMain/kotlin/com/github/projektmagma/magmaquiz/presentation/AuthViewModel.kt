@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.projektmagma.magmaquiz.data.UserRepository
-import com.github.projektmagma.magmaquiz.data.domain.ThisUser
 import com.github.projektmagma.magmaquiz.data.domain.abstraction.Resource
 import com.github.projektmagma.magmaquiz.domain.validator.validateEmail
 import com.github.projektmagma.magmaquiz.domain.validator.validateIsEmptyPassword
@@ -16,8 +15,6 @@ import com.github.projektmagma.magmaquiz.presentation.model.AuthCommand
 import com.github.projektmagma.magmaquiz.presentation.model.AuthEvent
 import com.github.projektmagma.magmaquiz.presentation.model.AuthState
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
@@ -25,9 +22,7 @@ class AuthViewModel(
     private val repository: UserRepository
 ) : ViewModel() {
 
-    private val _thisUser: MutableStateFlow<ThisUser?> = repository.thisUser
-    val user = _thisUser.asStateFlow()
-
+    val thisUser = repository.thisUser
     var state by mutableStateOf(AuthState())
 
     private val _authChannel = Channel<AuthEvent>()
@@ -42,6 +37,7 @@ class AuthViewModel(
             AuthCommand.Login -> loginUser(state.email, state.password)
             AuthCommand.Register -> registerUser(state.username, state.email, state.password)
             AuthCommand.Logout -> logoutUser()
+            AuthCommand.WhoAmI -> whoAmI()
         }
     }
 
@@ -50,12 +46,13 @@ class AuthViewModel(
             emailError = validateEmail(email),
             passwordError = validateIsEmptyPassword(password)
         )
-        
+
         if (listOf(
-            state.emailError,
-            state.passwordError
-        ).any { it != null }) return
-        
+                state.emailError,
+                state.passwordError
+            ).any { it != null }
+        ) return
+
         viewModelScope.launch {
             when (val result = repository.loginUser(
                 email = email,
@@ -66,7 +63,6 @@ class AuthViewModel(
                 }
 
                 is Resource.Success -> {
-                    _thisUser.value = result.data
                     _authChannel.trySend(AuthEvent.Success)
                 }
             }
@@ -79,13 +75,14 @@ class AuthViewModel(
             emailError = validateEmail(email),
             passwordError = validatePassword(password),
         )
-        
+
         if (listOf(
-            state.usernameError,
-            state.emailError,
-            state.passwordError,
-        ).any { it != null}) return
-        
+                state.usernameError,
+                state.emailError,
+                state.passwordError,
+            ).any { it != null }
+        ) return
+
         viewModelScope.launch {
             when (val result = repository.registerUser(
                 username = username,
@@ -97,7 +94,6 @@ class AuthViewModel(
                 }
 
                 is Resource.Success -> {
-                    _thisUser.value = result.data
                     _authChannel.trySend(AuthEvent.Success)
                 }
             }
@@ -112,7 +108,20 @@ class AuthViewModel(
                 }
 
                 is Resource.Success -> {
-                    _thisUser.value = null
+                    _authChannel.trySend(AuthEvent.Success)
+                }
+            }
+        }
+    }
+
+    private fun whoAmI() {
+        viewModelScope.launch {
+            when (val result = repository.whoAmI()) {
+                is Resource.Error -> {
+                    _authChannel.trySend(AuthEvent.Failure(result.error))
+                }
+
+                is Resource.Success -> {
                     _authChannel.trySend(AuthEvent.Success)
                 }
             }

@@ -20,8 +20,8 @@ fun HomeScreen(
     navigateToLogin: () -> Unit
 ) {
     val viewModel = koinViewModel<AuthViewModel>()
-    val user = viewModel.user.collectAsStateWithLifecycle()
-    
+    val thisUser = viewModel.thisUser.collectAsStateWithLifecycle()
+
     LaunchedEffect(viewModel.authChannel) {
         viewModel.authChannel.collect { event ->
             when (event) {
@@ -35,13 +35,13 @@ fun HomeScreen(
             }
         }
     }
-    
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("Hello ${user.value?.userName}!")
+        Text("Hello ${thisUser.value?.userName}!")
 
         Button(onClick = {
             viewModel.onCommand(AuthCommand.Logout)

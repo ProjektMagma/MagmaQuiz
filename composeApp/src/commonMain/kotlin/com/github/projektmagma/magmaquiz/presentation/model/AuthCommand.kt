@@ -7,4 +7,6 @@ sealed interface AuthCommand {
     data object Login : AuthCommand
     data object Register : AuthCommand
     data object Logout : AuthCommand
+    data object WhoAmI : AuthCommand
 }
+

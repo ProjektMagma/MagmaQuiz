@@ -2,55 +2,34 @@ package com.github.projektmagma.magmaquiz.data
 
 import com.github.projektmagma.magmaquiz.data.domain.ThisUser
 import com.github.projektmagma.magmaquiz.data.domain.abstraction.Resource
-import com.github.projektmagma.magmaquiz.data.networking.safeCall
-import com.github.projektmagma.magmaquiz.data.rest.values.CreateUserValue
-import com.github.projektmagma.magmaquiz.data.rest.values.LoginUserValue
+import com.github.projektmagma.magmaquiz.data.domain.abstraction.whenError
+import com.github.projektmagma.magmaquiz.data.domain.abstraction.whenSuccess
 import com.github.projektmagma.magmaquiz.domain.NetworkError
-import io.ktor.client.HttpClient
-import io.ktor.client.request.get
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class UserRepository(
-    private val httpClient: HttpClient
+    private val authService: AuthService
 ) {
 
-    private val url = "http://10.0.2.2:8080" // TODO: MOCNO TYMCZASOWE
-
-    val thisUser = MutableStateFlow<ThisUser?>(null)
+    private val _thisUser = MutableStateFlow<ThisUser?>(null)
+    val thisUser = _thisUser.asStateFlow()
 
     suspend fun registerUser(username: String, email: String, password: String): Resource<ThisUser, NetworkError> {
-        return safeCall<ThisUser> {
-            httpClient.post("${url}/auth/register") {
-                contentType(ContentType.Application.Json)
-                setBody(CreateUserValue(username, email, password))
-            }
-        }
+        return authService.registerUser(username, email, password).whenSuccess { _thisUser.value = it.data }
     }
 
+
     suspend fun loginUser(email: String, password: String): Resource<ThisUser, NetworkError> {
-        return safeCall<ThisUser> {
-            httpClient.post("${url}/auth/login") {
-                contentType(ContentType.Application.Json)
-                setBody(LoginUserValue(email, password))
-            }
-        }
+        return authService.loginUser(email, password).whenSuccess { _thisUser.value = it.data }
+
     }
-    
-    suspend fun whoAmI(): Resource<ThisUser, NetworkError>{
-        return safeCall<ThisUser> { 
-            val result = httpClient.get("${url}/auth/whoami")
-            println("TAG: $result")
-            result
-        }
+
+    suspend fun whoAmI(): Resource<ThisUser, NetworkError> {
+        return authService.whoAmI().whenSuccess { _thisUser.value = it.data }
     }
 
     suspend fun logoutUser(): Resource<Unit, NetworkError> {
-        return safeCall<Unit> {
-            httpClient.get("${url}/settings/logout")
-        }
+        return authService.logoutUser().whenError { _thisUser.value = null }
     }
 }
