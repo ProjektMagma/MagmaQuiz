@@ -10,12 +10,14 @@ import kotlinx.coroutines.flow.map
 
 class ApiDataStore(private val dataStore: DataStore<Preferences>) {
 
+    companion object {
+        val USER_SESSION_KEY = stringPreferencesKey("user_session")
+    }
 
     suspend fun setSessionHeader(userSessionString: String): Boolean {
         try {
             dataStore.edit {
-                val userSession = stringPreferencesKey("user_session")
-                it[userSession] = userSessionString
+                it[USER_SESSION_KEY] = userSessionString
             }
         } catch (_: IOException) {
             return false
@@ -25,8 +27,7 @@ class ApiDataStore(private val dataStore: DataStore<Preferences>) {
 
     suspend fun getSessionHeader(): String {
         return dataStore.data.map {
-            val userSession = stringPreferencesKey("user_session")
-            it[userSession] ?: ""
+            it[USER_SESSION_KEY] ?: ""
         }.first()
     }
 }

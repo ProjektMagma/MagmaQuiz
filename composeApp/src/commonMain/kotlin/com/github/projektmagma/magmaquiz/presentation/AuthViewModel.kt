@@ -11,9 +11,9 @@ import com.github.projektmagma.magmaquiz.domain.validator.validateEmail
 import com.github.projektmagma.magmaquiz.domain.validator.validateIsEmptyPassword
 import com.github.projektmagma.magmaquiz.domain.validator.validatePassword
 import com.github.projektmagma.magmaquiz.domain.validator.validateUsername
-import com.github.projektmagma.magmaquiz.presentation.model.AuthCommand
-import com.github.projektmagma.magmaquiz.presentation.model.AuthEvent
-import com.github.projektmagma.magmaquiz.presentation.model.AuthState
+import com.github.projektmagma.magmaquiz.presentation.model.auth.AuthCommand
+import com.github.projektmagma.magmaquiz.presentation.model.auth.AuthEvent
+import com.github.projektmagma.magmaquiz.presentation.model.auth.AuthState
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch

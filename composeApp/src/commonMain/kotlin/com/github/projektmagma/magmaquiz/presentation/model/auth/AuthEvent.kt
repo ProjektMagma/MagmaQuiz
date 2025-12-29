@@ -1,4 +1,4 @@
-package com.github.projektmagma.magmaquiz.presentation.model
+package com.github.projektmagma.magmaquiz.presentation.model.auth
 
 import com.github.projektmagma.magmaquiz.domain.NetworkError
 

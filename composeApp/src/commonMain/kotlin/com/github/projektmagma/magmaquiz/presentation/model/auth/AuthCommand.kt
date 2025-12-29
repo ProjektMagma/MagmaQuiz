@@ -1,4 +1,4 @@
-package com.github.projektmagma.magmaquiz.presentation.model
+package com.github.projektmagma.magmaquiz.presentation.model.auth
 
 sealed interface AuthCommand {
     data class UsernameChanged(val username: String) : AuthCommand
@@ -9,4 +9,3 @@ sealed interface AuthCommand {
     data object Logout : AuthCommand
     data object WhoAmI : AuthCommand
 }
-

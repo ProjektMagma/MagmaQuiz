@@ -1,6 +1,11 @@
 package com.github.projektmagma.magmaquiz.presentation
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -11,8 +16,8 @@ import androidx.compose.ui.unit.dp
 import com.github.projektmagma.magmaquiz.presentation.components.EmailTextField
 import com.github.projektmagma.magmaquiz.presentation.components.NavigationAuthText
 import com.github.projektmagma.magmaquiz.presentation.components.PasswordTextField
-import com.github.projektmagma.magmaquiz.presentation.model.AuthCommand
-import com.github.projektmagma.magmaquiz.presentation.model.AuthEvent
+import com.github.projektmagma.magmaquiz.presentation.model.auth.AuthCommand
+import com.github.projektmagma.magmaquiz.presentation.model.auth.AuthEvent
 import com.github.projektmagma.magmaquiz.util.SnackbarController
 import org.koin.compose.viewmodel.koinViewModel
 

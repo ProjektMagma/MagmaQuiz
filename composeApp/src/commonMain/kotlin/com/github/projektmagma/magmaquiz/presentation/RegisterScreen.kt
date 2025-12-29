@@ -17,8 +17,8 @@ import com.github.projektmagma.magmaquiz.presentation.components.EmailTextField
 import com.github.projektmagma.magmaquiz.presentation.components.NavigationAuthText
 import com.github.projektmagma.magmaquiz.presentation.components.PasswordTextField
 import com.github.projektmagma.magmaquiz.presentation.components.UsernameTextField
-import com.github.projektmagma.magmaquiz.presentation.model.AuthCommand
-import com.github.projektmagma.magmaquiz.presentation.model.AuthEvent
+import com.github.projektmagma.magmaquiz.presentation.model.auth.AuthCommand
+import com.github.projektmagma.magmaquiz.presentation.model.auth.AuthEvent
 import com.github.projektmagma.magmaquiz.util.SnackbarController
 import org.koin.compose.viewmodel.koinViewModel
 

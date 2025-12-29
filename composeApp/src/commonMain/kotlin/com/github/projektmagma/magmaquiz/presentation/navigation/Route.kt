@@ -12,6 +12,12 @@ sealed interface Route : NavKey {
 
         @Serializable
         data object Register : Route
+        
+        @Serializable
+        data object OnBoarding : Route
+        
+        @Serializable
+        data object ServerConfig : Route
     }
 
     @Serializable

@@ -6,20 +6,27 @@ import com.github.projektmagma.magmaquiz.data.networking.safeCall
 import com.github.projektmagma.magmaquiz.data.rest.values.CreateUserValue
 import com.github.projektmagma.magmaquiz.data.rest.values.LoginUserValue
 import com.github.projektmagma.magmaquiz.domain.NetworkError
-import io.ktor.client.*
-import io.ktor.client.request.*
-import io.ktor.http.*
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 
 class AuthService(
     private val httpClient: HttpClient,
-    private val apiDataStore: ApiDataStore
-
+    private val apiDataStore: ApiDataStore,
+    private val serverConfigStore: ServerConfigDataStore
 ) {
-    private val url = "http://192.168.1.149:8080" // TODO: MOCNO TYMCZASOWE
+    private suspend fun getBaseUrl(): String {
+        val config = serverConfigStore.getServerConfig()
+        return "${config.protocol.name}://${config.ip}:${config.port}"
+    }
 
     suspend fun registerUser(username: String, email: String, password: String): Resource<ThisUser, NetworkError> {
         return safeCall<ThisUser> {
-            val result = httpClient.post("${url}/auth/register") {
+            val result = httpClient.post("${getBaseUrl()}/auth/register") {
                 contentType(ContentType.Application.Json)
                 setBody(CreateUserValue(username, email, password))
             }
@@ -30,7 +37,7 @@ class AuthService(
 
     suspend fun loginUser(email: String, password: String): Resource<ThisUser, NetworkError> {
         return safeCall<ThisUser> {
-            val result = httpClient.post("${url}/auth/login") {
+            val result = httpClient.post("${getBaseUrl()}/auth/login") {
                 contentType(ContentType.Application.Json)
                 setBody(LoginUserValue(email, password))
             }
@@ -41,7 +48,7 @@ class AuthService(
 
     suspend fun whoAmI(): Resource<ThisUser, NetworkError> {
         return safeCall<ThisUser> {
-            val result = httpClient.get("${url}/auth/whoami") {
+            val result = httpClient.get("${getBaseUrl()}/auth/whoami") {
                 header("user_session", apiDataStore.getSessionHeader())
             }
             println("TAG: $result")
@@ -51,7 +58,7 @@ class AuthService(
 
     suspend fun logoutUser(): Resource<Unit, NetworkError> {
         return safeCall<Unit> {
-            val result = httpClient.get("${url}/auth/logout") {
+            val result = httpClient.get("${getBaseUrl()}/auth/logout") {
                 header("user_session", apiDataStore.getSessionHeader())
             }
             apiDataStore.setSessionHeader("")

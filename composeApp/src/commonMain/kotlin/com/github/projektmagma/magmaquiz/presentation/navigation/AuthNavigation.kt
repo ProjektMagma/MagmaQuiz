@@ -9,7 +9,10 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.github.projektmagma.magmaquiz.presentation.LoginScreen
+import com.github.projektmagma.magmaquiz.presentation.OnBoardingScreen
 import com.github.projektmagma.magmaquiz.presentation.RegisterScreen
+import com.github.projektmagma.magmaquiz.presentation.ServerConfigScreen
+import com.github.projektmagma.magmaquiz.presentation.navigation.Route.Auth
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 
@@ -21,13 +24,23 @@ fun AuthNavigation(
         configuration = SavedStateConfiguration {
             serializersModule = SerializersModule {
                 polymorphic(NavKey::class) {
-                    subclass(Route.Auth.Login::class, Route.Auth.Login.serializer())
-                    subclass(Route.Auth.Register::class, Route.Auth.Register.serializer())
+                    subclass(Auth.Login::class, Auth.Login.serializer())
+                    subclass(Auth.Register::class, Auth.Register.serializer())
+                    subclass(Auth.OnBoarding::class, Auth.OnBoarding.serializer())
+                    subclass(Auth.ServerConfig::class, Auth.ServerConfig.serializer())
                 }
             }
         },
-        Route.Auth.Login
+        Auth.OnBoarding
     )
+    
+    fun navigateToRegister() {
+        authBackStack.add(Auth.Register)
+    }
+    
+    fun navigateToLogin() {
+        authBackStack.add(Auth.Login)
+    }
 
     NavDisplay(
         backStack = authBackStack,
@@ -36,20 +49,34 @@ fun AuthNavigation(
             rememberViewModelStoreNavEntryDecorator()
         ),
         entryProvider = entryProvider {
-            entry<Route.Auth.Login> {
+            entry<Auth.Login> {
                 LoginScreen(
                     navigateToRegister = {
-                        authBackStack.add(Route.Auth.Register)
+                        navigateToRegister()
                     },
                     navigateToHome = {
                         navigateToMain()
                     }
                 )
             }
-            entry<Route.Auth.Register> {
+            entry<Auth.Register> {
                 RegisterScreen(
                     navigateToLogin = {
-                        authBackStack.add(Route.Auth.Login)
+                        navigateToLogin()
+                    }
+                )
+            }
+            entry<Auth.OnBoarding> {
+                OnBoardingScreen(
+                    navigateToLogin = { navigateToLogin() },
+                    navigateToRegister = { navigateToRegister() },
+                    navigateToServerConfig = { authBackStack.add(Auth.ServerConfig) }
+                )
+            }
+            entry<Auth.ServerConfig> {
+                ServerConfigScreen(
+                    navigateBack = {
+                        authBackStack.removeAt(authBackStack.count() - 1)
                     }
                 )
             }

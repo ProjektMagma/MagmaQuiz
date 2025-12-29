@@ -10,8 +10,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.projektmagma.magmaquiz.presentation.model.AuthCommand
-import com.github.projektmagma.magmaquiz.presentation.model.AuthEvent
+import com.github.projektmagma.magmaquiz.presentation.model.auth.AuthCommand
+import com.github.projektmagma.magmaquiz.presentation.model.auth.AuthEvent
 import com.github.projektmagma.magmaquiz.util.SnackbarController
 import org.koin.compose.viewmodel.koinViewModel
 
