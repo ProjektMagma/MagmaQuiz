@@ -1,35 +1,45 @@
 [versions]
 agp = "8.12.3"
+kotlin = "2.3.0"
+kotlinx-coroutines = "1.10.2"
+serialization = "1.9.0"
+serialization-plugin = "2.3.0"
+
 android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "36"
-androidx-activity = "1.12.1"
-datastore = "1.2.0"
+
+androidx-activity = "1.12.2"
+androidx-lifecycle-viewmodel = "2.10.0"
+androidx-lifecycle = "2.9.6"
+androidx-datastore = "1.2.0"
+
+compose-multiplatform = "1.9.3"
+compose-hot-reload = "1.0.0"
+
+material-icons = "1.7.3"
+
+nav3-core = "1.1.0-alpha01"
+nav3-material = "1.3.0-alpha03"
+
+ktor = "3.3.3"
+
 exposed = "0.61.0"
 exposed-migration = "1.0.0-rc-4"
+
+koin = "4.1.1"
+koin-ktor = "4.1.1"
+
+logback = "1.5.23"
+postgresql = "42.7.8"
+jbcrypt = "0.4"
+slf4j = "1.7.36"
+
 #junit = "4.13.2"
 #androidx-core = "1.17.0"
 #androidx-testExt = "1.3.0"
 #androidx-espresso = "3.7.0"
 #androidx-appcompat = "1.7.1"
-androidx-lifecycle = "2.9.6"
-composeHotReload = "1.0.0"
-composeMultiplatform = "1.9.3"
-koinKtor = "4.1.1"
-kotlin = "2.2.21"
-kotlinx-coroutines = "1.10.2"
-ktor = "3.3.3"
-logback = "1.5.21"
-postgresql = "42.7.8"
-nav3Core = "1.0.0"
-nav3Material = "1.3.0-alpha05"
-lifecycleViewmodel = "2.10.0"
-serialization-plugin = "2.2.21"
-serialization = "1.9.0"
-material-icons = "1.7.3"
-koin = "4.1.1"
-jbcrypt = "0.4"
-slf4j = "1.7.36"
 
 [libraries]
 
@@ -48,21 +58,29 @@ kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.
 #androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
 
 
-# UI / ANDROID / JETPACK COMPOSE
+# UI / JETPACK COMPOSE
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
-androidx-lifecycle-viewmodelCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
-androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+jetbrains-lifecycle-viewmodelCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
+jetbrains-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 
-androidx-navigation3-runtime = { module="androidx.navigation3:navigation3-runtime", version.ref="nav3Core"}
-androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref="nav3Core"}
-androidx-navigation3-adaptive = { module = "androidx.compose.material3.adaptive:adaptive-navigation3", version.ref="nav3Material"}
-androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycleViewmodel" }
+androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "nav3-core" }
 
-androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
-androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
+jetbrains-navigation3-ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "nav3-core" }
+jetbrains-navigation3-adaptive = { module = "org.jetbrains.compose.material3.adaptive:adaptive", version.ref = "nav3-material" }
 
-material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "material-icons" }
+androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "androidx-lifecycle-viewmodel" }
+jetbrains-material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "material-icons" }
+
+
+# ANDROID
 slf4j-android = { module = "org.slf4j:slf4j-android", version.ref = "slf4j" }
+
+# DESKTOP
+
+
+# DATASTORE
+androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "androidx-datastore" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "androidx-datastore" }
 
 
 # KOIN
@@ -71,8 +89,8 @@ koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = 
 koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
 koin-compose = { group = "io.insert-koin", name = "koin-compose", version.ref = "koin" }
 koin-compose-viewModel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
-koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koinKtor" }
-koin-logger-slf4j = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koinKtor" }
+koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin-ktor" }
+koin-logger-slf4j = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin-ktor" }
 
 
 # KTOR
@@ -112,8 +130,8 @@ postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
-composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload" }
-composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
+composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "compose-hot-reload" }
+composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }

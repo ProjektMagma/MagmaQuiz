@@ -25,6 +25,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
+            runtimeOnly(libs.slf4j.android)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -33,18 +34,20 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
-            implementation(libs.androidx.lifecycle.viewmodelCompose)
-            implementation(libs.androidx.lifecycle.runtimeCompose)
-            implementation(projects.shared)
 
-            implementation(libs.material.icons.extended)
+            implementation(libs.jetbrains.lifecycle.viewmodelCompose)
+            implementation(libs.jetbrains.lifecycle.runtimeCompose)
+            implementation(libs.jetbrains.material.icons.extended)
+            
+
 
             implementation(libs.androidx.datastore)
             implementation(libs.androidx.datastore.preferences)
+
+            implementation(libs.jetbrains.navigation3.ui)
+            implementation(libs.jetbrains.navigation3.adaptive)
             
-            implementation(libs.androidx.navigation3.ui)
             implementation(libs.androidx.navigation3.runtime)
-            implementation(libs.androidx.navigation3.adaptive)
             implementation(libs.androidx.lifecycle.viewmodel.navigation3)
 
             api(libs.koin.core)
@@ -55,6 +58,8 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.content.negotiation)
+
+            implementation(projects.shared)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
