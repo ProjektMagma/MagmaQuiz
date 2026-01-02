@@ -3,6 +3,7 @@ package com.github.projektmagma.magmaquiz.di
 import com.github.projektmagma.magmaquiz.data.AuthService
 import com.github.projektmagma.magmaquiz.data.UserRepository
 import com.github.projektmagma.magmaquiz.presentation.AuthViewModel
+import com.github.projektmagma.magmaquiz.presentation.RootViewModel
 import com.github.projektmagma.magmaquiz.presentation.ServerConfigViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
@@ -20,6 +21,7 @@ val sharedModule = module {
     singleOf(::UserRepository)
     viewModelOf(::AuthViewModel)
     viewModelOf(::ServerConfigViewModel)
+    viewModelOf(::RootViewModel)
 
     single {
         HttpClient(OkHttp) {
