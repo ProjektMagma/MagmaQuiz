@@ -1,4 +1,4 @@
-package com.github.projektmagma.magmaquiz.presentation
+package com.github.projektmagma.magmaquiz.presentation.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,18 +9,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.github.projektmagma.magmaquiz.presentation.AuthViewModel
 import com.github.projektmagma.magmaquiz.presentation.model.auth.AuthCommand
 import com.github.projektmagma.magmaquiz.presentation.model.auth.AuthEvent
 import com.github.projektmagma.magmaquiz.util.SnackbarController
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun HomeScreen(
-    navigateToLogin: () -> Unit
-) {
+actual fun SettingsScreen(navigateToAuth: () -> Unit) {
+
     val viewModel = koinViewModel<AuthViewModel>()
-    val thisUser = viewModel.thisUser.collectAsStateWithLifecycle()
 
     LaunchedEffect(viewModel.authChannel) {
         viewModel.authChannel.collect { event ->
@@ -30,7 +28,7 @@ fun HomeScreen(
                 }
 
                 AuthEvent.Success -> {
-                    navigateToLogin()
+                    navigateToAuth()
                 }
             }
         }
@@ -41,8 +39,6 @@ fun HomeScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("Hello ${thisUser.value?.userName}!")
-
         Button(onClick = {
             viewModel.onCommand(AuthCommand.Logout)
         }) {

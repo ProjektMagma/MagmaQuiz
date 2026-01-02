@@ -8,11 +8,11 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
-import com.github.projektmagma.magmaquiz.presentation.LoginScreen
-import com.github.projektmagma.magmaquiz.presentation.OnBoardingScreen
-import com.github.projektmagma.magmaquiz.presentation.RegisterScreen
-import com.github.projektmagma.magmaquiz.presentation.ServerConfigScreen
 import com.github.projektmagma.magmaquiz.presentation.navigation.Route.Auth
+import com.github.projektmagma.magmaquiz.presentation.screens.LoginScreen
+import com.github.projektmagma.magmaquiz.presentation.screens.OnBoardingScreen
+import com.github.projektmagma.magmaquiz.presentation.screens.RegisterScreen
+import com.github.projektmagma.magmaquiz.presentation.screens.ServerConfigScreen
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 

@@ -1,4 +1,4 @@
-package com.github.projektmagma.magmaquiz.presentation
+package com.github.projektmagma.magmaquiz.presentation.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

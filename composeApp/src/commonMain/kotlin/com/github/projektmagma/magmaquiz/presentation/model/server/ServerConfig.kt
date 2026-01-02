@@ -1,6 +1,6 @@
 package com.github.projektmagma.magmaquiz.presentation.model.server
 
-import com.github.projektmagma.magmaquiz.presentation.Protocols
+import com.github.projektmagma.magmaquiz.presentation.screens.Protocols
 
 data class ServerConfig(
     val ip: String = "menito.eu",

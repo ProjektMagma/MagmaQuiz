@@ -5,8 +5,8 @@ import androidx.datastore.core.IOException
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.github.projektmagma.magmaquiz.presentation.Protocols
 import com.github.projektmagma.magmaquiz.presentation.model.server.ServerConfig
+import com.github.projektmagma.magmaquiz.presentation.screens.Protocols
 import kotlinx.coroutines.flow.first
 
 class ServerConfigDataStore(private val dataStore: DataStore<Preferences>) {
