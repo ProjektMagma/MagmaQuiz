@@ -1,11 +1,11 @@
 package com.github.projektmagma.magmaquiz.server.data.entities
 
-import com.github.projektmagma.magmaquiz.data.domain.Question
 import com.github.projektmagma.magmaquiz.server.data.abstraction.DomainCapable
 import com.github.projektmagma.magmaquiz.server.data.abstraction.ExtUUIDEntity
 import com.github.projektmagma.magmaquiz.server.data.conversion.ConversionCommand
 import com.github.projektmagma.magmaquiz.server.data.tables.AnswersTable
 import com.github.projektmagma.magmaquiz.server.data.tables.QuestionsTable
+import com.github.projektmagma.magmaquiz.shared.data.domain.Question
 import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.transactions.transaction

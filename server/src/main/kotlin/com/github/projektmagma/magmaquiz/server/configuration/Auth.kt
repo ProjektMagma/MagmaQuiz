@@ -1,8 +1,8 @@
 package com.github.projektmagma.magmaquiz.server.configuration
 
-import com.github.projektmagma.magmaquiz.data.domain.abstraction.NetworkResource
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import com.github.projektmagma.magmaquiz.server.data.util.respondToResource
+import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkResource
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*

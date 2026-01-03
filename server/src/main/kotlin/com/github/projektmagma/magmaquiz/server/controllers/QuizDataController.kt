@@ -1,8 +1,5 @@
 package com.github.projektmagma.magmaquiz.server.controllers
 
-import com.github.projektmagma.magmaquiz.data.domain.Quiz
-import com.github.projektmagma.magmaquiz.data.domain.abstraction.NetworkResource
-import com.github.projektmagma.magmaquiz.data.rest.values.CreateOrModifyQuizValue
 import com.github.projektmagma.magmaquiz.server.data.conversion.HasChildrenConversionCommand
 import com.github.projektmagma.magmaquiz.server.data.entities.*
 import com.github.projektmagma.magmaquiz.server.data.tables.AnswersTable
@@ -10,6 +7,9 @@ import com.github.projektmagma.magmaquiz.server.data.tables.FavoriteQuizzesTable
 import com.github.projektmagma.magmaquiz.server.data.tables.QuestionsTable
 import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesTable
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
+import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
+import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkResource
+import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
 import io.ktor.http.*
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.and

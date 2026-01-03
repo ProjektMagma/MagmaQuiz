@@ -1,10 +1,10 @@
 package com.github.projektmagma.magmaquiz.server.routes
 
-import com.github.projektmagma.magmaquiz.data.rest.values.ChangePasswordValue
-import com.github.projektmagma.magmaquiz.data.rest.values.ImageValue
 import com.github.projektmagma.magmaquiz.server.controllers.SettingsDataController
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import com.github.projektmagma.magmaquiz.server.data.util.respondToResource
+import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangePasswordValue
+import com.github.projektmagma.magmaquiz.shared.data.rest.values.ImageValue
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.request.*

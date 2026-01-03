@@ -1,10 +1,10 @@
 package com.github.projektmagma.magmaquiz.server.controllers
 
-import com.github.projektmagma.magmaquiz.data.domain.abstraction.NetworkResource
-import com.github.projektmagma.magmaquiz.data.rest.values.ChangePasswordValue
-import com.github.projektmagma.magmaquiz.data.rest.values.ImageValue
 import com.github.projektmagma.magmaquiz.server.data.entities.UserEntity
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
+import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkResource
+import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangePasswordValue
+import com.github.projektmagma.magmaquiz.shared.data.rest.values.ImageValue
 import io.ktor.http.*
 import org.jetbrains.exposed.sql.transactions.transaction
 

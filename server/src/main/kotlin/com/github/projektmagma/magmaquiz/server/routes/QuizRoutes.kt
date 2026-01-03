@@ -1,9 +1,9 @@
 package com.github.projektmagma.magmaquiz.server.routes
 
-import com.github.projektmagma.magmaquiz.data.rest.values.CreateOrModifyQuizValue
 import com.github.projektmagma.magmaquiz.server.controllers.QuizDataController
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import com.github.projektmagma.magmaquiz.server.data.util.respondToResource
+import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.request.*

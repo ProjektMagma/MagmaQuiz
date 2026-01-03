@@ -104,7 +104,7 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "com.github.projektmagma.magmaquiz.MainKt"
+        mainClass = "com.github.projektmagma.magmaquiz.app.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)

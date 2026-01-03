@@ -1,12 +1,12 @@
 package com.github.projektmagma.magmaquiz.server.data.entities
 
-import com.github.projektmagma.magmaquiz.data.domain.ForeignUser
-import com.github.projektmagma.magmaquiz.data.domain.ThisUser
-import com.github.projektmagma.magmaquiz.data.domain.abstraction.User
 import com.github.projektmagma.magmaquiz.server.data.abstraction.DomainCapable
 import com.github.projektmagma.magmaquiz.server.data.abstraction.ExtUUIDEntity
 import com.github.projektmagma.magmaquiz.server.data.conversion.UserConversionCommand
 import com.github.projektmagma.magmaquiz.server.data.tables.UsersTable
+import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
+import com.github.projektmagma.magmaquiz.shared.data.domain.ThisUser
+import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.User
 import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.transactions.transaction

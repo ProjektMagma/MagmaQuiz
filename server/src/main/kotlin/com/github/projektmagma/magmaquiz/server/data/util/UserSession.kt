@@ -1,6 +1,6 @@
 package com.github.projektmagma.magmaquiz.server.data.util
 
-import com.github.projektmagma.magmaquiz.data.domain.serializers.UUIDSerializer
+import com.github.projektmagma.magmaquiz.shared.data.domain.serializers.UUIDSerializer
 import kotlinx.serialization.Serializable
 import java.util.*
 

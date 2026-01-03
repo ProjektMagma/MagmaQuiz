@@ -1,11 +1,11 @@
 package com.github.projektmagma.magmaquiz.server.routes
 
-import com.github.projektmagma.magmaquiz.data.domain.abstraction.NetworkResource
-import com.github.projektmagma.magmaquiz.data.rest.values.CreateUserValue
-import com.github.projektmagma.magmaquiz.data.rest.values.LoginUserValue
 import com.github.projektmagma.magmaquiz.server.controllers.AuthDataController
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import com.github.projektmagma.magmaquiz.server.data.util.respondToResource
+import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkResource
+import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateUserValue
+import com.github.projektmagma.magmaquiz.shared.data.rest.values.LoginUserValue
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
