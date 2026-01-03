@@ -32,8 +32,8 @@ class ServerConfigDataStore(private val dataStore: DataStore<Preferences>) {
     suspend fun getServerConfig(): ServerConfig {
         val preferences = dataStore.data.first()
         return ServerConfig(
-            ip = preferences[SERVER_IP_KEY] ?: "",
-            port = preferences[SERVER_PORT_KEY] ?: "",
+            ip = preferences[SERVER_IP_KEY] ?: "menito.eu",
+            port = preferences[SERVER_PORT_KEY] ?: "8080",
             protocol = Protocols.valueOf(preferences[SERVER_PROTOCOL_KEY] ?: Protocols.HTTPS.name)
         )
     }
