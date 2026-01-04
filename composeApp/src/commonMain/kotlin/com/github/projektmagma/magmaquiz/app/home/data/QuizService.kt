@@ -12,6 +12,7 @@ import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import java.util.UUID
 
 class QuizService(
     private val httpClient: HttpClient,
@@ -20,11 +21,20 @@ class QuizService(
 ) {
     suspend fun getQuizByName(name: String): Resource<List<Quiz>, NetworkError>{
         return safeCall<List<Quiz>> { 
-            val result = httpClient.get("${baseUrlProvider.getBaseUrl()}/quiz/find/$name") {
+            httpClient.get("${baseUrlProvider.getBaseUrl()}/quiz/find/$name") {
                 contentType(ContentType.Application.Json)
                 header("user_session", apiDataStore.getSessionHeader())
             }
-            println("TAG ${result.bodyAsText()}")
+        }
+    }
+    
+    suspend fun getQuizById(id: UUID): Resource<Quiz, NetworkError> {
+        return safeCall<Quiz> { 
+            val result = httpClient.get("${baseUrlProvider.getBaseUrl()}/quiz/$id") { 
+                contentType(ContentType.Application.Json)
+                header("user_session", apiDataStore.getSessionHeader())
+            }
+            println("ODPYTYWANIE PO ID ${result.bodyAsText()} ${result.status.value}")
             result
         }
     }

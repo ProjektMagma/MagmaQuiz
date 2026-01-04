@@ -8,6 +8,7 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.ServerConfigViewM
 import com.github.projektmagma.magmaquiz.app.core.util.BaseUrlProvider
 import com.github.projektmagma.magmaquiz.app.home.data.QuizRepository
 import com.github.projektmagma.magmaquiz.app.home.data.QuizService
+import com.github.projektmagma.magmaquiz.app.home.presentation.QuizDetailsViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.QuizViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
@@ -30,6 +31,7 @@ val sharedModule = module {
     viewModelOf(::ServerConfigViewModel)
     viewModelOf(::RootViewModel)
     viewModelOf(::QuizViewModel)
+    viewModelOf(::QuizDetailsViewModel)
 
     single {
         HttpClient(OkHttp) {

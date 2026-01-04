@@ -1,7 +1,9 @@
 package com.github.projektmagma.magmaquiz.app.core.presentation.navigation
 
 import androidx.navigation3.runtime.NavKey
+import com.github.projektmagma.magmaquiz.shared.data.domain.serializers.UUIDSerializer
 import kotlinx.serialization.Serializable
+import java.util.UUID
 
 @Serializable
 sealed interface Route : NavKey {
@@ -31,16 +33,19 @@ sealed interface Route : NavKey {
         @Serializable
         data object Play : Route {
             @Serializable
-            data object Singleplayer
+            data object Singleplayer : Route
 
             @Serializable
-            data object Multiplayer
+            data object Multiplayer : Route
         }
 
         @Serializable
         data object Quizzes : Route {
             @Serializable
             data object Find : Route
+
+            @Serializable
+            data class Details(@Serializable(UUIDSerializer::class) val id: UUID) : Route
 
             @Serializable
             data object Favorites : Route

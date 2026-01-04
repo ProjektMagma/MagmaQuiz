@@ -17,9 +17,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.projektmagma.magmaquiz.app.home.presentation.QuizViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.QuizCard
 import org.koin.compose.viewmodel.koinViewModel
+import java.util.UUID
 
 @Composable
 fun QuizzesScreen(
+    navigateToQuizDetails: (id: UUID) -> Unit,
     quizViewModel: QuizViewModel = koinViewModel()
 ) {
     val quizzes by quizViewModel.quizzes.collectAsStateWithLifecycle()
@@ -46,7 +48,9 @@ fun QuizzesScreen(
         )
         LazyColumn {
             items(quizzes){ quiz ->
-                QuizCard(quiz)
+                QuizCard(
+                    quiz
+                ) { navigateToQuizDetails(quiz.id!!) }
             }
         }
     }
