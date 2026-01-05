@@ -20,6 +20,7 @@ suspend inline fun <reified T> responseToResult(
         401 -> Resource.Error(NetworkError.UNAUTHORIZED)
         404 -> Resource.Error(NetworkError.NOT_FOUND)
         409 ->  Resource.Error(NetworkError.CONFLICT)
+        500 -> Resource.Error(NetworkError.SERVER_ERROR)
         else -> Resource.Error(NetworkError.UNKNOWN)
     }
 }

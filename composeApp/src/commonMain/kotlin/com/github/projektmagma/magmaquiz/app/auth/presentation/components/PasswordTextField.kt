@@ -1,6 +1,8 @@
 package com.github.projektmagma.magmaquiz.app.auth.presentation.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Visibility
@@ -8,6 +10,8 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import com.github.projektmagma.magmaquiz.app.auth.domain.validator.PasswordError
@@ -16,10 +20,13 @@ import com.github.projektmagma.magmaquiz.app.auth.domain.validator.PasswordError
 fun PasswordTextField(
     passwordText: String,
     passwordError: PasswordError?,
-    onValueChange: (String) -> Unit
-){
+    imeAction: ImeAction = ImeAction.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    onValueChange: (String) -> Unit,
+
+    ) {
     var isVisible by remember { mutableStateOf(false) }
-    
+
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
         value = passwordText,
@@ -56,6 +63,8 @@ fun PasswordTextField(
             )
         },
         colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer),
-        onValueChange = { onValueChange(it) }
+        onValueChange = { onValueChange(it) },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = imeAction),
+        keyboardActions = keyboardActions
     )
 }

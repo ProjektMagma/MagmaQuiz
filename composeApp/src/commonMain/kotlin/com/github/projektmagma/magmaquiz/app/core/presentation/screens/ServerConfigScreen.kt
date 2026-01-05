@@ -9,8 +9,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.projektmagma.magmaquiz.app.core.presentation.ServerConfigViewModel
+import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.LocalEvent
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.server.ServerCommand
-import com.github.projektmagma.magmaquiz.app.core.presentation.model.server.ServerEvent
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -23,8 +23,8 @@ fun ServerConfigScreen(
     LaunchedEffect(serverConfigViewModel.serverChannel){
         serverConfigViewModel.serverChannel.collect { event ->
             when (event) {
-                ServerEvent.Failure -> SnackbarController.onEvent("Nie udalo sie zapisac")
-                ServerEvent.Success -> {
+                LocalEvent.Failure -> SnackbarController.onEvent("Nie udalo sie zapisac")
+                LocalEvent.Success -> {
                     navigateBack()
                     SnackbarController.onEvent("Pomyslnie zapisano ustawienia")
                 }

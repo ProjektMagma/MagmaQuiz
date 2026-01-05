@@ -9,5 +9,6 @@ enum class NetworkError: Error {
     MULTIPLE_CHOICES,
     NOT_FOUND,
     UNAUTHORIZED,
+    SERVER_ERROR,
     UNKNOWN
 }

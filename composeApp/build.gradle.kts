@@ -38,8 +38,8 @@ kotlin {
             implementation(libs.jetbrains.lifecycle.viewmodelCompose)
             implementation(libs.jetbrains.lifecycle.runtimeCompose)
             implementation(libs.jetbrains.material.icons.extended)
-            
 
+            implementation(libs.coil.compose)
 
             implementation(libs.androidx.datastore)
             implementation(libs.androidx.datastore.preferences)

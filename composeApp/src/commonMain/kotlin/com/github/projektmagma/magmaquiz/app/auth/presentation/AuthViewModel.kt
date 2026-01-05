@@ -11,8 +11,8 @@ import com.github.projektmagma.magmaquiz.app.auth.domain.validator.validateIsEmp
 import com.github.projektmagma.magmaquiz.app.auth.domain.validator.validatePassword
 import com.github.projektmagma.magmaquiz.app.auth.domain.validator.validateUsername
 import com.github.projektmagma.magmaquiz.app.auth.presentation.model.auth.AuthCommand
-import com.github.projektmagma.magmaquiz.app.auth.presentation.model.auth.AuthEvent
 import com.github.projektmagma.magmaquiz.app.auth.presentation.model.auth.AuthState
+import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Resource
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -25,7 +25,7 @@ class AuthViewModel(
     val thisUser = repository.thisUser
     var state by mutableStateOf(AuthState())
 
-    private val _authChannel = Channel<AuthEvent>()
+    private val _authChannel = Channel<NetworkEvent>()
     val authChannel = _authChannel.receiveAsFlow()
 
 
@@ -59,11 +59,11 @@ class AuthViewModel(
                 password = password
             )) {
                 is Resource.Error -> {
-                    _authChannel.trySend(AuthEvent.Failure(result.error))
+                    _authChannel.trySend(NetworkEvent.Failure(result.error))
                 }
 
                 is Resource.Success -> {
-                    _authChannel.trySend(AuthEvent.Success)
+                    _authChannel.trySend(NetworkEvent.Success)
                 }
             }
         }
@@ -71,9 +71,9 @@ class AuthViewModel(
 
     private fun registerUser(username: String, email: String, password: String) {
         state = state.copy(
-            usernameError = validateUsername(username),
-            emailError = validateEmail(email),
-            passwordError = validatePassword(password),
+            usernameError = validateUsername(username.trim()),
+            emailError = validateEmail(email.trim()),
+            passwordError = validatePassword(password.trim()),
         )
 
         if (listOf(
@@ -90,11 +90,11 @@ class AuthViewModel(
                 password = password
             )) {
                 is Resource.Error -> {
-                    _authChannel.trySend(AuthEvent.Failure(result.error))
+                    _authChannel.trySend(NetworkEvent.Failure(result.error))
                 }
 
                 is Resource.Success -> {
-                    _authChannel.trySend(AuthEvent.Success)
+                    _authChannel.trySend(NetworkEvent.Success)
                 }
             }
         }
@@ -104,11 +104,11 @@ class AuthViewModel(
         viewModelScope.launch {
             when (val result = repository.logoutUser()) {
                 is Resource.Error -> {
-                    _authChannel.trySend(AuthEvent.Failure(result.error))
+                    _authChannel.trySend(NetworkEvent.Failure(result.error))
                 }
 
                 is Resource.Success -> {
-                    _authChannel.trySend(AuthEvent.Success)
+                    _authChannel.trySend(NetworkEvent.Success)
                 }
             }
         }
@@ -118,11 +118,11 @@ class AuthViewModel(
         viewModelScope.launch {
             when (val result = repository.whoAmI()) {
                 is Resource.Error -> {
-                    _authChannel.trySend(AuthEvent.Failure(result.error))
+                    _authChannel.trySend(NetworkEvent.Failure(result.error))
                 }
 
                 is Resource.Success -> {
-                    _authChannel.trySend(AuthEvent.Success)
+                    _authChannel.trySend(NetworkEvent.Success)
                 }
             }
         }

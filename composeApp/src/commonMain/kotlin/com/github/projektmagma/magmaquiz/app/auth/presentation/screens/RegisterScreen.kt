@@ -1,12 +1,14 @@
 package com.github.projektmagma.magmaquiz.app.auth.presentation.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.github.projektmagma.magmaquiz.app.auth.presentation.AuthViewModel
 import com.github.projektmagma.magmaquiz.app.auth.presentation.components.EmailTextField
@@ -14,7 +16,7 @@ import com.github.projektmagma.magmaquiz.app.auth.presentation.components.Naviga
 import com.github.projektmagma.magmaquiz.app.auth.presentation.components.PasswordTextField
 import com.github.projektmagma.magmaquiz.app.auth.presentation.components.UsernameTextField
 import com.github.projektmagma.magmaquiz.app.auth.presentation.model.auth.AuthCommand
-import com.github.projektmagma.magmaquiz.app.auth.presentation.model.auth.AuthEvent
+import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -28,16 +30,17 @@ fun RegisterScreen(
     LaunchedEffect(viewModel.authChannel) {
         viewModel.authChannel.collect { event ->
             when (event) {
-                is AuthEvent.Failure -> {
+                is NetworkEvent.Failure -> {
                     SnackbarController.onEvent(event.networkError.name)
                 }
 
-                AuthEvent.Success -> {
+                NetworkEvent.Success -> {
 
                 }
             }
         }
     }
+
     Column(
         modifier = Modifier
             .padding(horizontal = 32.dp)
@@ -46,25 +49,32 @@ fun RegisterScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
     ) {
+
         Text(text = "Register")
 
         UsernameTextField(
             usernameText = state.username,
-            usernameError = state.usernameError
+            usernameError = state.usernameError,
+            imeAction = ImeAction.Next
         ) {
             viewModel.onCommand(AuthCommand.UsernameChanged(it))
         }
 
         EmailTextField(
             emailText = state.email,
-            emailError = state.emailError
+            emailError = state.emailError,
+            imeAction = ImeAction.Next
         ) {
             viewModel.onCommand(AuthCommand.EmailChanged(it))
         }
 
         PasswordTextField(
             passwordText = state.password,
-            passwordError = state.passwordError
+            passwordError = state.passwordError,
+            imeAction = ImeAction.Done,
+            keyboardActions = KeyboardActions(onDone = {
+                viewModel.onCommand(AuthCommand.Register)
+            })
         ) {
             viewModel.onCommand(AuthCommand.PasswordChanged(it))
         }

@@ -11,7 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.github.projektmagma.magmaquiz.app.auth.presentation.AuthViewModel
 import com.github.projektmagma.magmaquiz.app.auth.presentation.model.auth.AuthCommand
-import com.github.projektmagma.magmaquiz.app.auth.presentation.model.auth.AuthEvent
+import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -23,11 +23,11 @@ actual fun SettingsScreen(navigateToAuth: () -> Unit) {
     LaunchedEffect(viewModel.authChannel) {
         viewModel.authChannel.collect { event ->
             when (event) {
-                is AuthEvent.Failure -> {
+                is NetworkEvent.Failure -> {
                     SnackbarController.onEvent(event.networkError.name)
                 }
 
-                AuthEvent.Success -> {
+                NetworkEvent.Success -> {
                     navigateToAuth()
                 }
             }

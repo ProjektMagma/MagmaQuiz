@@ -22,6 +22,8 @@ material-icons = "1.7.3"
 nav3-core = "1.1.0-alpha01"
 nav3-material = "1.3.0-alpha03"
 
+coil = "3.3.0"
+
 ktor = "3.3.3"
 
 exposed = "0.61.0"
@@ -70,6 +72,7 @@ jetbrains-navigation3-adaptive = { module = "org.jetbrains.compose.material3.ada
 
 androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "androidx-lifecycle-viewmodel" }
 jetbrains-material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "material-icons" }
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 
 
 # ANDROID

@@ -1,36 +1,28 @@
 package com.github.projektmagma.magmaquiz.app.home.presentation.navigation
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.PersonAdd
-import androidx.compose.material.icons.filled.PlayCircleFilled
 import androidx.compose.material.icons.filled.Quiz
-import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
 import com.github.projektmagma.magmaquiz.app.auth.presentation.AuthViewModel
+import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route
+import com.github.projektmagma.magmaquiz.app.home.presentation.components.ProfilePictureIcon
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 actual fun MainNavMenu(
+    backStack: NavBackStack<NavKey>,
     navigateToHome: () -> Unit,
-    navigateToPlay: () -> Unit,
     navigateToQuizzes: () -> Unit,
     navigateToUsers: () -> Unit,
     navigateToSettings: () -> Unit,
@@ -53,14 +45,15 @@ actual fun MainNavMenu(
             IconButton(
                 onClick = { navigateToSettings() },
             ) {
-                // TODO: Tutaj zamiast ikonki, małe zdjęcie profilowe (64x64 lub 128x128), ale muszę to dodać na serwer
-                Icon(
-                    modifier = Modifier.size(25.dp),
-                    imageVector = Icons.Default.AccountCircle,
-                    tint = MaterialTheme.colorScheme.onPrimary,
-                    contentDescription = "SettingsButton",
-                )
-
+                if (thisUser.value!!.userProfilePicture == null)
+                    Icon(
+                        modifier = Modifier.size(25.dp),
+                        imageVector = Icons.Default.AccountCircle,
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        contentDescription = "SettingsButton",
+                    )
+                else
+                    ProfilePictureIcon(thisUser.value!!.userProfilePicture!!)
             }
         }
         Column(
@@ -88,21 +81,7 @@ actual fun MainNavMenu(
                     )
                 },
                 label = { Text("Home") },
-                selected = false,
-            )
-            NavigationBarItem(
-                onClick = {
-                    navigateToPlay()
-                },
-                icon = {
-                    Icon(
-                        imageVector = Icons.Default.PlayCircleFilled,
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        contentDescription = "PlayButton",
-                    )
-                },
-                label = { Text("Play") },
-                selected = false,
+                selected = backStack.last() == Route.Main.Home,
             )
             NavigationBarItem(
                 onClick = {
@@ -116,7 +95,7 @@ actual fun MainNavMenu(
                     )
                 },
                 label = { Text("Quizzes") },
-                selected = false,
+                selected = backStack.last() == Route.Main.Quizzes,
             )
             NavigationBarItem(
                 onClick = {
@@ -130,7 +109,7 @@ actual fun MainNavMenu(
                     )
                 },
                 label = { Text("Users") },
-                selected = false,
+                selected = backStack.last() == Route.Main.Users,
             )
         }
     }

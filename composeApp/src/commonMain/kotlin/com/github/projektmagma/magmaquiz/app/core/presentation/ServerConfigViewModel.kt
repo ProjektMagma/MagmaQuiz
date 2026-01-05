@@ -3,9 +3,9 @@ package com.github.projektmagma.magmaquiz.app.core.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.projektmagma.magmaquiz.app.core.data.ServerConfigDataStore
+import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.LocalEvent
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.server.ServerCommand
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.server.ServerConfig
-import com.github.projektmagma.magmaquiz.app.core.presentation.model.server.ServerEvent
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,8 +18,8 @@ class ServerConfigViewModel(
 ): ViewModel() {
     private val _serverConfig = MutableStateFlow(ServerConfig())
     val serverConfig = _serverConfig.asStateFlow()
-    
-    private val _serverChannel = Channel<ServerEvent>()
+
+    private val _serverChannel = Channel<LocalEvent>()
     val serverChannel = _serverChannel.receiveAsFlow()
     
     fun onCommand(serverCommand: ServerCommand){
@@ -47,8 +47,8 @@ class ServerConfigViewModel(
         viewModelScope.launch {
             val result = serverConfigDataStore.setServerConfiguration(_serverConfig.value)
             when (result) {
-                true -> _serverChannel.send(ServerEvent.Success)
-                false -> _serverChannel.send(ServerEvent.Failure)
+                true -> _serverChannel.send(LocalEvent.Success)
+                false -> _serverChannel.send(LocalEvent.Failure)
             }
         }
     }

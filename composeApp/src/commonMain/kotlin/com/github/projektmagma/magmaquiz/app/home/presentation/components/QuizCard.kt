@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
-import java.util.UUID
+import java.util.*
 
 @Composable
 fun QuizCard(
@@ -19,13 +19,11 @@ fun QuizCard(
 ) {
     Column(
         modifier = Modifier
+            .clickable {
+                navigateToQuizDetails(quiz.id!!)
+            }
             .border(2.dp, MaterialTheme.colorScheme.onPrimary, MaterialTheme.shapes.large)
             .padding(8.dp)
-            .clickable(
-                onClick = {
-                    navigateToQuizDetails(quiz.id!!) // TODO id moze byc nullem?
-                }
-            )
     ) {
         Text(text = quiz.quizName)
         Text(text = quiz.quizDescription ?: "null")

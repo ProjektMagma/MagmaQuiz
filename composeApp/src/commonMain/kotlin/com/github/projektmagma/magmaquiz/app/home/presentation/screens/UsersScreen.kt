@@ -7,41 +7,40 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.projektmagma.magmaquiz.app.home.presentation.QuizViewModel
+import com.github.projektmagma.magmaquiz.app.home.presentation.UsersViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.ContentLazyColumn
-import com.github.projektmagma.magmaquiz.app.home.presentation.components.QuizCard
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.SearchTextField
+import com.github.projektmagma.magmaquiz.app.home.presentation.components.UserCard
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.users.UsersCommand
 import org.koin.compose.viewmodel.koinViewModel
-import java.util.*
 
 @Composable
-fun QuizzesScreen(
-    navigateToQuizDetails: (id: UUID) -> Unit,
-    quizViewModel: QuizViewModel = koinViewModel()
-) {
-    val quizzes by quizViewModel.quizzes.collectAsStateWithLifecycle()
+fun UsersScreen() {
+
+    val usersViewModel: UsersViewModel = koinViewModel()
+    val userList by usersViewModel.userList.collectAsStateWithLifecycle()
+
 
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
         SearchTextField(
-            searchedText = quizViewModel.quizName,
-            labelText = "Quiz title",
+            searchedText = usersViewModel.userName,
+            labelText = "Username",
             onSearch = {
-                quizViewModel.getQuizByName()
+                usersViewModel.onCommand(UsersCommand.UserList(false))
             },
             onValueChange = {
-                quizViewModel.quizName = it
-                quizViewModel.getQuizByName(true)
+                usersViewModel.userName = it
+                usersViewModel.onCommand(UsersCommand.UserList(true))
             }
         )
+
         ContentLazyColumn {
-            items(quizzes) { quiz ->
-                QuizCard(
-                    quiz
-                ) { navigateToQuizDetails(quiz.id!!) }
+            items(userList) { user ->
+                UserCard(user)
             }
         }
     }
-
 }
+

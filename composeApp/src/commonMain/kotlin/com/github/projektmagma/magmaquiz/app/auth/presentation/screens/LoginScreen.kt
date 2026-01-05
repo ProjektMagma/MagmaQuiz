@@ -1,19 +1,21 @@
 package com.github.projektmagma.magmaquiz.app.auth.presentation.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.github.projektmagma.magmaquiz.app.auth.presentation.AuthViewModel
 import com.github.projektmagma.magmaquiz.app.auth.presentation.components.EmailTextField
 import com.github.projektmagma.magmaquiz.app.auth.presentation.components.NavigationAuthText
 import com.github.projektmagma.magmaquiz.app.auth.presentation.components.PasswordTextField
 import com.github.projektmagma.magmaquiz.app.auth.presentation.model.auth.AuthCommand
-import com.github.projektmagma.magmaquiz.app.auth.presentation.model.auth.AuthEvent
+import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -28,20 +30,20 @@ fun LoginScreen(
     LaunchedEffect(viewModel.authChannel) {
         viewModel.authChannel.collect { event ->
             when (event) {
-                is AuthEvent.Failure -> {
+                is NetworkEvent.Failure -> {
                     SnackbarController.onEvent(event.networkError.name)
                 }
 
-                AuthEvent.Success -> {
+                NetworkEvent.Success -> {
                     navigateToHome()
                 }
             }
         }
     }
-    
+
     Column(
         modifier = Modifier
-            .padding(horizontal = 48.dp)
+            .padding(horizontal = 32.dp)
             .fillMaxSize()
             .widthIn(max = 512.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -51,14 +53,19 @@ fun LoginScreen(
 
         EmailTextField(
             emailText = state.email,
-            emailError = state.emailError
+            emailError = state.emailError,
+            imeAction = ImeAction.Next
         ) {
             viewModel.onCommand(AuthCommand.EmailChanged(it))
         }
 
         PasswordTextField(
             passwordText = state.password,
-            passwordError = state.passwordError
+            passwordError = state.passwordError,
+            imeAction = ImeAction.Done,
+            keyboardActions = KeyboardActions(onDone = {
+                viewModel.onCommand(AuthCommand.Login)
+            })
         ) {
             viewModel.onCommand(AuthCommand.PasswordChanged(it))
         }
