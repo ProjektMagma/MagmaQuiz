@@ -9,10 +9,13 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route.Main.Quizzes
+import com.github.projektmagma.magmaquiz.app.home.presentation.QuizViewModel
+import com.github.projektmagma.magmaquiz.app.home.presentation.screens.GameScreen
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.QuizDetailsScreen
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.QuizzesScreen
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun QuizzesNavigation() {
@@ -22,12 +25,15 @@ fun QuizzesNavigation() {
                 polymorphic(NavKey::class) {
                     subclass(Quizzes.Find::class, Quizzes.Find.serializer())
                     subclass(Quizzes.Details::class, Quizzes.Details.serializer())
+                    subclass(Quizzes.Game::class, Quizzes.Game.serializer())
                     subclass(Quizzes.Favorites::class, Quizzes.Favorites.serializer())
                 }
             }
         },
         Quizzes.Find
     )
+    
+    val quizViewModel: QuizViewModel = koinViewModel()
 
     NavDisplay(
         backStack = quizzesBackstack,
@@ -45,7 +51,19 @@ fun QuizzesNavigation() {
             }
             entry<Quizzes.Details> {
                 QuizDetailsScreen(
-                    id = it.id
+                    id = it.id,
+                    quizViewModel = quizViewModel,
+                    navigateToPlayScreen = {
+                        quizzesBackstack.add(Quizzes.Game)
+                    }
+                )
+            }
+            entry<Quizzes.Game> {
+                GameScreen(
+                    quizViewModel = quizViewModel,
+                    navigateBack = {
+                        quizzesBackstack.removeAt(quizzesBackstack.size - 1)
+                    }
                 )
             }
             entry<Quizzes.Favorites> {

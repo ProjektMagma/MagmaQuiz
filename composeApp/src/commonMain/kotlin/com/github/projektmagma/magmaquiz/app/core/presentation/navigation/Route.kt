@@ -46,6 +46,9 @@ sealed interface Route : NavKey {
 
             @Serializable
             data class Details(@Serializable(UUIDSerializer::class) val id: UUID) : Route
+            
+            @Serializable
+            data object Game : Route
 
             @Serializable
             data object Favorites : Route

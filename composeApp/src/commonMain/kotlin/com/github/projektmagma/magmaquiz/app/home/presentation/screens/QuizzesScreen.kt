@@ -7,32 +7,32 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.projektmagma.magmaquiz.app.home.presentation.QuizViewModel
+import com.github.projektmagma.magmaquiz.app.home.presentation.QuizzesListViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.ContentLazyColumn
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.QuizCard
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.SearchTextField
 import org.koin.compose.viewmodel.koinViewModel
-import java.util.*
+import java.util.UUID
 
 @Composable
 fun QuizzesScreen(
     navigateToQuizDetails: (id: UUID) -> Unit,
-    quizViewModel: QuizViewModel = koinViewModel()
+    quizzesListViewModel: QuizzesListViewModel = koinViewModel()
 ) {
-    val quizzes by quizViewModel.quizzes.collectAsStateWithLifecycle()
+    val quizzes by quizzesListViewModel.quizzes.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
         SearchTextField(
-            searchedText = quizViewModel.quizName,
+            searchedText = quizzesListViewModel.quizName,
             labelText = "Quiz title",
             onSearch = {
-                quizViewModel.getQuizByName()
+                quizzesListViewModel.getQuizByName()
             },
             onValueChange = {
-                quizViewModel.quizName = it
-                quizViewModel.getQuizByName(true)
+                quizzesListViewModel.quizName = it
+                quizzesListViewModel.getQuizByName(true)
             }
         )
         ContentLazyColumn {
