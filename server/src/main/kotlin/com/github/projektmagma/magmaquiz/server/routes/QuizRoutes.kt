@@ -22,11 +22,17 @@ fun Application.quizRoutes(quizDataController: QuizDataController) {
 
                 }
 
+                get("/find/") {
+                    val session = call.sessions.get<UserSession>()!!
+
+                    call.respondToResource(quizDataController.quizFindByName(session))
+                }
+
                 get("/find/{stringToSearch}") {
                     val session = call.sessions.get<UserSession>()!!
-                    val stringToSearch = call.parameters["stringToSearch"]!!
+                    val stringToSearch = call.parameters["stringToSearch"]
 
-                    call.respondToResource(quizDataController.quizFindByName(stringToSearch, session))
+                    call.respondToResource(quizDataController.quizFindByName(session, stringToSearch))
                 }
 
                 post("/create") {

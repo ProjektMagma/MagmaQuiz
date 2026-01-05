@@ -171,32 +171,38 @@ class QuizDataController {
         return NetworkResource.Success(Unit)
     }
 
-    fun quizFindByName(stringToSearch: String, session: UserSession): NetworkResource<List<Quiz>> {
+    fun quizFindByName(session: UserSession, stringToSearch: String? = null): NetworkResource<List<Quiz>> {
         val dbUser = transaction {
             UserEntity.findById(session.userId)
         }!!
 
         val quizzesList = transaction {
-            QuizEntity.find {
-                QuizzesTable.quizName.lowerCase() like "%${stringToSearch.lowercase()}%" and
-                        QuizzesTable.isActive and QuizzesTable.isPublic
-            }
-                .map { dbQuiz ->
-                    dbQuiz.toDomain(HasChildrenConversionCommand.NoChildren).apply {
-                        val favoriteStatus = transaction {
-                            FavoriteQuizzesEntity.find {
-                                FavoriteQuizzesTable.user eq dbUser.id and
-                                        (FavoriteQuizzesTable.quiz eq dbQuiz.id)
-                            }
-                        }.firstOrNull()
-
-                        this.likedByYou = favoriteStatus != null && favoriteStatus.isActive
-                    }
+            if (stringToSearch.isNullOrBlank())
+                QuizEntity.find {
+                    QuizzesTable.isActive and QuizzesTable.isPublic
+                }
+                    .sortedBy { it.createdAt }
+                    .reversed()
+                    .take(100)
+            else
+                QuizEntity.find {
+                    QuizzesTable.quizName.lowerCase() like "%${stringToSearch.lowercase()}%" and
+                            QuizzesTable.isActive and QuizzesTable.isPublic
                 }
         }
 
+        val quizzesMapped = transaction {
+            quizzesList.map { dbQuiz ->
+                dbQuiz.toDomain(HasChildrenConversionCommand.NoChildren).apply {
+                    val favoriteStatus =
+                        transaction { FavoriteQuizzesEntity.find { FavoriteQuizzesTable.user eq dbUser.id and (FavoriteQuizzesTable.quiz eq dbQuiz.id) } }.firstOrNull()
+                    this.likedByYou =
+                        favoriteStatus != null && favoriteStatus.isActive
+                }
+            }
+        }
         return NetworkResource.Success(
-            quizzesList,
+            quizzesMapped,
             HttpStatusCode.PartialContent
         )
     }
@@ -229,7 +235,7 @@ class QuizDataController {
 
                     this.likedByYou = favoriteStatus != null && favoriteStatus.isActive
                 }
-        }, HttpStatusCode.Found)
+        })
     }
 
     fun quizChangeFavoriteStatus(quizId: UUID, session: UserSession): NetworkResource<Unit> {

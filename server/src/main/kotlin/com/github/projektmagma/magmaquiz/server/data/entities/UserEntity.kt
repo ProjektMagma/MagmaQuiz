@@ -21,7 +21,9 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
     var userName by UsersTable.userName
     var userEmail by UsersTable.userEmail
     var mustChangePassword by UsersTable.mustChangePassword
-    var userProfilePicture by UsersTable.userProfilePicture
+    var userBigProfilePicture by UsersTable.userBigProfilePicture
+    var userSmallProfilePicture by UsersTable.userSmallProfilePicture
+    var lastActivity by UsersTable.lastActivity
 
     override fun toDomain(command: UserConversionCommand): User {
         return transaction {
@@ -32,18 +34,19 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
                         userName = userName,
                         userEmail = userEmail,
                         mustChangePassword = mustChangePassword,
-                        userProfilePicture = userProfilePicture,
+                        userProfilePicture = userBigProfilePicture,
                         createdAt = createdAt.epochSecond,
-                        lastActivity = modifiedAt.epochSecond, // TODO: Tymczasowe, potem dodatkowe pole
+                        lastActivity = lastActivity.epochSecond,
                     )
                 }
 
-                UserConversionCommand.ForeignUserWithSmallPicture -> { // TODO: DODAĆ MAŁE ZDJĘCIA
+                UserConversionCommand.ForeignUserWithSmallPicture -> {
                     ForeignUser(
                         userId = super.id.value,
                         userName = userName,
+                        userProfilePicture = userSmallProfilePicture,
                         createdAt = createdAt.epochSecond,
-                        lastActivity = modifiedAt.epochSecond, // TODO: Tymczasowe, potem dodatkowe pole
+                        lastActivity = lastActivity.epochSecond,
                     )
                 }
 
@@ -51,9 +54,9 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
                     ForeignUser(
                         userId = super.id.value,
                         userName = userName,
-                        userProfilePicture = userProfilePicture,
+                        userProfilePicture = userBigProfilePicture,
                         createdAt = createdAt.epochSecond,
-                        lastActivity = modifiedAt.epochSecond, // TODO: Tymczasowe, potem dodatkowe pole
+                        lastActivity = lastActivity.epochSecond,
                     )
                 }
             }

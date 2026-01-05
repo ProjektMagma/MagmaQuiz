@@ -4,8 +4,7 @@ import com.github.projektmagma.magmaquiz.server.data.entities.UserEntity
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkResource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangePasswordValue
-import com.github.projektmagma.magmaquiz.shared.data.rest.values.ImageValue
-import io.ktor.http.*
+import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangeProfilePictureValue
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class SettingsDataController {
@@ -33,15 +32,21 @@ class SettingsDataController {
 
         transaction { dbUser.isActive = isActive }
 
-        return NetworkResource.Success(Unit, HttpStatusCode.Found)
+        return NetworkResource.Success(Unit)
     }
 
-    fun settingsChangeProfilePicture(session: UserSession, postContent: ImageValue): NetworkResource<Unit> {
+    fun settingsChangeProfilePicture(
+        session: UserSession,
+        postContent: ChangeProfilePictureValue
+    ): NetworkResource<Unit> {
         val dbUser = transaction {
             UserEntity.findById(session.userId)
         }!!
 
-        transaction { dbUser.userProfilePicture = postContent.image }
+        transaction {
+            dbUser.userBigProfilePicture = postContent.profilePictureBig
+            dbUser.userSmallProfilePicture = postContent.profilePictureSmall
+        }
 
         return NetworkResource.Success(Unit)
     }

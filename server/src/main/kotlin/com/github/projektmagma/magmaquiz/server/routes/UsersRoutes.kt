@@ -41,6 +41,12 @@ fun Application.usersRoutes(usersDataController: UsersDataController) {
                     }
                 }
 
+                get("/find/") {
+                    call.respondToResource(
+                        usersDataController.usersFindByUserName()
+                    )
+                }
+
                 get("/find/{userName}") {
                     val userName = call.parameters["userName"]!!
 

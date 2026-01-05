@@ -16,14 +16,23 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
 class UsersDataController {
-    fun usersFindByUserName(userName: String): NetworkResource<List<User>> {
+    fun usersFindByUserName(userName: String? = null): NetworkResource<List<User>> {
         val userList = transaction {
-            UserEntity
-                .find { UsersTable.userName.lowerCase() like "%${userName.lowercase()}%" and UsersTable.isActive }
-                .map { it.toDomain(UserConversionCommand.ForeignUserWithSmallPicture) }
+            if (userName.isNullOrBlank())
+                UserEntity.find {
+                    UsersTable.isActive eq true
+                }
+                    .sortedBy { it.createdAt }
+                    .reversed()
+                    .take(100)
+            else
+                UserEntity
+                    .find { UsersTable.userName.lowerCase() like "%${userName.lowercase()}%" and UsersTable.isActive }
         }
+        val usersMapped =
+            transaction { userList.map { it.toDomain(UserConversionCommand.ForeignUserWithSmallPicture) } }
 
-        return NetworkResource.Success(userList, HttpStatusCode.PartialContent)
+        return NetworkResource.Success(usersMapped, HttpStatusCode.PartialContent)
     }
 
     fun usersUserData(userId: UUID): NetworkResource<User> {

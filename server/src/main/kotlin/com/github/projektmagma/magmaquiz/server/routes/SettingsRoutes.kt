@@ -4,7 +4,7 @@ import com.github.projektmagma.magmaquiz.server.controllers.SettingsDataControll
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import com.github.projektmagma.magmaquiz.server.data.util.respondToResource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangePasswordValue
-import com.github.projektmagma.magmaquiz.shared.data.rest.values.ImageValue
+import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangeProfilePictureValue
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.request.*
@@ -31,7 +31,7 @@ fun Application.settingsRoutes(settingsDataController: SettingsDataController) {
 
                 post("/changeProfilePicture") {
                     val session = call.sessions.get<UserSession>()!!
-                    val postContent = call.receive<ImageValue>()
+                    val postContent = call.receive<ChangeProfilePictureValue>()
                     call.respondToResource(
                         settingsDataController.settingsChangeProfilePicture(
                             session, postContent
