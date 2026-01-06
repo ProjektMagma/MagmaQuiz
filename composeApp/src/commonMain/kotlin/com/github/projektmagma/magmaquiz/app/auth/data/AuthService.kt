@@ -45,11 +45,9 @@ class AuthService(
 
     suspend fun whoAmI(): Resource<ThisUser, NetworkError> {
         return safeCall<ThisUser> {
-            val result = httpClient.get("${baseUrlProvider.getBaseUrl()}/auth/whoami") {
+            httpClient.get("${baseUrlProvider.getBaseUrl()}/auth/whoami") {
                 header("user_session", apiDataStore.getSessionHeader())
             }
-            println("TAG: $result")
-            result
         }
     }
 

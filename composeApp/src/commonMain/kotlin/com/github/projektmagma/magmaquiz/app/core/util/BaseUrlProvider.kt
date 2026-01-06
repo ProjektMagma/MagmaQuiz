@@ -7,6 +7,7 @@ class BaseUrlProvider(
 ) {
     suspend fun getBaseUrl(): String {
         val config = serverConfigDataStore.getServerConfig()
-        return "${config.protocol.name}://${config.ip}:${config.port}"
+        val port = if (!config.port.isEmpty()) ":${config.port}" else ""
+        return "${config.protocol.name}://${config.ip}$port"
     }
 }

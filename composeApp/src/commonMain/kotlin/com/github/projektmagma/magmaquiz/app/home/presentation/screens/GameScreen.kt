@@ -61,6 +61,8 @@ fun GameScreen(
             }
         } else {
             val currentQuestion = questions[targetIndex]
+            val answerList = currentQuestion.answerList ?: emptyList()
+            
             Column(
                 modifier = Modifier
                     .fillMaxSize(),
@@ -71,7 +73,7 @@ fun GameScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
                 
-                if (currentQuestion.answerList?.size == 1) {
+                if (answerList.size == 1) {
                     var inputValue by remember { mutableStateOf("") }
                     
                     OutlinedTextField(
@@ -83,7 +85,7 @@ fun GameScreen(
                             IconButton(
                                 onClick = {
                                     currentQuestionIndex++
-                                    if (inputValue == currentQuestion.answerList?.first()?.answerContent) {
+                                    if (inputValue == answerList.first().answerContent) {
                                         correctAnswers++
                                     }
                                 }
@@ -96,7 +98,7 @@ fun GameScreen(
                         }
                     )
                 } else {
-                    currentQuestion.answerList?.forEach { answer ->
+                    answerList.forEach { answer ->
                         Button(
                             onClick = {
                                 currentQuestionIndex++

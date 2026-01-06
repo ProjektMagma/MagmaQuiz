@@ -15,4 +15,12 @@ class QuizRepository(
     suspend fun getQuizById(id: UUID): Resource<Quiz, NetworkError> {
         return quizService.getQuizById(id)
     }
+    
+    suspend fun changeFavoriteStatus(id: UUID): Resource<Unit, NetworkError> {
+        return quizService.changeFavoriteStatus(id)
+    }
+    
+    suspend fun getMyFavorites(): Resource<List<Quiz>, NetworkError> {
+        return quizService.getMyFavorites()
+    }
 }

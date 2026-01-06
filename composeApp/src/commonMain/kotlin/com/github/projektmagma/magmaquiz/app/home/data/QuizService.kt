@@ -9,7 +9,6 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Resource
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import java.util.UUID
@@ -30,12 +29,28 @@ class QuizService(
     
     suspend fun getQuizById(id: UUID): Resource<Quiz, NetworkError> {
         return safeCall<Quiz> { 
-            val result = httpClient.get("${baseUrlProvider.getBaseUrl()}/quiz/$id") { 
+            httpClient.get("${baseUrlProvider.getBaseUrl()}/quiz/$id") { 
                 contentType(ContentType.Application.Json)
                 header("user_session", apiDataStore.getSessionHeader())
             }
-            println("ODPYTYWANIE PO ID ${result.bodyAsText()} ${result.status.value}")
-            result
+        }
+    }
+    
+    suspend fun changeFavoriteStatus(id: UUID): Resource<Unit, NetworkError> {
+        return safeCall<Unit> { 
+            httpClient.get("${baseUrlProvider.getBaseUrl()}/quiz/changeFavoriteStatus/$id") {
+                contentType(ContentType.Application.Json)
+                header("user_session", apiDataStore.getSessionHeader())
+            }
+        }
+    }
+    
+    suspend fun getMyFavorites(): Resource<List<Quiz>, NetworkError> {
+        return safeCall<List<Quiz>> { 
+            httpClient.get("${baseUrlProvider.getBaseUrl()}/quiz/myFavorites") { 
+                contentType(ContentType.Application.Json)
+                header("user_session", apiDataStore.getSessionHeader())
+            }
         }
     }
 }

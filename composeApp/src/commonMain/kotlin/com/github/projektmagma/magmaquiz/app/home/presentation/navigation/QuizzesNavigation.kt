@@ -10,6 +10,7 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route.Main.Quizzes
 import com.github.projektmagma.magmaquiz.app.home.presentation.QuizViewModel
+import com.github.projektmagma.magmaquiz.app.home.presentation.screens.FavoritesQuizzesScreen
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.GameScreen
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.QuizDetailsScreen
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.QuizzesScreen
@@ -44,6 +45,9 @@ fun QuizzesNavigation() {
         entryProvider = entryProvider {
             entry<Quizzes.Find> {
                 QuizzesScreen(
+                    navigateToFavoritesScreen = {
+                        quizzesBackstack.add(Quizzes.Favorites)
+                    },
                     navigateToQuizDetails = { id ->
                         quizzesBackstack.add(Quizzes.Details(id))
                     }
@@ -67,7 +71,11 @@ fun QuizzesNavigation() {
                 )
             }
             entry<Quizzes.Favorites> {
-
+                FavoritesQuizzesScreen(
+                    navigateToQuizDetails = { id ->
+                        quizzesBackstack.add(Quizzes.Details(id))
+                    }
+                )
             }
         }
     )

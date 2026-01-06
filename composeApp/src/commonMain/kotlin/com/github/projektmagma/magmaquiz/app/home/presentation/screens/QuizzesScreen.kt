@@ -3,6 +3,8 @@ package com.github.projektmagma.magmaquiz.app.home.presentation.screens
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -16,6 +18,7 @@ import java.util.UUID
 
 @Composable
 fun QuizzesScreen(
+    navigateToFavoritesScreen: () -> Unit,
     navigateToQuizDetails: (id: UUID) -> Unit,
     quizzesListViewModel: QuizzesListViewModel = koinViewModel()
 ) {
@@ -35,11 +38,24 @@ fun QuizzesScreen(
                 quizzesListViewModel.getQuizByName(true)
             }
         )
+        TextButton(
+            onClick = {
+                navigateToFavoritesScreen()
+            },
+        ) {
+            Text(text = "Favorites")
+        }
         ContentLazyColumn {
             items(quizzes) { quiz ->
                 QuizCard(
-                    quiz
-                ) { navigateToQuizDetails(quiz.id!!) }
+                    quiz = quiz,
+                    navigateToQuizDetails = {
+                        navigateToQuizDetails(quiz.id!!)
+                    },
+                    changeFavoriteStatus = {
+                        quizzesListViewModel.changeFavoriteStatus(quiz.id!!)
+                    }
+                )
             }
         }
     }
