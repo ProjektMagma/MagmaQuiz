@@ -4,8 +4,10 @@ import com.github.projektmagma.magmaquiz.server.data.abstraction.DomainCapable
 import com.github.projektmagma.magmaquiz.server.data.abstraction.ExtUUIDEntity
 import com.github.projektmagma.magmaquiz.server.data.conversion.ConversionCommand
 import com.github.projektmagma.magmaquiz.server.data.conversion.HasChildrenConversionCommand
+import com.github.projektmagma.magmaquiz.server.data.conversion.UserConversionCommand
 import com.github.projektmagma.magmaquiz.server.data.tables.QuestionsTable
 import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesTable
+import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -26,6 +28,9 @@ class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable),
 
     override fun toDomain(command: HasChildrenConversionCommand): Quiz {
         return transaction {
+            val quizCreator = quizCreator.toDomain(UserConversionCommand.ForeignUserWithSmallPicture)
+                    as ForeignUser
+
             when (command) {
                 HasChildrenConversionCommand.WithChildren ->
                     Quiz(
@@ -34,7 +39,7 @@ class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable),
                         quizDescription = quizDescription,
                         quizImage = quizImage,
                         isPublic = isPublic,
-                        quizCreatorName = quizCreator.userName,
+                        quizCreator = quizCreator,
                         likesCount = likesCount,
                         createdAt = createdAt.epochSecond,
                         modifiedAt = modifiedAt.epochSecond,
@@ -48,10 +53,11 @@ class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable),
                         quizDescription = quizDescription,
                         quizImage = quizImage,
                         isPublic = isPublic,
-                        quizCreatorName = quizCreator.userName,
+                        quizCreator = quizCreator,
                         likesCount = likesCount,
                         createdAt = createdAt.epochSecond,
                         modifiedAt = modifiedAt.epochSecond,
+                        questionList = emptyList()
                     )
             }
         }

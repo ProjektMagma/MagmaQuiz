@@ -9,13 +9,13 @@ data class Quiz(
     @Serializable(UUIDSerializer::class)
     val id: UUID? = null,
     val quizName: String,
-    val quizDescription: String? = null,
+    val quizDescription: String,
     val quizImage: ByteArray? = null,
     val isPublic: Boolean,
-    val quizCreatorName: String? = null,
+    val quizCreator: ForeignUser,
     val likesCount: Int,
-    var likedByYou: Boolean? = null,
-    val createdAt: Long? = null,
-    val modifiedAt: Long? = null,
-    val questionList: List<Question>? = null
+    var likedByYou: Boolean = false,
+    val createdAt: Long,
+    val modifiedAt: Long,
+    val questionList: List<Question>
 )

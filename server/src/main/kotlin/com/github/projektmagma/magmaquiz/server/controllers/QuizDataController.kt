@@ -21,17 +21,15 @@ import java.util.*
 class QuizDataController {
 
     fun quizCreate(
-        createOrModifyQuizValue: CreateOrModifyQuizValue,
+        quizValue: CreateOrModifyQuizValue,
         session: UserSession
     ): NetworkResource<Unit> {
         val dbUser = transaction {
             UserEntity.findById(session.userId)
         }!!
 
-        val postQuiz = createOrModifyQuizValue.quiz
-
         val isNameAlreadyTaken = transaction {
-            !QuizEntity.find { QuizzesTable.quizName eq postQuiz.quizName }.empty()
+            !QuizEntity.find { QuizzesTable.quizName eq quizValue.quizName }.empty()
         }
 
         if (isNameAlreadyTaken)
@@ -40,19 +38,19 @@ class QuizDataController {
         transaction {
             val innerQuiz = QuizEntity.new {
                 quizCreator = dbUser
-                quizName = postQuiz.quizName
-                quizDescription = postQuiz.quizDescription
-                quizImage = postQuiz.quizImage
-                isPublic = postQuiz.isPublic
+                quizName = quizValue.quizName
+                quizDescription = quizValue.quizDescription
+                quizImage = quizValue.quizImage
+                isPublic = quizValue.isPublic
             }
-            postQuiz.questionList?.forEach { q ->
+            quizValue.questionList.forEach { q ->
                 val innerQuestion = QuestionEntity.new {
                     quiz = innerQuiz
                     questionNumber = q.questionNumber
                     questionContent = q.questionContent
                     questionImage = q.questionImage
                 }
-                q.answerList?.forEach { a ->
+                q.answerList.forEach { a ->
                     AnswerEntity.new {
                         question = innerQuestion
                         answerContent = a.answerContent
@@ -66,13 +64,11 @@ class QuizDataController {
 
     // TODO: Sprawdzić czy na pewno działa
     fun quizModify(
-        createOrModifyQuizValue: CreateOrModifyQuizValue,
+        quizValue: CreateOrModifyQuizValue,
         session: UserSession
     ): NetworkResource<Unit> {
 
-        val postQuiz = createOrModifyQuizValue.quiz
-
-        val modifiedQuiz = transaction { QuizEntity.findById(postQuiz.id!!) }
+        val modifiedQuiz = transaction { QuizEntity.findById(quizValue.id!!) }
 
         if (modifiedQuiz == null)
             return NetworkResource.Error(HttpStatusCode.NotFound)
@@ -81,25 +77,25 @@ class QuizDataController {
             return NetworkResource.Error(HttpStatusCode.Forbidden)
 
         val isNameAlreadyTaken = transaction {
-            !QuizEntity.find { QuizzesTable.quizName eq postQuiz.quizName }.empty()
+            !QuizEntity.find { QuizzesTable.quizName eq quizValue.quizName }.empty()
         }
 
-        if (isNameAlreadyTaken && transaction { postQuiz.quizName != modifiedQuiz.quizName })
+        if (isNameAlreadyTaken && transaction { quizValue.quizName != modifiedQuiz.quizName })
             return NetworkResource.Error(HttpStatusCode.Conflict)
 
         transaction {
 
             QuizEntity.findByIdAndUpdate(modifiedQuiz.id.value) {
-                it.quizName = postQuiz.quizName
-                it.quizDescription = postQuiz.quizDescription
-                it.quizImage = postQuiz.quizImage
-                it.isPublic = postQuiz.isPublic
+                it.quizName = quizValue.quizName
+                it.quizDescription = quizValue.quizDescription
+                it.quizImage = quizValue.quizImage
+                it.isPublic = quizValue.isPublic
             }
 
             val existingQuestions = mutableListOf<EntityID<UUID>>()
             val existingAnswers = mutableListOf<EntityID<UUID>>()
 
-            postQuiz.questionList?.forEach { postQuestion ->
+            quizValue.questionList.forEach { postQuestion ->
                 if (postQuestion.id != null) { // modyfikacja starych pytania
                     val q = transaction {
                         QuestionEntity.findByIdAndUpdate(postQuestion.id!!) {
@@ -109,7 +105,7 @@ class QuizDataController {
                         }!!
                     }
                     existingQuestions.add(q.id)
-                    postQuestion.answerList?.forEach { postAnswer -> // modyfikacja starych odpowiedzi
+                    postQuestion.answerList.forEach { postAnswer -> // modyfikacja starych odpowiedzi
                         if (postAnswer.id != null) {
                             val a = transaction {
                                 AnswerEntity.findByIdAndUpdate(postAnswer.id!!) {
@@ -140,7 +136,7 @@ class QuizDataController {
                     }
                     existingQuestions.add(q.id)
 
-                    postQuestion.answerList?.forEach { answer -> // nowe odpowiedzi
+                    postQuestion.answerList.forEach { answer -> // nowe odpowiedzi
                         val a = transaction {
                             AnswerEntity.new {
                                 question = q
@@ -208,8 +204,6 @@ class QuizDataController {
     }
 
     fun quizFromId(quizId: UUID, session: UserSession): NetworkResource<Quiz> {
-
-
         val dbUser = transaction {
             UserEntity.findById(session.userId)
         }!!

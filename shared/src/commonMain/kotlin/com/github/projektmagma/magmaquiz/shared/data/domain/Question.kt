@@ -12,5 +12,5 @@ data class Question(
     val questionNumber: Int,
     val questionContent: String,
     val questionImage: ByteArray? = null,
-    val answerList: List<Answer>? = null
+    val answerList: List<Answer>
 )
