@@ -1,15 +1,13 @@
 package com.github.projektmagma.magmaquiz.app.home.presentation.components
 
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.ImageNotSupported
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -18,19 +16,19 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 
 @Composable
-fun ProfilePictureIcon(imageData: ByteArray?, iconTint: Color = MaterialTheme.colorScheme.onPrimary) {
+fun ContentImage(imageData: ByteArray?) {
     if (imageData == null)
         Icon(
-            modifier = Modifier.size(25.dp),
-            imageVector = Icons.Default.AccountCircle,
-            tint = iconTint,
+            modifier = Modifier.size(200.dp),
+            imageVector = Icons.Default.ImageNotSupported,
+            tint = MaterialTheme.colorScheme.onSurface,
             contentDescription = "NoPicture",
         )
     else
         AsyncImage(
             modifier = Modifier
-                .size(50.dp)
-                .clip(MaterialTheme.shapes.small),
+                .size(200.dp)
+                .clip(MaterialTheme.shapes.large),
             model = ImageRequest.Builder(LocalPlatformContext.current)
                 .crossfade(true)
                 .data(imageData)

@@ -2,7 +2,6 @@ package com.github.projektmagma.magmaquiz.app.home.presentation.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -10,7 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.projektmagma.magmaquiz.app.home.presentation.QuizzesListViewModel
-import com.github.projektmagma.magmaquiz.app.home.presentation.components.ContentLazyColumn
+import com.github.projektmagma.magmaquiz.app.home.presentation.components.AutoScalableLazyColumn
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.QuizCard
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.SearchTextField
 import org.koin.compose.viewmodel.koinViewModel
@@ -45,19 +44,16 @@ fun QuizzesScreen(
         ) {
             Text(text = "Favorites")
         }
-        ContentLazyColumn {
-            items(quizzes) { quiz ->
-                QuizCard(
-                    quiz = quiz,
-                    navigateToQuizDetails = {
-                        navigateToQuizDetails(quiz.id!!)
-                    },
-                    changeFavoriteStatus = {
-                        quizzesListViewModel.changeFavoriteStatus(quiz.id!!)
-                    }
-                )
-            }
+        AutoScalableLazyColumn(quizzes) { quiz ->
+            QuizCard(
+                quiz = quiz,
+                navigateToQuizDetails = {
+                    navigateToQuizDetails(quiz.id!!)
+                },
+                changeFavoriteStatus = {
+                    quizzesListViewModel.changeFavoriteStatus(quiz.id!!)
+                }
+            )
         }
     }
-
 }

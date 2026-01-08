@@ -45,15 +45,7 @@ actual fun MainNavMenu(
             IconButton(
                 onClick = { navigateToSettings() },
             ) {
-                if (thisUser.value!!.userProfilePicture == null)
-                    Icon(
-                        modifier = Modifier.size(25.dp),
-                        imageVector = Icons.Default.AccountCircle,
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        contentDescription = "SettingsButton",
-                    )
-                else
-                    ProfilePictureIcon(thisUser.value!!.userProfilePicture!!)
+                ProfilePictureIcon(thisUser.value!!.userProfilePicture)
             }
         }
         Column(

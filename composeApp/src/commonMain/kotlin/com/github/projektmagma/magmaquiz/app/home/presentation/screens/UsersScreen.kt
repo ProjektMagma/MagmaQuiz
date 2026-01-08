@@ -2,13 +2,12 @@ package com.github.projektmagma.magmaquiz.app.home.presentation.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.projektmagma.magmaquiz.app.home.presentation.UsersViewModel
-import com.github.projektmagma.magmaquiz.app.home.presentation.components.ContentLazyColumn
+import com.github.projektmagma.magmaquiz.app.home.presentation.components.AutoScalableLazyColumn
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.SearchTextField
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.UserCard
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.users.UsersCommand
@@ -36,11 +35,10 @@ fun UsersScreen() {
             }
         )
 
-        ContentLazyColumn {
-            items(userList) { user ->
-                UserCard(user)
-            }
+        AutoScalableLazyColumn(userList) { user ->
+            UserCard(user, navigateToUserDetails = {}) // TODO: Szczegóły użytkownika
         }
     }
 }
+
 

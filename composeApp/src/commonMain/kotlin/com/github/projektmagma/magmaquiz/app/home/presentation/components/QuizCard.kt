@@ -1,12 +1,17 @@
 package com.github.projektmagma.magmaquiz.app.home.presentation.components
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material.icons.outlined.StarBorder
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -16,8 +21,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.github.projektmagma.magmaquiz.app.core.util.convertLongSecondsToString
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 import java.util.UUID
 
@@ -28,31 +38,80 @@ fun QuizCard(
     changeFavoriteStatus: () -> Unit
 ) {
     var isLiked by remember { mutableStateOf(quiz.likedByYou) }
-    
-    Column(
-        modifier = Modifier
-            .clickable {
-                navigateToQuizDetails(quiz.id!!)
-            }
-            .border(2.dp, MaterialTheme.colorScheme.onPrimary, MaterialTheme.shapes.large)
-            .padding(8.dp)
+
+    UniversalCardContainer(
+        onClick = {
+            navigateToQuizDetails(quiz.id!!)
+        }
     ) {
-        Text(text = quiz.quizName)
-        Text(text = quiz.quizDescription ?: "null")
-        Text(text = quiz.isPublic.toString())
-        Text(text = quiz.quizCreatorName ?: "null")
-        Text(text = quiz.likesCount.toString())
-        Text(text = isLiked.toString())
-        IconButton(
-            onClick = {
-                changeFavoriteStatus()
-                isLiked = !isLiked!!
-            }
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Icon(
-                imageVector = if (isLiked == true) Icons.Outlined.Star else Icons.Outlined.StarBorder,
-                contentDescription = "Gwiazda do polubiania"
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = quiz.quizName,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                )
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Text(
+                        modifier = Modifier.padding(bottom = 8.dp),
+                        text = "${quiz.likesCount}",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    IconButton(
+                        onClick = {
+                            changeFavoriteStatus()
+                            isLiked = !isLiked
+                        }
+                    ) {
+                        Icon(
+                            imageVector = if (isLiked) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
+                            tint = Color(0xfff498ae),
+                            contentDescription = "FavoriteButton"
+                        )
+
+                    }
+                }
+            }
+
+            Text(
+                text = quiz.quizDescription.ifBlank { "Nie podano opisu" },
+                style = MaterialTheme.typography.titleMedium
             )
+            ContentImage(quiz.quizImage)
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(text = "Stworzony przez")
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier
+                        .clip(MaterialTheme.shapes.large)
+                        .clickable {
+                            // TODO: Nawigacja (na początek zakładka users a potem szczegóły jak będą)
+                        }
+                        .padding(4.dp)
+                ) {
+                    Text(
+                        text = quiz.quizCreator.userName,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    ProfilePictureIcon(quiz.quizCreator.userProfilePicture, MaterialTheme.colorScheme.onSurface)
+                }
+            }
         }
     }
 }
