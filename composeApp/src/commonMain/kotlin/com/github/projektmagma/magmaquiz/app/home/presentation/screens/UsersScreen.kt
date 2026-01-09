@@ -11,6 +11,9 @@ import com.github.projektmagma.magmaquiz.app.home.presentation.components.AutoSc
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.SearchTextField
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.UserCard
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.users.UsersCommand
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.username
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -25,7 +28,7 @@ fun UsersScreen() {
     ) {
         SearchTextField(
             searchedText = usersViewModel.userName,
-            labelText = "Username",
+            labelText = stringResource(Res.string.username),
             onSearch = {
                 usersViewModel.onCommand(UsersCommand.UserList(false))
             },
@@ -35,7 +38,7 @@ fun UsersScreen() {
             }
         )
 
-        AutoScalableLazyColumn(userList) { user ->
+        AutoScalableLazyColumn(userList, key = { it.userId!! }) { user ->
             UserCard(user, navigateToUserDetails = {}) // TODO: Szczegóły użytkownika
         }
     }

@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -39,9 +40,11 @@ import java.util.UUID
 actual fun QuizCard(
     quiz: Quiz,
     navigateToQuizDetails: (id: UUID) -> Unit,
+    navigateToUserDetails: (id: UUID) -> Unit,
     changeFavoriteStatus: () -> Unit
 ) {
     var isLiked by remember { mutableStateOf(quiz.likedByYou) }
+    var likesCount by remember { mutableIntStateOf(quiz.likesCount) }
 
     UniversalCardContainer(
         onClick = {
@@ -66,8 +69,8 @@ actual fun QuizCard(
                         modifier = Modifier
                             .background(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.medium)
                             .clip(MaterialTheme.shapes.medium)
-                            .clickable {
-                                // TODO: Nawigacja (na początek zakładka users a potem szczegóły jak będą)
+                            .clickable{
+                                navigateToUserDetails(quiz.quizCreator.userId!!)
                             }
                             .padding(8.dp),
                         verticalAlignment = Alignment.CenterVertically
@@ -86,7 +89,7 @@ actual fun QuizCard(
                 ) {
                     Text(
                         modifier = Modifier.padding(bottom = 8.dp),
-                        text = "${quiz.likesCount}",
+                        text = "$likesCount",
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -94,6 +97,9 @@ actual fun QuizCard(
                         onClick = {
                             changeFavoriteStatus()
                             isLiked = !isLiked
+                            if (isLiked) likesCount++
+                            else likesCount--
+
                         }
                     ) {
                         Icon(
@@ -120,6 +126,8 @@ actual fun QuizCard(
             ContentImage(quiz.quizImage)
 
             Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(text = "Data stworzenia ")
@@ -130,6 +138,8 @@ actual fun QuizCard(
             }
 
             Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(text = "Data modyfikacji ")

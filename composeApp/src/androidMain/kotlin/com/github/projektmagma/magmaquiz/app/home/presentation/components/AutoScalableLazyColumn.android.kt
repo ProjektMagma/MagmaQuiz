@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 actual fun <T> AutoScalableLazyColumn(
     itemList: List<T>,
+    key: ((T) -> Any)?,
     content: @Composable ((T) -> Unit)
 ) {
     LazyColumn(
@@ -24,7 +25,7 @@ actual fun <T> AutoScalableLazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
     ) {
-        items(itemList) {
+        items(itemList, key = key) {
             content(it)
         }
     }

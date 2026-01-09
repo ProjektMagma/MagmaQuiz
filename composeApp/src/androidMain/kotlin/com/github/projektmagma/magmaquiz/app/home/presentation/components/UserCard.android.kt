@@ -12,6 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import com.github.projektmagma.magmaquiz.app.core.util.convertLongSecondsToString
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.last_activity
+import org.jetbrains.compose.resources.stringResource
 import java.util.UUID
 
 @Composable
@@ -31,7 +34,7 @@ actual fun UserCard(
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
-                Text(text = "Ostatnia aktywność ")
+                Text(text = "${stringResource(Res.string.last_activity)} ")
                 Text(
                     text = convertLongSecondsToString(user.lastActivity),
                     fontWeight = FontWeight.Bold

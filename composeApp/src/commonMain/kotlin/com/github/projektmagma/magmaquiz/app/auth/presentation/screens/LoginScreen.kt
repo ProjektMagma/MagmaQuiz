@@ -17,6 +17,11 @@ import com.github.projektmagma.magmaquiz.app.auth.presentation.components.Passwo
 import com.github.projektmagma.magmaquiz.app.auth.presentation.model.auth.AuthCommand
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.dont_have_an_account
+import magmaquiz.composeapp.generated.resources.log_in
+import magmaquiz.composeapp.generated.resources.register
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -49,7 +54,7 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
     ) {
-        Text(text = "Login")
+        Text(text = stringResource(Res.string.log_in))
 
         EmailTextField(
             emailText = state.email,
@@ -76,12 +81,12 @@ fun LoginScreen(
                 viewModel.onCommand(AuthCommand.Login)
             }
         ) {
-            Text(text = "Zaloguj")
+            Text(text = stringResource(Res.string.log_in))
         }
 
         NavigationAuthText(
-            text1 = "Nie masz konta",
-            text2 = "Zarejestruj sie"
+            text1 = stringResource(Res.string.dont_have_an_account),
+            text2 = stringResource(Res.string.register)
         ) {
             navigateToRegister()
         }

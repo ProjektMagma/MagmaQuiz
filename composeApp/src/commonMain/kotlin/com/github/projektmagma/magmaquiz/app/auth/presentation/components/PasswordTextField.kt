@@ -15,6 +15,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import com.github.projektmagma.magmaquiz.app.auth.domain.validator.PasswordError
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.password
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun PasswordTextField(
@@ -33,7 +36,7 @@ fun PasswordTextField(
         shape = MaterialTheme.shapes.large,
         placeholder = {
             Text(
-                text = "Password",
+                text = stringResource(Res.string.password),
                 style = MaterialTheme.typography.labelMedium
             )
         },

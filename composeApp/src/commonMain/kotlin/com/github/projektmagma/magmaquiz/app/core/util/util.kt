@@ -5,8 +5,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 // Jeżeli piszesz to po pół sekundy wykona funkcję
-suspend inline fun withSearchDelay(applyDelay: Boolean, body: () -> Unit) {
-    if (applyDelay) delay(500)
+suspend inline fun withSearchDelay(applyDelay: Boolean, delayInMillis: Long = 500, body: () -> Unit) {
+    if (applyDelay) delay(delayInMillis)
     body()
 }
 

@@ -1,14 +1,12 @@
 package com.github.projektmagma.magmaquiz.app.home.presentation.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
@@ -21,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -30,19 +29,25 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.github.projektmagma.magmaquiz.app.core.util.convertLongSecondsToString
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.created_at
+import magmaquiz.composeapp.generated.resources.description_not_provided
+import magmaquiz.composeapp.generated.resources.modified_at
+import org.jetbrains.compose.resources.stringResource
 import java.util.UUID
 
 @Composable
 actual fun QuizCard(
     quiz: Quiz,
     navigateToQuizDetails: (id: UUID) -> Unit,
+    navigateToUserDetails: (id: UUID) -> Unit,
     changeFavoriteStatus: () -> Unit
 ) {
     var isLiked by remember { mutableStateOf(quiz.likedByYou) }
+    var likesCount by remember { mutableIntStateOf(quiz.likesCount) }
 
     UniversalCardContainer(
         onClick = {
@@ -50,7 +55,8 @@ actual fun QuizCard(
         }
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+            modifier = Modifier.fillMaxWidth()
+                .padding(horizontal = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
@@ -73,7 +79,7 @@ actual fun QuizCard(
 
                     Text(
                         modifier = Modifier.padding(bottom = 8.dp),
-                        text = "${quiz.likesCount}",
+                        text = "$likesCount",
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -81,6 +87,8 @@ actual fun QuizCard(
                         onClick = {
                             changeFavoriteStatus()
                             isLiked = !isLiked
+                            if (isLiked) likesCount++
+                            else likesCount--
                         }
                     ) {
                         Icon(
@@ -94,21 +102,22 @@ actual fun QuizCard(
             }
 
             Text(
-                text = quiz.quizDescription.ifBlank { "Nie podano opisu" },
+                text = quiz.quizDescription.ifBlank { stringResource(Res.string.description_not_provided) },
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center
             )
             ContentImage(quiz.quizImage)
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
             ) {
                 Row(
                     modifier = Modifier
                         .background(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.medium)
                         .clip(MaterialTheme.shapes.medium)
                         .clickable {
-                            // TODO: Nawigacja (na początek zakładka users a potem szczegóły jak będą)
+                            navigateToUserDetails(quiz.quizCreator.userId!!)
                         }
                         .padding(8.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -120,21 +129,20 @@ actual fun QuizCard(
                     Spacer(modifier = Modifier.width(4.dp))
                     ProfilePictureIcon(quiz.quizCreator.userProfilePicture, 25.dp)
                 }
-                Column {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.End
                     ) {
-                        Text(text = "Data stworzenia ")
+                        Text(text = stringResource(Res.string.created_at))
                         Text(
                             text = convertLongSecondsToString(quiz.createdAt),
                             fontWeight = FontWeight.Bold
                         )
-                    }
 
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(text = "Data modyfikacji ")
+                        Text(text = stringResource(Res.string.modified_at))
                         Text(
                             text = convertLongSecondsToString(quiz.modifiedAt),
                             fontWeight = FontWeight.Bold

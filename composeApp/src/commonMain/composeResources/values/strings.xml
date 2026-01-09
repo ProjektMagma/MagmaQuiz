@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name" translatable="false">Magma Quiz</string>
+    <string name="greeting">Hello</string>
+    <string name="last_activity">Last activity</string>
+    <string name="description_not_provided">Description not provided</string>
+    <string name="created_at">Created at</string>
+    <string name="modified_at">Modified at</string>
+    <string name="home_nav">Home</string>
+    <string name="quizzes_nav">Quizzes</string>
+    <string name="users_nav">Users</string>
+    <string name="protocol">Protocol</string>
+    <string name="save">Save</string>
+    <string name="log_in">Log in</string>
+    <string name="dont_have_an_account">Don't have an account</string>
+    <string name="have_an_account">Have an account</string>
+    <string name="register">Register</string>
+    <string name="welcome_in">Welcome in</string>
+    <string name="change_server">Change server</string>
+    <string name="email" translatable="false">Email</string>
+    <string name="password">Password</string>
+    <string name="username">Username</string>
+    <string name="quiz_title">Quiz title</string>
+    <string name="log_out">Log out</string>
+    <string name="nothing_here">Nothing here</string>
+    <string name="favorites">Favorites</string>
+</resources>

@@ -12,6 +12,10 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.ServerConfigViewM
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.LocalEvent
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.server.ServerCommand
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.protocol
+import magmaquiz.composeapp.generated.resources.save
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -19,8 +23,8 @@ import org.koin.compose.viewmodel.koinViewModel
 fun ServerConfigScreen(
     navigateBack: () -> Unit,
     serverConfigViewModel: ServerConfigViewModel = koinViewModel()
-){
-    LaunchedEffect(serverConfigViewModel.serverChannel){
+) {
+    LaunchedEffect(serverConfigViewModel.serverChannel) {
         serverConfigViewModel.serverChannel.collect { event ->
             when (event) {
                 LocalEvent.Failure -> SnackbarController.onEvent("Nie udalo sie zapisac")
@@ -31,7 +35,7 @@ fun ServerConfigScreen(
             }
         }
     }
-    
+
     val serverConfig by serverConfigViewModel.serverConfig.collectAsStateWithLifecycle()
     var expanded by remember { mutableStateOf(false) }
 
@@ -51,14 +55,14 @@ fun ServerConfigScreen(
 
         ExposedDropdownMenuBox(
             expanded = expanded,
-            onExpandedChange = { expanded = !expanded}
+            onExpandedChange = { expanded = !expanded }
         ) {
             OutlinedTextField(
                 modifier = Modifier.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable),
-                readOnly = true, 
+                readOnly = true,
                 value = serverConfig.protocol.name,
                 onValueChange = {},
-                label = { Text("Protokół") },
+                label = { Text(text = stringResource(Res.string.protocol)) },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
             )
             ExposedDropdownMenu(
@@ -88,7 +92,7 @@ fun ServerConfigScreen(
                 serverConfigViewModel.onCommand(ServerCommand.SettingsSaved)
             }
         ) {
-            Text("Zapisz")
+            Text(text = stringResource(Res.string.save))
         }
     }
 }

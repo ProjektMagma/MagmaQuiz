@@ -11,6 +11,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import com.github.projektmagma.magmaquiz.app.auth.domain.validator.UsernameError
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.username
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun UsernameTextField(
@@ -26,7 +29,7 @@ fun UsernameTextField(
         shape = MaterialTheme.shapes.large,
         placeholder = {
             Text(
-                text = "Username",
+                text = stringResource(Res.string.username),
                 style = MaterialTheme.typography.labelMedium
             )
         },

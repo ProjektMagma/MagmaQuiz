@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 actual fun <T> AutoScalableLazyColumn(
     itemList: List<T>,
+    key: ((T) -> Any)?,
     content: @Composable ((T) -> Unit)
 ) {
     LazyVerticalGrid(
@@ -29,7 +30,7 @@ actual fun <T> AutoScalableLazyColumn(
         contentPadding = PaddingValues(8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        items(itemList) {
+        items(itemList, key = key) {
             content(it)
         }
     }

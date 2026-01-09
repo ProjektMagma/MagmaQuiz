@@ -11,6 +11,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavBackStack
@@ -18,6 +20,12 @@ import androidx.navigation3.runtime.NavKey
 import com.github.projektmagma.magmaquiz.app.auth.presentation.AuthViewModel
 import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.ProfilePictureIcon
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.greeting
+import magmaquiz.composeapp.generated.resources.home_nav
+import magmaquiz.composeapp.generated.resources.quizzes_nav
+import magmaquiz.composeapp.generated.resources.users_nav
+import org.jetbrains.compose.resources.stringResource
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -34,13 +42,15 @@ actual fun MainNavMenu(
 
     Column(modifier = Modifier.fillMaxSize()) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Spacer(modifier = Modifier.size(25.dp))
             Text(
-                text = "Hello, ${thisUser.value!!.userName}!",
+                text = "${stringResource(Res.string.greeting)}, ${thisUser.value!!.userName}!",
                 style = MaterialTheme.typography.titleLarge
             )
             IconButton(
@@ -73,7 +83,12 @@ actual fun MainNavMenu(
                         contentDescription = "HomeButton",
                     )
                 },
-                label = { Text("Home") },
+                label = {
+                    Text(
+                        text = stringResource(Res.string.home_nav),
+                        textAlign = TextAlign.Center
+                    )
+                },
                 selected = backStack.last() == Route.Main.Home,
             )
             NavigationBarItem(
@@ -87,7 +102,12 @@ actual fun MainNavMenu(
                         contentDescription = "QuizzesButton",
                     )
                 },
-                label = { Text("Quizzes") },
+                label = {
+                    Text(
+                        text = stringResource(Res.string.quizzes_nav),
+                        textAlign = TextAlign.Center
+                    )
+                },
                 selected = backStack.last() == Route.Main.Quizzes,
             )
             NavigationBarItem(
@@ -101,7 +121,12 @@ actual fun MainNavMenu(
                         contentDescription = "UsersButton",
                     )
                 },
-                label = { Text("Users") },
+                label = {
+                    Text(
+                        text = stringResource(Res.string.users_nav),
+                        textAlign = TextAlign.Center
+                    )
+                },
                 selected = backStack.last() == Route.Main.Users,
             )
         }

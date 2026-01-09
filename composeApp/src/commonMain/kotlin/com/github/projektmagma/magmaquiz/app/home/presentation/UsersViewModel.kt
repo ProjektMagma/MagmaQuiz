@@ -27,6 +27,9 @@ class UsersViewModel(
 
     val friendList = usersRepository.friendList
 
+    var searchLock = false
+
+
     init {
         onCommand(UsersCommand.UserList(false))
     }
@@ -42,6 +45,8 @@ class UsersViewModel(
 
     private fun userList(withDelay: Boolean = false) {
         viewModelScope.launch {
+            if (searchLock && withDelay) return@launch
+            searchLock = true
             withSearchDelay(withDelay) {
                 when (val result = usersRepository.getFindUsersByName(userName)) {
                     is Resource.Error -> {
@@ -52,6 +57,7 @@ class UsersViewModel(
                         _authChannel.trySend(NetworkEvent.Success)
                     }
                 }
+                searchLock = false
             }
         }
     }

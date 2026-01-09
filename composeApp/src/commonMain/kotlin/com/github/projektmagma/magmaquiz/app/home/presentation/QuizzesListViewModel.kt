@@ -11,6 +11,7 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -22,15 +23,22 @@ class QuizzesListViewModel(
     private val _quizzes = MutableStateFlow<List<Quiz>>(emptyList())
     val quizzes = _quizzes.asStateFlow()
 
+    val isOnFavorites = mutableStateOf(false)
+
+    var searchLock = false
+
     init {
         getQuizByName(false)
     }
-    
+
     // Todo przechwytywanie bledow
     fun getQuizByName(withDelay: Boolean = false) {
         viewModelScope.launch {
+            if (searchLock && withDelay) return@launch
+            searchLock = true
             withSearchDelay(withDelay) {
                 quizRepository.getQuizByName(quizName).whenSuccess { _quizzes.value = it.data }
+                searchLock = false
             }
         }
     }
@@ -38,6 +46,21 @@ class QuizzesListViewModel(
     fun changeFavoriteStatus(id: UUID) {
         viewModelScope.launch {
             quizRepository.changeFavoriteStatus(id)
+            _quizzes.value.first { it.id == id }.apply {
+                if (likedByYou) {
+                    likedByYou = false
+                    likesCount--
+                } else {
+                    likedByYou = true
+                    likesCount++
+                }
+            }
+        }
+    }
+
+    fun getMyFavorites() {
+        viewModelScope.launch {
+            quizRepository.getMyFavorites().whenSuccess { _quizzes.value = it.data }
         }
     }
 }

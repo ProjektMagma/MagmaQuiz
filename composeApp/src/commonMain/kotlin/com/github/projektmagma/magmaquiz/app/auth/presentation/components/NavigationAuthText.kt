@@ -16,11 +16,11 @@ fun NavigationAuthText(
     text1: String,
     text2: String,
     navigationAction: () -> Unit
-){
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = text1)
+        Text(text = "${text1}?")
         Spacer(modifier = Modifier.padding(horizontal = 2.dp))
         Text(
             modifier = Modifier

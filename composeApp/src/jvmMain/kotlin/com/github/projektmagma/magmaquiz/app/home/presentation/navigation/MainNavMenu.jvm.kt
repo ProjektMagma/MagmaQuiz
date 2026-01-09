@@ -7,14 +7,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Quiz
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -29,6 +26,12 @@ import com.github.projektmagma.magmaquiz.app.auth.presentation.AuthViewModel
 import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.NavButton
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.ProfilePictureIcon
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.greeting
+import magmaquiz.composeapp.generated.resources.home_nav
+import magmaquiz.composeapp.generated.resources.quizzes_nav
+import magmaquiz.composeapp.generated.resources.users_nav
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -66,7 +69,7 @@ actual fun MainNavMenu(
                     onClick = {
                         navigateToHome()
                     },
-                    contentLabel = "Home",
+                    contentLabel = stringResource(Res.string.home_nav),
                     contentIcon = Icons.Default.Home
                 )
                 NavButton(
@@ -74,7 +77,7 @@ actual fun MainNavMenu(
                     onClick = {
                         navigateToQuizzes()
                     },
-                    contentLabel = "Quizzes",
+                    contentLabel = stringResource(Res.string.quizzes_nav),
                     contentIcon = Icons.Default.Quiz
                 )
                 NavButton(
@@ -82,12 +85,12 @@ actual fun MainNavMenu(
                     onClick = {
                         navigateToUsers()
                     },
-                    contentLabel = "Users",
+                    contentLabel = stringResource(Res.string.users_nav),
                     contentIcon = Icons.Default.PersonAdd
                 )
             }
             Text(
-                text = "Hello, ${thisUser.value!!.userName}!",
+                text = "${stringResource(Res.string.greeting)}, ${thisUser.value!!.userName}!",
                 style = MaterialTheme.typography.titleLarge
             )
             Spacer(modifier = Modifier.width(20.dp))

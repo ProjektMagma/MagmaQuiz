@@ -18,6 +18,11 @@ import com.github.projektmagma.magmaquiz.app.auth.presentation.components.Userna
 import com.github.projektmagma.magmaquiz.app.auth.presentation.model.auth.AuthCommand
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.have_an_account
+import magmaquiz.composeapp.generated.resources.log_in
+import magmaquiz.composeapp.generated.resources.register
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -50,7 +55,7 @@ fun RegisterScreen(
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
     ) {
 
-        Text(text = "Register")
+        Text(text = stringResource(Res.string.register))
 
         UsernameTextField(
             usernameText = state.username,
@@ -85,12 +90,12 @@ fun RegisterScreen(
                 viewModel.onCommand(AuthCommand.Register)
             }
         ) {
-            Text(text = "Zarejestruj")
+            Text(text = stringResource(Res.string.register))
         }
 
         NavigationAuthText(
-            text1 = "Masz juz konto?",
-            text2 = "Zaloguj sie"
+            text1 = stringResource(Res.string.have_an_account),
+            text2 = stringResource(Res.string.log_in)
         ) {
             navigateToLogin()
         }

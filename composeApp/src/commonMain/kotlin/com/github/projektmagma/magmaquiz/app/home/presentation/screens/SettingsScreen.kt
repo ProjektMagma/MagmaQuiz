@@ -13,6 +13,9 @@ import com.github.projektmagma.magmaquiz.app.auth.presentation.AuthViewModel
 import com.github.projektmagma.magmaquiz.app.auth.presentation.model.auth.AuthCommand
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.log_out
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -42,7 +45,7 @@ fun SettingsScreen(navigateToAuth: () -> Unit) {
         Button(onClick = {
             viewModel.onCommand(AuthCommand.Logout)
         }) {
-            Text(text = "Wyloguj")
+            Text(text = stringResource(Res.string.log_out))
         }
     }
 }
