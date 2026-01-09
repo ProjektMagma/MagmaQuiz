@@ -3,6 +3,7 @@ package com.github.projektmagma.magmaquiz.app.home.data
 import com.github.projektmagma.magmaquiz.app.core.domain.NetworkError
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Resource
+import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
 import java.util.UUID
 
 class QuizRepository(
@@ -22,5 +23,9 @@ class QuizRepository(
     
     suspend fun getMyFavorites(): Resource<List<Quiz>, NetworkError> {
         return quizService.getMyFavorites()
+    }
+    
+    suspend fun createQuiz(quiz: CreateOrModifyQuizValue): Resource<Unit, NetworkError> {
+        return quizService.createQuiz(quiz)
     }
 }

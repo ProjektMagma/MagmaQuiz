@@ -40,6 +40,8 @@ kotlin {
             implementation(libs.jetbrains.material.icons.extended)
 
             implementation(libs.coil.compose)
+            
+            implementation(libs.ismoy.imagepicker)
 
             implementation(libs.androidx.datastore)
             implementation(libs.androidx.datastore.preferences)

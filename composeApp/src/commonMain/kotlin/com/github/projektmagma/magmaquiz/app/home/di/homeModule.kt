@@ -4,6 +4,7 @@ import com.github.projektmagma.magmaquiz.app.home.data.QuizRepository
 import com.github.projektmagma.magmaquiz.app.home.data.QuizService
 import com.github.projektmagma.magmaquiz.app.home.data.UsersRepository
 import com.github.projektmagma.magmaquiz.app.home.data.UsersService
+import com.github.projektmagma.magmaquiz.app.home.presentation.CreateQuizViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.FavoritesQuizzesViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.QuizViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.QuizzesListViewModel
@@ -19,6 +20,7 @@ val homeModule = module {
     viewModelOf(::QuizzesListViewModel)
     viewModelOf(::QuizViewModel)
     viewModelOf(::FavoritesQuizzesViewModel)
+    viewModelOf(::CreateQuizViewModel)
 
     // Users
     singleOf(::UsersService)

@@ -52,6 +52,9 @@ sealed interface Route : NavKey {
 
             @Serializable
             data object Favorites : Route
+            
+            @Serializable
+            data object Create: Route
         }
 
         @Serializable
