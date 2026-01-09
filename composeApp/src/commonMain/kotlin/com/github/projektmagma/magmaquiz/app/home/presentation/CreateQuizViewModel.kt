@@ -6,8 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.projektmagma.magmaquiz.app.home.data.QuizService
-import com.github.projektmagma.magmaquiz.app.home.presentation.model.AnswerState
-import com.github.projektmagma.magmaquiz.app.home.presentation.model.QuestionState
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuizCommand
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuizState
 import com.github.projektmagma.magmaquiz.shared.data.domain.Answer
@@ -27,38 +25,8 @@ class CreateQuizViewModel(
             is QuizCommand.NameChanged -> state = state.copy(name = quizCommand.name)
             is QuizCommand.VisibilityChanged -> state = state.copy(isPublic = quizCommand.isPublic)
             
-            QuizCommand.AddNewQuestion -> {
-                state = state.copy(questionList = state.questionList + QuestionState())
-            }
-            is QuizCommand.QuestionContentChanged -> {
-                val updatedList = state.questionList.map { 
-                    if (it.id == quizCommand.questionId) {
-                        it.copy(content = quizCommand.content)
-                    } else { it }
-                }
-                state = state.copy(questionList = updatedList)
-            }
-            
-            is QuizCommand.AddNewAnswer -> {
-                val updatedQuestion = state.questionList.map {
-                    if (it.id == quizCommand.questionId){
-                        it.copy(answerList = it.answerList.plus(AnswerState()))
-                    } else { it }
-                }
-                state = state.copy(questionList = updatedQuestion)
-            }
-            is QuizCommand.AnswerContentChanged -> {
-                val updatedQuestions = state.questionList.map { 
-                    if (it.id == quizCommand.questionId) {
-                        val updateAnswers = it.answerList.map { answer ->
-                            if (answer.id == quizCommand.answerId) {
-                                answer.copy(content = quizCommand.content)
-                            } else { answer }
-                        }
-                        it.copy(answerList = updateAnswers)
-                    } else { it }
-                }
-                state = state.copy(questionList = updatedQuestions)
+            is QuizCommand.AddNewQuestion -> {
+                state = state.copy(questionList = state.questionList + quizCommand.questionState)
             }
             QuizCommand.Create -> createQuiz()
         }

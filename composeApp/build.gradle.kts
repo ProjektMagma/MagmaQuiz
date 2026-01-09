@@ -41,7 +41,10 @@ kotlin {
 
             implementation(libs.coil.compose)
             
-            implementation(libs.ismoy.imagepicker)
+            implementation(libs.filekit.core)
+            implementation(libs.filekit.dialogs)
+            implementation(libs.filekit.dialogs.compose)
+            implementation(libs.filekit.coil)
 
             implementation(libs.androidx.datastore)
             implementation(libs.androidx.datastore.preferences)

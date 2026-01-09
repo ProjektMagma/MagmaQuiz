@@ -51,7 +51,10 @@ sealed interface Route : NavKey {
             data object Game : Route
             
             @Serializable
-            data object Create: Route
+            data object CreateQuiz: Route
+            
+            @Serializable
+            data class CreateQuestion(val isMultiple: Boolean): Route
         }
 
         @Serializable

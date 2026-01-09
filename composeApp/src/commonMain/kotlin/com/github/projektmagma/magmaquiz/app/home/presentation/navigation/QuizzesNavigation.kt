@@ -9,11 +9,13 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route.Main.Quizzes
+import com.github.projektmagma.magmaquiz.app.home.presentation.CreateQuizViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.QuizViewModel
-import com.github.projektmagma.magmaquiz.app.home.presentation.screens.CreateQuizScreen
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.GameScreen
-import com.github.projektmagma.magmaquiz.app.home.presentation.screens.QuizDetailsScreen
-import com.github.projektmagma.magmaquiz.app.home.presentation.screens.QuizzesScreen
+import com.github.projektmagma.magmaquiz.app.home.presentation.screens.quizzes.CreateQuestionScreen
+import com.github.projektmagma.magmaquiz.app.home.presentation.screens.quizzes.CreateQuizScreen
+import com.github.projektmagma.magmaquiz.app.home.presentation.screens.quizzes.QuizDetailsScreen
+import com.github.projektmagma.magmaquiz.app.home.presentation.screens.quizzes.QuizzesScreen
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import org.koin.compose.viewmodel.koinViewModel
@@ -27,7 +29,8 @@ fun QuizzesNavigation() {
                     subclass(Quizzes.Find::class, Quizzes.Find.serializer())
                     subclass(Quizzes.Details::class, Quizzes.Details.serializer())
                     subclass(Quizzes.Game::class, Quizzes.Game.serializer())
-                    subclass(Quizzes.Create::class, Quizzes.Create.serializer())
+                    subclass(Quizzes.CreateQuiz::class, Quizzes.CreateQuiz.serializer())
+                    subclass(Quizzes.CreateQuestion::class, Quizzes.CreateQuestion.serializer())
                 }
             }
         },
@@ -35,6 +38,7 @@ fun QuizzesNavigation() {
     )
 
     val quizViewModel: QuizViewModel = koinViewModel()
+    val createQuizViewModel: CreateQuizViewModel = koinViewModel()
 
     NavDisplay(
         backStack = quizzesBackstack,
@@ -46,7 +50,7 @@ fun QuizzesNavigation() {
             entry<Quizzes.Find> {
                 QuizzesScreen(
                     navigateToCreateQuizScreen = {
-                        quizzesBackstack.add(Quizzes.Create)
+                        quizzesBackstack.add(Quizzes.CreateQuiz)
                     },
                     navigateToQuizDetails = { id ->
                         quizzesBackstack.add(Quizzes.Details(id))
@@ -71,8 +75,20 @@ fun QuizzesNavigation() {
                     }
                 )
             }
-            entry<Quizzes.Create> {
-                CreateQuizScreen()
+            entry<Quizzes.CreateQuiz> {
+                CreateQuizScreen(
+                    navigateToQuestionCreate = {
+                        quizzesBackstack.add(Quizzes.CreateQuestion(it))
+                    },
+                    createQuizViewModel = createQuizViewModel
+                )
+            }
+            entry<Quizzes.CreateQuestion> {
+                CreateQuestionScreen(
+                    it.isMultiple,
+                    createQuizViewModel = createQuizViewModel,
+                    navigateBack = { quizzesBackstack.removeLastOrNull() }
+                )
             }
         }
     )

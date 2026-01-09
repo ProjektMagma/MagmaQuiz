@@ -37,7 +37,7 @@ postgresql = "42.7.8"
 jbcrypt = "0.4"
 slf4j = "1.7.36"
 
-image-picker = "1.0.28"
+filekit = "0.12.0"
 
 #junit = "4.13.2"
 #androidx-core = "1.17.0"
@@ -75,7 +75,10 @@ jetbrains-navigation3-adaptive = { module = "org.jetbrains.compose.material3.ada
 androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "androidx-lifecycle-viewmodel" }
 jetbrains-material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "material-icons" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
-ismoy-imagepicker = { module = "io.github.ismoy:imagepickerkmp", version.ref = "image-picker" }
+filekit-core = { module = "io.github.vinceglb:filekit-core", version.ref = "filekit" }
+filekit-dialogs = { module = "io.github.vinceglb:filekit-dialogs", version.ref = "filekit" }
+filekit-dialogs-compose = { module = "io.github.vinceglb:filekit-dialogs-compose", version.ref = "filekit"}
+filekit-coil = { module = "io.github.vinceglb:filekit-coil", version.ref = "filekit" }
 
 
 # ANDROID

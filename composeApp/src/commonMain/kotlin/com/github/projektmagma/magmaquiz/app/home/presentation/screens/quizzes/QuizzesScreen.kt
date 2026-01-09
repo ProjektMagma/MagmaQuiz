@@ -1,4 +1,4 @@
-package com.github.projektmagma.magmaquiz.app.home.presentation.screens
+package com.github.projektmagma.magmaquiz.app.home.presentation.screens.quizzes
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,13 +14,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.projektmagma.magmaquiz.app.home.presentation.QuizzesListViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.AutoScalableLazyColumn
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.FilterButton
-import com.github.projektmagma.magmaquiz.app.home.presentation.components.QuizCard
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.SearchTextField
+import com.github.projektmagma.magmaquiz.app.home.presentation.components.quizzes.QuizCard
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.favorites
 import magmaquiz.composeapp.generated.resources.quiz_title
