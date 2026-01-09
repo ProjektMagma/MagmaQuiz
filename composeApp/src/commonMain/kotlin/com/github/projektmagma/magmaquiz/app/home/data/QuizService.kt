@@ -6,9 +6,12 @@ import com.github.projektmagma.magmaquiz.app.core.domain.NetworkError
 import com.github.projektmagma.magmaquiz.app.core.util.BaseUrlProvider
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Resource
+import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import java.util.UUID
@@ -51,6 +54,18 @@ class QuizService(
                 contentType(ContentType.Application.Json)
                 header("user_session", apiDataStore.getSessionHeader())
             }
+        }
+    }
+    
+    suspend fun createQuiz(quiz: CreateOrModifyQuizValue): Resource<Unit, NetworkError> {
+        return safeCall<Unit> { 
+            val result = httpClient.post("${baseUrlProvider.getBaseUrl()}/quiz/create") {
+                contentType(ContentType.Application.Json)
+                header("user_session", apiDataStore.getSessionHeader())
+                setBody(quiz)
+            }
+            println("TAG ${result.status} ${result.status.value}")
+            result
         }
     }
 }

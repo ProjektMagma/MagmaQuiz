@@ -49,6 +49,9 @@ sealed interface Route : NavKey {
             
             @Serializable
             data object Game : Route
+            
+            @Serializable
+            data object Create: Route
         }
 
         @Serializable
