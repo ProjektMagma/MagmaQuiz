@@ -61,7 +61,7 @@ fun GameScreen(
             }
         } else {
             val currentQuestion = questions[targetIndex]
-            val answerList = currentQuestion.answerList ?: emptyList()
+            val answerList = currentQuestion.answerList
             
             Column(
                 modifier = Modifier

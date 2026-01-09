@@ -18,7 +18,7 @@ actual fun <T> AutoScalableLazyColumn(
 ) {
     LazyColumn(
         modifier = Modifier
-            .padding(horizontal = 32.dp)
+            .padding(horizontal = 8.dp)
             .fillMaxSize()
             .widthIn(max = 512.dp),
         horizontalAlignment = Alignment.CenterHorizontally,

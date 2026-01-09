@@ -32,86 +32,8 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 import java.util.UUID
 
 @Composable
-fun QuizCard(
+expect fun QuizCard(
     quiz: Quiz,
     navigateToQuizDetails: (id: UUID) -> Unit,
     changeFavoriteStatus: () -> Unit
-) {
-    var isLiked by remember { mutableStateOf(quiz.likedByYou) }
-
-    UniversalCardContainer(
-        onClick = {
-            navigateToQuizDetails(quiz.id!!)
-        }
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = quiz.quizName,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                )
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-
-                    Text(
-                        modifier = Modifier.padding(bottom = 8.dp),
-                        text = "${quiz.likesCount}",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                    IconButton(
-                        onClick = {
-                            changeFavoriteStatus()
-                            isLiked = !isLiked
-                        }
-                    ) {
-                        Icon(
-                            imageVector = if (isLiked) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
-                            tint = Color(0xfff498ae),
-                            contentDescription = "FavoriteButton"
-                        )
-
-                    }
-                }
-            }
-
-            Text(
-                text = quiz.quizDescription.ifBlank { "Nie podano opisu" },
-                style = MaterialTheme.typography.titleMedium
-            )
-            ContentImage(quiz.quizImage)
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(text = "Stworzony przez")
-                Spacer(modifier = Modifier.height(4.dp))
-                Row(
-                    modifier = Modifier
-                        .clip(MaterialTheme.shapes.large)
-                        .clickable {
-                            // TODO: Nawigacja (na początek zakładka users a potem szczegóły jak będą)
-                        }
-                        .padding(4.dp)
-                ) {
-                    Text(
-                        text = quiz.quizCreator.userName,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    ProfilePictureIcon(quiz.quizCreator.userProfilePicture, MaterialTheme.colorScheme.onSurface)
-                }
-            }
-        }
-    }
-}
+)

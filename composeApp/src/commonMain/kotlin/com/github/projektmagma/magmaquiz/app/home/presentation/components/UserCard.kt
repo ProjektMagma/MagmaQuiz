@@ -11,25 +11,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.github.projektmagma.magmaquiz.app.core.util.convertLongSecondsToString
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import java.util.UUID
 
 @Composable
-fun UserCard(
+expect fun UserCard(
     user: ForeignUser,
     navigateToUserDetails: (id: UUID) -> Unit,
-) {
-    UniversalCardContainer(onClick = { navigateToUserDetails(user.userId!!) }) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 4.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(text = user.userName)
-            ProfilePictureIcon(user.userProfilePicture)
-        }
-    }
-}
+) 

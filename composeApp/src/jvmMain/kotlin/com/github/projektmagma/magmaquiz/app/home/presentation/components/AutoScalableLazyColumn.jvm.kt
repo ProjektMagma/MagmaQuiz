@@ -22,10 +22,10 @@ actual fun <T> AutoScalableLazyColumn(
 ) {
     LazyVerticalGrid(
         modifier = Modifier
-            .padding(horizontal = 32.dp)
+            .padding(horizontal = 8.dp)
             .fillMaxSize()
             .widthIn(max = 512.dp),
-        columns = GridCells.Adaptive(400.dp),
+        columns = GridCells.Adaptive(450.dp),
         contentPadding = PaddingValues(8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {

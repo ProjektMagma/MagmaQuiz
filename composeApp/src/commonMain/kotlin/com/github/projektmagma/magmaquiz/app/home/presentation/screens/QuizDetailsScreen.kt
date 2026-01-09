@@ -6,10 +6,21 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowCircleLeft
+import androidx.compose.material.icons.filled.ImageNotSupported
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,7 +38,8 @@ import java.util.UUID
 fun QuizDetailsScreen(
     id: UUID,
     quizViewModel: QuizViewModel,
-    navigateToPlayScreen: () -> Unit
+    navigateToPlayScreen: () -> Unit,
+    navigateBack: () -> Unit
 ) {
     LaunchedEffect(id) {
         quizViewModel.getQuizById(id)
@@ -40,6 +52,16 @@ fun QuizDetailsScreen(
         CircularProgressIndicator()
     } else {
         Column(modifier = Modifier.fillMaxSize()) {
+            IconButton(
+                onClick = { // na desktopie koniecznie musi być, bo inaczej escape usuwa z backstack co jest nieintuicyjne
+                    navigateBack()
+                }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    contentDescription = "BackButton",
+                )
+            }
             Text(text = "Tytul: ${currentQuiz.quizName}")
             Text(text = "Opis: ${currentQuiz.quizDescription}")
             Text(text = "Publiczny: ${currentQuiz.isPublic}")
@@ -48,6 +70,7 @@ fun QuizDetailsScreen(
             Text(text = "Polubiony przez Ciebie: ${currentQuiz.likedByYou}")
 
             // Pierwotnie to chciałem dać w card, ale się na androidzie nie skalowało, więc to tu zostawiam
+            // EDIT: Już nieważne, ale nadal to tu zostawię
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -69,7 +92,7 @@ fun QuizDetailsScreen(
                     fontWeight = FontWeight.Bold
                 )
             }
-            
+
             Button(
                 onClick = {
                     navigateToPlayScreen()

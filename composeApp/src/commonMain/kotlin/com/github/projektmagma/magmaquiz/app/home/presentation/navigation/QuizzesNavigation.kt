@@ -33,7 +33,7 @@ fun QuizzesNavigation() {
         },
         Quizzes.Find
     )
-    
+
     val quizViewModel: QuizViewModel = koinViewModel()
 
     NavDisplay(
@@ -59,7 +59,8 @@ fun QuizzesNavigation() {
                     quizViewModel = quizViewModel,
                     navigateToPlayScreen = {
                         quizzesBackstack.add(Quizzes.Game)
-                    }
+                    },
+                    navigateBack = { quizzesBackstack.removeLastOrNull() }
                 )
             }
             entry<Quizzes.Game> {

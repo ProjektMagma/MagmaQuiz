@@ -27,6 +27,10 @@ class UsersViewModel(
 
     val friendList = usersRepository.friendList
 
+    init {
+        onCommand(UsersCommand.UserList(false))
+    }
+
     fun onCommand(command: UsersCommand) {
         when (command) {
             is UsersCommand.UserList -> userList(command.withDelay)

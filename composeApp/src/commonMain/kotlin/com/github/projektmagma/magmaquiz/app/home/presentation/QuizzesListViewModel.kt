@@ -22,7 +22,10 @@ class QuizzesListViewModel(
     private val _quizzes = MutableStateFlow<List<Quiz>>(emptyList())
     val quizzes = _quizzes.asStateFlow()
 
-
+    init {
+        getQuizByName(false)
+    }
+    
     // Todo przechwytywanie bledow
     fun getQuizByName(withDelay: Boolean = false) {
         viewModelScope.launch {

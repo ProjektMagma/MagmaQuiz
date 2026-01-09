@@ -38,16 +38,28 @@ fun MainNavigation(
     MainNavMenu(
         backStack = mainBackStack,
         navigateToHome = {
-            mainBackStack.add(Route.Main.Home)
+            if (mainBackStack.getOrNull(mainBackStack.size - 2) == Route.Main.Home)
+                mainBackStack.removeLastOrNull()
+            else
+                mainBackStack.add(Route.Main.Home)
         },
         navigateToQuizzes = {
-            mainBackStack.add(Route.Main.Quizzes)
+            if (mainBackStack.getOrNull(mainBackStack.size - 2) == Route.Main.Quizzes)
+                mainBackStack.removeLastOrNull()
+            else
+                mainBackStack.add(Route.Main.Quizzes)
         },
         navigateToUsers = {
-            mainBackStack.add(Route.Main.Users)
+            if (mainBackStack.getOrNull(mainBackStack.size - 2) == Route.Main.Users)
+                mainBackStack.removeLastOrNull()
+            else
+                mainBackStack.add(Route.Main.Users)
         },
         navigateToSettings = {
-            mainBackStack.add(Route.Main.Settings)
+            if (mainBackStack.getOrNull(mainBackStack.size - 2) == Route.Main.Settings)
+                mainBackStack.removeLastOrNull()
+            else
+                mainBackStack.add(Route.Main.Settings)
         },
     ) {
         NavDisplay(

@@ -21,7 +21,7 @@ fun SearchTextField(
     onValueChange: (String) -> Unit,
 ) {
     OutlinedTextField(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
         value = searchedText,
         shape = MaterialTheme.shapes.large,
         placeholder = {

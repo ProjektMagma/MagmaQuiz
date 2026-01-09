@@ -1,6 +1,7 @@
 package com.github.projektmagma.magmaquiz.app.home.presentation.navigation
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
@@ -33,8 +34,8 @@ actual fun MainNavMenu(
 
     Column(modifier = Modifier.fillMaxSize()) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround,
+            modifier = Modifier.fillMaxWidth().padding(8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Spacer(modifier = Modifier.size(25.dp))
@@ -68,7 +69,7 @@ actual fun MainNavMenu(
                 icon = {
                     Icon(
                         imageVector = Icons.Default.Home,
-                        tint = MaterialTheme.colorScheme.onPrimary,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         contentDescription = "HomeButton",
                     )
                 },
@@ -82,7 +83,7 @@ actual fun MainNavMenu(
                 icon = {
                     Icon(
                         imageVector = Icons.Default.Quiz,
-                        tint = MaterialTheme.colorScheme.onPrimary,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         contentDescription = "QuizzesButton",
                     )
                 },
@@ -96,7 +97,7 @@ actual fun MainNavMenu(
                 icon = {
                     Icon(
                         imageVector = Icons.Default.PersonAdd,
-                        tint = MaterialTheme.colorScheme.onPrimary,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         contentDescription = "UsersButton",
                     )
                 },
