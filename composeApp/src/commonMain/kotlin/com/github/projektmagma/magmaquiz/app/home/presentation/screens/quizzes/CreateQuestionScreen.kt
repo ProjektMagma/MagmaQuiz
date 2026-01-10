@@ -8,14 +8,8 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.github.projektmagma.magmaquiz.app.home.presentation.CreateQuizViewModel
-import com.github.projektmagma.magmaquiz.app.home.presentation.model.AnswerState
-import com.github.projektmagma.magmaquiz.app.home.presentation.model.QuestionState
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuizCommand
 
 @Composable
@@ -24,14 +18,8 @@ fun CreateQuestionScreen(
     navigateBack: () -> Unit,
     createQuizViewModel: CreateQuizViewModel
 ) {
-    var questionState by remember(isMultiple) {
-        val initialState = if (isMultiple) {
-            QuestionState(answerList = listOf(AnswerState(), AnswerState(), AnswerState(), AnswerState()))
-        } else {
-            QuestionState(answerList = listOf(AnswerState(isCorrect = true)))
-        }
-        mutableStateOf(initialState)
-    }
+    val questionState = createQuizViewModel.questionState
+    
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -39,7 +27,7 @@ fun CreateQuestionScreen(
         OutlinedTextField(
             value = questionState.content,
             onValueChange = {
-                questionState = questionState.copy(content = it)
+                createQuizViewModel.onCommand(QuizCommand.QuestionContentChanged(it))
             }
         )
         
@@ -49,21 +37,13 @@ fun CreateQuestionScreen(
                     OutlinedTextField(
                         value = answer.content,
                         onValueChange = {
-                            questionState = questionState.copy(
-                                answerList = questionState.answerList.mapIndexed { i, a -> 
-                                    if (i == index) a.copy(content = it) else a
-                                }
-                            )
+                            createQuizViewModel.onCommand(QuizCommand.AnswerContentChanged(it, index))
                         }
                     )
                     Checkbox(
                         checked = answer.isCorrect,
                         onCheckedChange = {
-                            questionState = questionState.copy(
-                                answerList = questionState.answerList.mapIndexed { i, a -> 
-                                    if (i == index) a.copy(isCorrect = it) else a
-                                }
-                            )
+                            createQuizViewModel.onCommand(QuizCommand.AnswerCorrectnessChanged(it, index))
                         }
                     )
                 }
@@ -73,8 +53,7 @@ fun CreateQuestionScreen(
             OutlinedTextField(
                 value = questionState.answerList.first().content,
                 onValueChange = {
-                    val updatedAnswer = questionState.answerList.first().copy(content = it)
-                    questionState = questionState.copy(answerList = listOf(updatedAnswer))
+                    createQuizViewModel.onCommand(QuizCommand.AnswerContentChanged(it, 0))
                 }
             )
         }

@@ -43,7 +43,6 @@ import com.github.projektmagma.magmaquiz.app.home.presentation.CreateQuizViewMod
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.quizzes.QuestionCard
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuizCommand
 import io.github.vinceglb.filekit.FileKit
-import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.dialogs.FileKitMode
 import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.openFilePicker
@@ -57,7 +56,6 @@ fun CreateQuizScreen(
     createQuizViewModel: CreateQuizViewModel
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedImage by remember { mutableStateOf<PlatformFile?>(null) }
     val scope = rememberCoroutineScope()
     val modalBottomSheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -94,14 +92,13 @@ fun CreateQuizScreen(
                                     type = FileKitType.Image,
                                     mode = FileKitMode.Single
                                 )
-                                selectedImage = image
                                 createQuizViewModel.onCommand(QuizCommand.ImageChanged(image?.readBytes()))
                             }
                         }
                     )
                     .clip(MaterialTheme.shapes.medium)
                     .background(MaterialTheme.colorScheme.surfaceContainer),
-                model = selectedImage,
+                model = state.image,
                 error = {
                     Icon(
                         imageVector = Icons.Default.ImageNotSupported,
@@ -173,6 +170,7 @@ fun CreateQuizScreen(
             QuestionCard(
                 question = question,
                 navigateToQuestionCreate = {
+                    createQuizViewModel.onCommand(QuizCommand.SetEditingQuestion(question))
                     navigateToQuestionCreate(question.answerList.size>1)
                 }
             )
@@ -207,6 +205,7 @@ fun CreateQuizScreen(
                         
                         Button(
                             onClick = {
+                                createQuizViewModel.onCommand(QuizCommand.InitQuestion(false))
                                 navigateToQuestionCreate(false)
                             }
                         ) {
@@ -215,6 +214,7 @@ fun CreateQuizScreen(
 
                         Button(
                             onClick = {
+                                createQuizViewModel.onCommand(QuizCommand.InitQuestion(true))
                                 navigateToQuestionCreate(true)
                             }
                         ) {
