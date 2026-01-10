@@ -59,13 +59,11 @@ class QuizService(
     
     suspend fun createQuiz(quiz: CreateOrModifyQuizValue): Resource<Unit, NetworkError> {
         return safeCall<Unit> { 
-            val result = httpClient.post("${baseUrlProvider.getBaseUrl()}/quiz/create") {
+            httpClient.post("${baseUrlProvider.getBaseUrl()}/quiz/create") {
                 contentType(ContentType.Application.Json)
                 header("user_session", apiDataStore.getSessionHeader())
                 setBody(quiz)
             }
-            println("TAG ${result.status} ${result.status.value}")
-            result
         }
     }
 }

@@ -1,11 +1,11 @@
 package com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes
 
-import com.github.projektmagma.magmaquiz.app.home.presentation.model.QuestionState
+import io.github.vinceglb.filekit.PlatformFile
 
 data class QuizState(
     val name: String = "",
     val description: String = "",
-    val image: ByteArray? = null,
+    val image: PlatformFile? = null,
     val isPublic: Boolean = false,
     val questionList: List<QuestionState> = emptyList()
 )

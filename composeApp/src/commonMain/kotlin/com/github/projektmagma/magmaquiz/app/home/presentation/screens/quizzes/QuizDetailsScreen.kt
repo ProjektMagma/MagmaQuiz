@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
 import com.github.projektmagma.magmaquiz.app.core.util.convertLongSecondsToString
 import com.github.projektmagma.magmaquiz.app.home.presentation.QuizViewModel
 import java.util.UUID
@@ -97,6 +98,11 @@ fun QuizDetailsScreen(
 
             LazyColumn(modifier = Modifier.weight(1f)) {
                 items(currentQuiz.questionList) { question ->
+                    AsyncImage(
+                        model =  question.questionImage,
+                        contentDescription = "Zdjecie pytania"
+                    )
+                    
                     Text(text = "Pytanie nr: ${question.questionNumber}")
                     Text(text = question.questionContent)
 

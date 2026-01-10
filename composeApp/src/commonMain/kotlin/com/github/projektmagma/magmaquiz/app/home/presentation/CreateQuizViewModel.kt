@@ -5,9 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.projektmagma.magmaquiz.app.core.util.compressImage
 import com.github.projektmagma.magmaquiz.app.home.data.QuizService
-import com.github.projektmagma.magmaquiz.app.home.presentation.model.AnswerState
-import com.github.projektmagma.magmaquiz.app.home.presentation.model.QuestionState
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.AnswerState
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuestionState
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuizCommand
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuizState
 import com.github.projektmagma.magmaquiz.shared.data.domain.Answer
@@ -23,64 +24,65 @@ class CreateQuizViewModel(
 
     fun onCommand(quizCommand: QuizCommand) {
         when (quizCommand) {
-            is QuizCommand.DescriptionChanged -> state = state.copy(description = quizCommand.description)
-            is QuizCommand.ImageChanged -> state = state.copy(image = quizCommand.byteArray)
-            is QuizCommand.NameChanged -> state = state.copy(name = quizCommand.name)
-            is QuizCommand.VisibilityChanged -> state = state.copy(isPublic = quizCommand.isPublic)
-
-            is QuizCommand.InitQuestion -> {
+            is QuizCommand.QuestionEditor -> questionOptions(quizCommand)
+            is QuizCommand.QuizProperties -> quizOptions(quizCommand)
+            QuizCommand.CreateQuiz -> createQuiz()
+        }
+    }
+    
+    private fun quizOptions(command: QuizCommand.QuizProperties) {
+        state = when (command) {
+            is QuizCommand.QuizProperties.DescriptionChanged ->  state.copy(description = command.description)
+            is QuizCommand.QuizProperties.ImageChanged -> state.copy(image = command.image)
+            is QuizCommand.QuizProperties.NameChanged -> state.copy(name = command.name)
+            is QuizCommand.QuizProperties.VisibilityChanged ->  state.copy(isPublic = command.isPublic)
+        }
+    }
+    
+    private fun questionOptions(command: QuizCommand.QuestionEditor) {
+        when (command) {
+            is QuizCommand.QuestionEditor.AnswerContentChanged -> updateAnswer(index = command.index) { it.copy(content = command.content) }
+            is QuizCommand.QuestionEditor.AnswerCorrectnessChanged -> updateAnswer(index = command.index) { it.copy(isCorrect = command.isCorrect) }
+            is QuizCommand.QuestionEditor.ContentChanged -> questionState = questionState.copy(content = command.content)
+            is QuizCommand.QuestionEditor.ImageChanged -> questionState = questionState.copy(image = command.platformFile)
+            is QuizCommand.QuestionEditor.Init -> {
                 val nextNumber = state.questionList.size + 1
-                questionState = if (quizCommand.isMultiple) {
+                questionState = if (command.isMultiple) {
                     QuestionState(
                         number = nextNumber,
-                        answerList = listOf(
-                            AnswerState(),
-                            AnswerState(),
-                            AnswerState(),
-                            AnswerState()
-                        )
+                        answerList = List(4) { AnswerState() }
                     )
                 } else {
                     QuestionState(
-                        number =nextNumber,
+                        number = nextNumber,
                         answerList = listOf(AnswerState(isCorrect = true))
                     )
                 }
             }
-            is QuizCommand.AnswerContentChanged -> {
-                questionState = questionState.copy(
-                    answerList = questionState.answerList.mapIndexed { index, answer -> 
-                        if (index == quizCommand.index) answer.copy(content = quizCommand.content) else answer
-                    }
-                )
-            }
-            is QuizCommand.AnswerCorrectnessChanged -> {
-                questionState = questionState.copy(
-                    answerList = questionState.answerList.mapIndexed { index, answer ->
-                        if (index == quizCommand.index) answer.copy(isCorrect = quizCommand.isCorrect) else answer
-                    }
-                )
-            }
-
-            is QuizCommand.QuestionContentChanged -> questionState = questionState.copy(content = quizCommand.content)
-            is QuizCommand.SetEditingQuestion -> questionState = quizCommand.questionState
-            is QuizCommand.AddNewQuestion -> {
-                val existingQuestionIndex = state.questionList.indexOfFirst { it.number == quizCommand.questionState.number }
+            is QuizCommand.QuestionEditor.SaveQuestion -> {
+                val existingQuestionIndex = state.questionList.indexOfFirst { it.number == command.questionState.number }
                 state = if (existingQuestionIndex != -1){
                     state.copy(
                         questionList = state.questionList.mapIndexed { index, question ->
-                            if (index == existingQuestionIndex) quizCommand.questionState else question
+                            if (index == existingQuestionIndex) command.questionState else question
                         }
                     )
                 } else {
                     state.copy(
-                        questionList = state.questionList + quizCommand.questionState
+                        questionList = state.questionList + command.questionState
                     )
                 }
             }
-
-            QuizCommand.Create -> createQuiz()
+            is QuizCommand.QuestionEditor.SetForEditing -> questionState = command.questionState
         }
+    }
+    
+    private inline fun updateAnswer(index: Int, transform: (AnswerState) -> AnswerState) {
+        questionState = questionState.copy(
+            answerList = questionState.answerList.mapIndexed { i, a -> 
+                if (i == index) transform(a) else a 
+            }
+        )
     }
 
     private fun createQuiz() {
@@ -90,11 +92,12 @@ class CreateQuizViewModel(
                     quizName = state.name,
                     quizDescription = state.description,
                     isPublic = state.isPublic,
-                    quizImage = state.image,
+                    quizImage = state.image.compressImage(75),
                     questionList = state.questionList.map { question ->
                         Question(
                             questionNumber = question.number,
                             questionContent = question.content,
+                            questionImage = question.image.compressImage(75),
                             answerList = question.answerList.map {
                                 Answer(
                                     answerContent = it.content,
@@ -103,7 +106,8 @@ class CreateQuizViewModel(
                             }
                         )
                     }
-                ))
+                )
+            )
         }
     }
 }

@@ -8,17 +8,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.UniversalCardContainer
-import com.github.projektmagma.magmaquiz.app.home.presentation.model.QuestionState
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuestionState
 
 @Composable
 fun QuestionCard(
     question: QuestionState,
-    navigateToQuestionCreate: () -> Unit,
+    navigateToQuestionCreate: () -> Unit = { },
 ) {
     UniversalCardContainer(
         onClick = { navigateToQuestionCreate() }
     ) {
+        AsyncImage(
+            model =  question.image,
+            contentDescription = "Zdjecie pytania"
+        )
+        
         Text(
             modifier = Modifier
                 .padding(4.dp)
