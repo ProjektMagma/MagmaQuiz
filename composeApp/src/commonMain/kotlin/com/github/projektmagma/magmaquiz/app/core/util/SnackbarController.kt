@@ -7,7 +7,7 @@ object SnackbarController {
     private val _events = Channel<String>()
     val events = _events.receiveAsFlow()
     
-    suspend fun onEvent(message: String){
-        _events.send(message)
+    fun onEvent(message: String){
+        _events.trySend(message)
     }
 }

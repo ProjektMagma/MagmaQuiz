@@ -28,6 +28,8 @@ suspend fun PlatformFile?.compressImage(quality: Int): ByteArray? {
         FileKit.compressImage(
             bytes = bytes,
             quality = quality,
+            maxWidth = 1024,
+            maxHeight = 1024,
             imageFormat = ImageFormat.PNG
         )
     } else null

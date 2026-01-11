@@ -5,95 +5,143 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
 import com.github.projektmagma.magmaquiz.app.core.util.compressImage
 import com.github.projektmagma.magmaquiz.app.home.data.QuizService
-import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.AnswerState
-import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuestionState
+import com.github.projektmagma.magmaquiz.app.home.domain.validators.toResId
+import com.github.projektmagma.magmaquiz.app.home.domain.validators.validateQuestion
+import com.github.projektmagma.magmaquiz.app.home.domain.validators.validateQuiz
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.UiEvent
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.AnswerModel
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.CreateQuizState
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuestionModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuizCommand
-import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuizState
 import com.github.projektmagma.magmaquiz.shared.data.domain.Answer
 import com.github.projektmagma.magmaquiz.shared.data.domain.Question
+import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Resource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class CreateQuizViewModel(
     private val quizService: QuizService
 ) : ViewModel() {
-    var state by mutableStateOf(QuizState())
-    var questionState by mutableStateOf(QuestionState())
+    var state by mutableStateOf(CreateQuizState())
+    
+    private val _quizChannel = Channel<NetworkEvent>() 
+    val quizChannel = _quizChannel.receiveAsFlow()
+    
+    private val _uiChannel = Channel<UiEvent>()
+    val uiChannel = _uiChannel.receiveAsFlow()
+    
 
     fun onCommand(quizCommand: QuizCommand) {
         when (quizCommand) {
             is QuizCommand.QuestionEditor -> questionOptions(quizCommand)
             is QuizCommand.QuizProperties -> quizOptions(quizCommand)
-            QuizCommand.CreateQuiz -> createQuiz()
+            QuizCommand.CreateQuiz -> {
+                state = state.copy(quizError = validateQuiz(state.quizModel))
+                if (state.quizError != null) {
+                    viewModelScope.launch { 
+                        _uiChannel.send(UiEvent.ShowSnackbar(state.quizError?.toResId()))
+                    }
+                    return
+                }
+                createQuiz()
+            }
         }
     }
     
     private fun quizOptions(command: QuizCommand.QuizProperties) {
-        state = when (command) {
-            is QuizCommand.QuizProperties.DescriptionChanged ->  state.copy(description = command.description)
-            is QuizCommand.QuizProperties.ImageChanged -> state.copy(image = command.image)
-            is QuizCommand.QuizProperties.NameChanged -> state.copy(name = command.name)
-            is QuizCommand.QuizProperties.VisibilityChanged ->  state.copy(isPublic = command.isPublic)
-        }
+        state = state.copy(quizModel = when (command) {
+            is QuizCommand.QuizProperties.DescriptionChanged -> state.quizModel.copy(description = command.description)
+            is QuizCommand.QuizProperties.ImageChanged -> state.quizModel.copy(image = command.image)
+            is QuizCommand.QuizProperties.NameChanged -> state.quizModel.copy(name = command.name)
+            is QuizCommand.QuizProperties.VisibilityChanged ->  state.quizModel.copy(isPublic = command.isPublic)
+        })
     }
     
     private fun questionOptions(command: QuizCommand.QuestionEditor) {
         when (command) {
             is QuizCommand.QuestionEditor.AnswerContentChanged -> updateAnswer(index = command.index) { it.copy(content = command.content) }
             is QuizCommand.QuestionEditor.AnswerCorrectnessChanged -> updateAnswer(index = command.index) { it.copy(isCorrect = command.isCorrect) }
-            is QuizCommand.QuestionEditor.ContentChanged -> questionState = questionState.copy(content = command.content)
-            is QuizCommand.QuestionEditor.ImageChanged -> questionState = questionState.copy(image = command.platformFile)
+            is QuizCommand.QuestionEditor.ContentChanged -> state = state.copy(questionModel = state.questionModel.copy(content = command.content))
+            is QuizCommand.QuestionEditor.ImageChanged -> state = state.copy(questionModel = state.questionModel.copy(image = command.platformFile))
             is QuizCommand.QuestionEditor.Init -> {
-                val nextNumber = state.questionList.size + 1
-                questionState = if (command.isMultiple) {
-                    QuestionState(
+                val nextNumber = state.quizModel.questionList.size + 1
+                val newQuestionModel = if (command.isMultiple) {
+                    QuestionModel(
                         number = nextNumber,
-                        answerList = List(4) { AnswerState() }
+                        answerList = List(4) { AnswerModel() }
                     )
                 } else {
-                    QuestionState(
+                    QuestionModel(
                         number = nextNumber,
-                        answerList = listOf(AnswerState(isCorrect = true))
+                        answerList = listOf(AnswerModel(isCorrect = true))
                     )
                 }
+                state = state.copy(questionModel = newQuestionModel)
             }
             is QuizCommand.QuestionEditor.SaveQuestion -> {
-                val existingQuestionIndex = state.questionList.indexOfFirst { it.number == command.questionState.number }
+                state = state.copy(questionError = validateQuestion(command.questionModel))
+                if (state.questionError != null) {
+                    viewModelScope.launch { 
+                        _uiChannel.send(UiEvent.ShowSnackbar(state.questionError?.toResId()))
+                    }
+                    return
+                }
+                
+                val existingQuestionIndex = state.quizModel.questionList.indexOfFirst { it.number == command.questionModel.number }
                 state = if (existingQuestionIndex != -1){
                     state.copy(
-                        questionList = state.questionList.mapIndexed { index, question ->
-                            if (index == existingQuestionIndex) command.questionState else question
-                        }
+                        quizModel = state.quizModel.copy(
+                            questionList = state.quizModel.questionList.mapIndexed { index, question ->
+                                if (index == existingQuestionIndex) command.questionModel else question
+                            }
+                        )
                     )
                 } else {
                     state.copy(
-                        questionList = state.questionList + command.questionState
+                        quizModel = state.quizModel.copy(
+                            questionList = state.quizModel.questionList + command.questionModel
+                        )
                     )
                 }
+                viewModelScope.launch {
+                    _uiChannel.send(UiEvent.NavigateBack)
+                }
             }
-            is QuizCommand.QuestionEditor.SetForEditing -> questionState = command.questionState
+            is QuizCommand.QuestionEditor.RemoveAnswer -> {
+                state = state.copy(
+                    questionModel = state.questionModel.copy(
+                        answerList = state.questionModel.answerList.filterIndexed { index, state -> index != command.index }
+                    )
+                )
+            }
+            QuizCommand.QuestionEditor.AddAnswer -> state = state.copy(questionModel = state.questionModel.copy(answerList = state.questionModel.answerList + AnswerModel()))
+            is QuizCommand.QuestionEditor.SetForEditing -> state = state.copy(questionModel = command.questionModel)
         }
     }
     
-    private inline fun updateAnswer(index: Int, transform: (AnswerState) -> AnswerState) {
-        questionState = questionState.copy(
-            answerList = questionState.answerList.mapIndexed { i, a -> 
+    private inline fun updateAnswer(index: Int, transform: (AnswerModel) -> AnswerModel) {
+        state = state.copy(
+            questionModel = state.questionModel.copy(
+            answerList = state.questionModel.answerList.mapIndexed { i, a -> 
                 if (i == index) transform(a) else a 
-            }
+            })
         )
     }
 
     private fun createQuiz() {
         viewModelScope.launch {
-            quizService.createQuiz(
+            val result = quizService.createQuiz(
                 CreateOrModifyQuizValue(
-                    quizName = state.name,
-                    quizDescription = state.description,
-                    isPublic = state.isPublic,
-                    quizImage = state.image.compressImage(75),
-                    questionList = state.questionList.map { question ->
+                    quizName = state.quizModel.name,
+                    quizDescription = state.quizModel.description,
+                    isPublic = state.quizModel.isPublic,
+                    quizImage = state.quizModel.image.compressImage(75),
+                    questionList = state.quizModel.questionList.map { question ->
                         Question(
                             questionNumber = question.number,
                             questionContent = question.content,
@@ -108,6 +156,11 @@ class CreateQuizViewModel(
                     }
                 )
             )
+            
+            when (result) {
+                is Resource.Error -> _quizChannel.send(NetworkEvent.Failure(result.error)) 
+                is Resource.Success -> _quizChannel.send(NetworkEvent.Success)
+            }
         }
     }
 }

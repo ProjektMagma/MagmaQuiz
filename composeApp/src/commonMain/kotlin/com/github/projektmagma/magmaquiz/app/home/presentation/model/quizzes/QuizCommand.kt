@@ -12,12 +12,14 @@ sealed interface QuizCommand {
     
     sealed interface QuestionEditor : QuizCommand {
         data class Init(val isMultiple: Boolean) : QuestionEditor
-        data class SetForEditing(val questionState: QuestionState) : QuestionEditor
+        data class SetForEditing(val questionModel: QuestionModel) : QuestionEditor
         data class ContentChanged(val content: String) : QuestionEditor
         data class ImageChanged(val platformFile: PlatformFile?) : QuestionEditor
         data class AnswerContentChanged(val content: String, val index: Int) : QuestionEditor
         data class AnswerCorrectnessChanged(val isCorrect: Boolean, val index: Int) : QuestionEditor
-        data class SaveQuestion(val questionState: QuestionState) : QuestionEditor
+        data class RemoveAnswer(val index: Int): QuestionEditor
+        data object AddAnswer: QuestionEditor
+        data class SaveQuestion(val questionModel: QuestionModel) : QuestionEditor
     }
     
     data object CreateQuiz : QuizCommand

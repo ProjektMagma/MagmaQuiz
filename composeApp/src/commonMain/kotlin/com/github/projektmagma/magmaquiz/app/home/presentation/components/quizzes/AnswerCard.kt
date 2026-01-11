@@ -10,11 +10,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.AnswerState
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.AnswerModel
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.correct_answer
+import magmaquiz.composeapp.generated.resources.wrong_asnwer
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun AnswerCard(
-    answer: AnswerState,
+    answer: AnswerModel,
 ) {
     Row(
         modifier = Modifier.padding(8.dp)
@@ -22,12 +26,12 @@ fun AnswerCard(
         if (answer.isCorrect) {
             Icon(
                 imageVector = Icons.Outlined.Check,
-                contentDescription = "poprawna odpowiedz"
+                contentDescription = stringResource(Res.string.correct_answer)
             )
         } else { 
             Icon(
                 imageVector = Icons.Outlined.Close,
-                contentDescription = "zla odpowiedz"
+                contentDescription = stringResource(Res.string.wrong_asnwer)
             )
         }
         Text(

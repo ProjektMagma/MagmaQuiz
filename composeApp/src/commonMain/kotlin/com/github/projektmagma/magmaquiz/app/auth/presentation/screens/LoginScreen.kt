@@ -1,6 +1,11 @@
 package com.github.projektmagma.magmaquiz.app.auth.presentation.screens
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -15,12 +20,14 @@ import com.github.projektmagma.magmaquiz.app.auth.presentation.components.EmailT
 import com.github.projektmagma.magmaquiz.app.auth.presentation.components.NavigationAuthText
 import com.github.projektmagma.magmaquiz.app.auth.presentation.components.PasswordTextField
 import com.github.projektmagma.magmaquiz.app.auth.presentation.model.auth.AuthCommand
+import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.dont_have_an_account
 import magmaquiz.composeapp.generated.resources.log_in
 import magmaquiz.composeapp.generated.resources.register
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -36,7 +43,7 @@ fun LoginScreen(
         viewModel.authChannel.collect { event ->
             when (event) {
                 is NetworkEvent.Failure -> {
-                    SnackbarController.onEvent(event.networkError.name)
+                    SnackbarController.onEvent(getString(event.networkError.toResId()))
                 }
 
                 NetworkEvent.Success -> {

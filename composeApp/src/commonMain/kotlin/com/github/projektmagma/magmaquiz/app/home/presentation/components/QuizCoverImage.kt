@@ -26,26 +26,31 @@ import kotlinx.coroutines.launch
 fun QuizCoverImage(
     height: Dp,
     model: PlatformFile?,
-    onImageClick: (PlatformFile?) -> Unit
+    modifier: Modifier = Modifier,
+    onImageClick: ((PlatformFile?) -> Unit)? = null
 ){
     val scope = rememberCoroutineScope()
     SubcomposeAsyncImage(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(height)
-            .clickable(
-                onClick = {
-                    scope.launch {
-                        val image = FileKit.openFilePicker(
-                            type = FileKitType.Image,
-                            mode = FileKitMode.Single
-                        )
-                        onImageClick(image)
-                    }
-                }
-            )
             .clip(MaterialTheme.shapes.medium)
-            .background(MaterialTheme.colorScheme.surfaceContainer),
+            .then(
+                if (onImageClick != null) {
+                    Modifier
+                        .clickable(
+                            onClick = {
+                                scope.launch {
+                                    val image = FileKit.openFilePicker(
+                                        type = FileKitType.Image,
+                                        mode = FileKitMode.Single
+                                    )
+                                    onImageClick(image)
+                                }
+                            },
+                        )
+                } else { Modifier }
+            ).background(MaterialTheme.colorScheme.surfaceContainer),
         model = model,
         error = {
             Icon(

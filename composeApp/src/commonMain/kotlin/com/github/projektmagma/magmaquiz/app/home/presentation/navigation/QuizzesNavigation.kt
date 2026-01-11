@@ -80,6 +80,9 @@ fun QuizzesNavigation() {
                     navigateToQuestionCreate = {
                         quizzesBackstack.add(Quizzes.CreateQuestion(it))
                     },
+                    navigateBack = {
+                        quizzesBackstack.removeLastOrNull()
+                    },
                     createQuizViewModel = createQuizViewModel
                 )
             }
