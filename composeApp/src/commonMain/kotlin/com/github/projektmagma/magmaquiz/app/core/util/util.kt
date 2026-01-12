@@ -30,7 +30,7 @@ suspend fun PlatformFile?.compressImage(quality: Int): ByteArray? {
             quality = quality,
             maxWidth = 1024,
             maxHeight = 1024,
-            imageFormat = ImageFormat.PNG
+            imageFormat = ImageFormat.JPEG
         )
     } else null
 }

@@ -22,4 +22,8 @@ class QuizViewModel(
             quizRepository.getQuizById(id).whenSuccess { _quiz.value = it.data }
         }
     }
+    
+    fun clearQuiz(){
+        _quiz.value = null
+    }
 }

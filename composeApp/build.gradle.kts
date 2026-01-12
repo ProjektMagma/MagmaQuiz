@@ -34,6 +34,7 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
+            implementation(libs.compose.backhandler)
 
             implementation(libs.jetbrains.lifecycle.viewmodelCompose)
             implementation(libs.jetbrains.lifecycle.runtimeCompose)

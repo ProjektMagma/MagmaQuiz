@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,7 +29,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.unit.dp
 import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
@@ -41,10 +44,13 @@ import com.github.projektmagma.magmaquiz.app.home.presentation.model.UiEvent
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuizCommand
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.add_question
+import magmaquiz.composeapp.generated.resources.all_changes_remove
+import magmaquiz.composeapp.generated.resources.are_you_sure
 import magmaquiz.composeapp.generated.resources.choose_type
 import magmaquiz.composeapp.generated.resources.description
 import magmaquiz.composeapp.generated.resources.multi_answer
 import magmaquiz.composeapp.generated.resources.name
+import magmaquiz.composeapp.generated.resources.no
 import magmaquiz.composeapp.generated.resources.private
 import magmaquiz.composeapp.generated.resources.public
 import magmaquiz.composeapp.generated.resources.save_icon
@@ -52,10 +58,11 @@ import magmaquiz.composeapp.generated.resources.save_quiz
 import magmaquiz.composeapp.generated.resources.single_answer
 import magmaquiz.composeapp.generated.resources.success_quiz_add
 import magmaquiz.composeapp.generated.resources.visibility
+import magmaquiz.composeapp.generated.resources.yes
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun CreateQuizScreen(
     navigateToQuestionCreate: (Boolean) -> Unit,
@@ -65,7 +72,12 @@ fun CreateQuizScreen(
     var expanded by remember { mutableStateOf(false) }
     val modalBottomSheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
+    var showAlertDialog by remember { mutableStateOf(false) }
     val quiz = createQuizViewModel.state.quizModel
+
+    BackHandler {
+        showAlertDialog = true
+    }
 
     LaunchedEffect(createQuizViewModel.quizChannel) {
         createQuizViewModel.quizChannel.collect { event -> 
@@ -73,7 +85,6 @@ fun CreateQuizScreen(
                 is NetworkEvent.Failure -> SnackbarController.onEvent(getString(event.networkError.toResId()))
                 NetworkEvent.Success -> {
                     SnackbarController.onEvent(getString(Res.string.success_quiz_add))
-                    navigateBack()
                 }
             }
         }
@@ -82,13 +93,39 @@ fun CreateQuizScreen(
     LaunchedEffect(createQuizViewModel.uiChannel) {
         createQuizViewModel.uiChannel.collect { event ->
             when (event) {
-                UiEvent.NavigateBack -> Unit
+                UiEvent.NavigateBack -> navigateBack()
                 is UiEvent.ShowSnackbar ->{
                     val message = if (event.id != null) getString(event.id) else ""
                     SnackbarController.onEvent(message)
                 }
             }
         }
+    }
+    
+    if (showAlertDialog){
+        AlertDialog(
+            onDismissRequest = { showAlertDialog = false },
+            title = { Text(text = stringResource(Res.string.are_you_sure)) },
+            text = { Text(text = stringResource(Res.string.all_changes_remove)) },
+            confirmButton = { 
+                Button(
+                    onClick = {
+                        showAlertDialog = false
+                        createQuizViewModel.clearState()
+                        navigateBack()
+                    }
+                ) {
+                    Text(text = stringResource(Res.string.yes))
+                }
+            },
+            dismissButton = { 
+                Button(
+                    onClick = { showAlertDialog = false } 
+                ) {
+                    Text(text = stringResource(Res.string.no))
+                }
+            }
+        )
     }
     
     LazyColumn(

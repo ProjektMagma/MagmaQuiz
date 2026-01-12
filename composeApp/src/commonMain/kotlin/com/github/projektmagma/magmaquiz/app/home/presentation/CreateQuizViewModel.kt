@@ -86,9 +86,7 @@ class CreateQuizViewModel(
             is QuizCommand.QuestionEditor.SaveQuestion -> {
                 state = state.copy(questionError = validateQuestion(command.questionModel))
                 if (state.questionError != null) {
-                    viewModelScope.launch { 
-                        _uiChannel.send(UiEvent.ShowSnackbar(state.questionError?.toResId()))
-                    }
+                    _uiChannel.trySend(UiEvent.ShowSnackbar(state.questionError?.toResId()))
                     return
                 }
                 
@@ -108,9 +106,7 @@ class CreateQuizViewModel(
                         )
                     )
                 }
-                viewModelScope.launch {
-                    _uiChannel.send(UiEvent.NavigateBack)
-                }
+                _uiChannel.trySend(UiEvent.NavigateBack)
             }
             is QuizCommand.QuestionEditor.RemoveAnswer -> {
                 state = state.copy(
@@ -119,7 +115,13 @@ class CreateQuizViewModel(
                     )
                 )
             }
-            QuizCommand.QuestionEditor.AddAnswer -> state = state.copy(questionModel = state.questionModel.copy(answerList = state.questionModel.answerList + AnswerModel()))
+            QuizCommand.QuestionEditor.AddAnswer -> {
+                state = state.copy(
+                    questionModel = state.questionModel.copy(
+                        answerList = state.questionModel.answerList + AnswerModel()
+                    )
+                )
+            }
             is QuizCommand.QuestionEditor.SetForEditing -> state = state.copy(questionModel = command.questionModel)
         }
     }
@@ -127,9 +129,10 @@ class CreateQuizViewModel(
     private inline fun updateAnswer(index: Int, transform: (AnswerModel) -> AnswerModel) {
         state = state.copy(
             questionModel = state.questionModel.copy(
-            answerList = state.questionModel.answerList.mapIndexed { i, a -> 
-                if (i == index) transform(a) else a 
-            })
+                answerList = state.questionModel.answerList.mapIndexed { i, a -> 
+                    if (i == index) transform(a) else a 
+                }
+            )
         )
     }
 
@@ -159,8 +162,16 @@ class CreateQuizViewModel(
             
             when (result) {
                 is Resource.Error -> _quizChannel.send(NetworkEvent.Failure(result.error)) 
-                is Resource.Success -> _quizChannel.send(NetworkEvent.Success)
+                is Resource.Success -> {
+                    clearState()
+                    _quizChannel.send(NetworkEvent.Success)
+                    _uiChannel.send(UiEvent.NavigateBack)
+                }
             }
         }
+    }
+    
+    fun clearState(){
+        state = CreateQuizState()
     }
 }
