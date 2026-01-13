@@ -1,6 +1,7 @@
-package com.github.projektmagma.magmaquiz.app.home.data
+package com.github.projektmagma.magmaquiz.app.home.data.repository
 
 import com.github.projektmagma.magmaquiz.app.core.domain.NetworkError
+import com.github.projektmagma.magmaquiz.app.home.data.service.UsersService
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Resource
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess

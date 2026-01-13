@@ -1,4 +1,4 @@
-package com.github.projektmagma.magmaquiz.app.home.data
+package com.github.projektmagma.magmaquiz.app.home.data.service
 
 import com.github.projektmagma.magmaquiz.app.core.data.ApiDataStore
 import com.github.projektmagma.magmaquiz.app.core.data.networking.safeCall

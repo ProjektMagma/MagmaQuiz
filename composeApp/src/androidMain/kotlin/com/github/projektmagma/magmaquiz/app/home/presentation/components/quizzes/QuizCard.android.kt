@@ -2,13 +2,7 @@ package com.github.projektmagma.magmaquiz.app.home.presentation.components.quizz
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -16,12 +10,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,7 +23,7 @@ import com.github.projektmagma.magmaquiz.app.home.presentation.components.Conten
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.ProfilePictureIcon
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.UniversalCardContainer
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
-import java.util.UUID
+import java.util.*
 
 @Composable
 actual fun QuizCard(
@@ -72,18 +61,18 @@ actual fun QuizCard(
                                 MaterialTheme.shapes.medium
                             )
                             .clip(MaterialTheme.shapes.medium)
-                            .clickable{
-                                navigateToUserDetails(quiz.quizCreator.userId!!)
+                            .clickable {
+                                navigateToUserDetails(quiz.quizCreator!!.userId!!)
                             }
                             .padding(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = quiz.quizCreator.userName,
+                            text = quiz.quizCreator!!.userName,
                             fontWeight = FontWeight.Bold,
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        ProfilePictureIcon(quiz.quizCreator.userProfilePicture, 25.dp)
+                        ProfilePictureIcon(quiz.quizCreator!!.userProfilePicture, 25.dp)
                     }
                 }
                 Row(

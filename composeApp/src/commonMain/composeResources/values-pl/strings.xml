@@ -62,4 +62,7 @@
     <string name="all_changes_remove">Wszystkie zmiany zostaną usunięte</string>
     <string name="yes">Tak</string>
     <string name="no">Nie</string>
+    <string name="no_image_provided_error">Nie podano żadnego zdjęcia</string>
+    <string name="profile_picture_changed_success">Zdjęcie profilowe pomyślnie zmienione. Zrestartuj aplikację.</string>
+    <string name="change_profile_picture">Zmień zdjęcie profilowe</string>
 </resources>

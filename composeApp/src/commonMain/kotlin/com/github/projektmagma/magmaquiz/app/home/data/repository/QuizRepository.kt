@@ -1,10 +1,11 @@
-package com.github.projektmagma.magmaquiz.app.home.data
+package com.github.projektmagma.magmaquiz.app.home.data.repository
 
 import com.github.projektmagma.magmaquiz.app.core.domain.NetworkError
+import com.github.projektmagma.magmaquiz.app.home.data.service.QuizService
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Resource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
-import java.util.UUID
+import java.util.*
 
 class QuizRepository(
     private val quizService: QuizService

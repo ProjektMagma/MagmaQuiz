@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.projektmagma.magmaquiz.app.auth.data.UserRepository
+import com.github.projektmagma.magmaquiz.app.auth.data.AuthRepository
 import com.github.projektmagma.magmaquiz.app.auth.domain.validator.validateEmail
 import com.github.projektmagma.magmaquiz.app.auth.domain.validator.validateIsEmptyPassword
 import com.github.projektmagma.magmaquiz.app.auth.domain.validator.validatePassword
@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class AuthViewModel(
-    private val repository: UserRepository
+    private val repository: AuthRepository
 ) : ViewModel() {
 
     val thisUser = repository.thisUser

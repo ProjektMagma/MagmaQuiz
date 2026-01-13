@@ -1,7 +1,7 @@
 package com.github.projektmagma.magmaquiz.app.home.presentation.components
 
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Icon
@@ -31,7 +31,7 @@ fun ProfilePictureIcon(imageData: ByteArray?, size: Dp = 50.dp, iconTint: Color 
         AsyncImage(
             modifier = Modifier
                 .size(size)
-                .clip(MaterialTheme.shapes.small),
+                .clip(CircleShape),
             model = ImageRequest.Builder(LocalPlatformContext.current)
                 .crossfade(true)
                 .data(imageData)

@@ -1,13 +1,12 @@
 package com.github.projektmagma.magmaquiz.app.home.di
 
-import com.github.projektmagma.magmaquiz.app.home.data.QuizRepository
-import com.github.projektmagma.magmaquiz.app.home.data.QuizService
-import com.github.projektmagma.magmaquiz.app.home.data.UsersRepository
-import com.github.projektmagma.magmaquiz.app.home.data.UsersService
-import com.github.projektmagma.magmaquiz.app.home.presentation.CreateQuizViewModel
-import com.github.projektmagma.magmaquiz.app.home.presentation.QuizViewModel
-import com.github.projektmagma.magmaquiz.app.home.presentation.QuizzesListViewModel
-import com.github.projektmagma.magmaquiz.app.home.presentation.UsersViewModel
+import com.github.projektmagma.magmaquiz.app.home.data.repository.QuizRepository
+import com.github.projektmagma.magmaquiz.app.home.data.repository.SettingsRepository
+import com.github.projektmagma.magmaquiz.app.home.data.repository.UsersRepository
+import com.github.projektmagma.magmaquiz.app.home.data.service.QuizService
+import com.github.projektmagma.magmaquiz.app.home.data.service.SettingsService
+import com.github.projektmagma.magmaquiz.app.home.data.service.UsersService
+import com.github.projektmagma.magmaquiz.app.home.presentation.*
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -24,4 +23,9 @@ val homeModule = module {
     singleOf(::UsersService)
     singleOf(::UsersRepository)
     viewModelOf(::UsersViewModel)
+
+    // Settings
+    singleOf(::SettingsService)
+    singleOf(::SettingsRepository)
+    viewModelOf(::SettingsViewModel)
 }

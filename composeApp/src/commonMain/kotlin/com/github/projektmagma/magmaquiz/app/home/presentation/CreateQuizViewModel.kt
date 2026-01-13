@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
 import com.github.projektmagma.magmaquiz.app.core.util.compressImage
-import com.github.projektmagma.magmaquiz.app.home.data.QuizService
+import com.github.projektmagma.magmaquiz.app.home.data.service.QuizService
 import com.github.projektmagma.magmaquiz.app.home.domain.validators.toResId
 import com.github.projektmagma.magmaquiz.app.home.domain.validators.validateQuestion
 import com.github.projektmagma.magmaquiz.app.home.domain.validators.validateQuiz

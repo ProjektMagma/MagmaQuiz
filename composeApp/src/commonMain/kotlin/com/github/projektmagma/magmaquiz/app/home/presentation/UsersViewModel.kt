@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
 import com.github.projektmagma.magmaquiz.app.core.util.withSearchDelay
-import com.github.projektmagma.magmaquiz.app.home.data.UsersRepository
+import com.github.projektmagma.magmaquiz.app.home.data.repository.UsersRepository
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.users.UsersCommand
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Resource
 import kotlinx.coroutines.channels.Channel

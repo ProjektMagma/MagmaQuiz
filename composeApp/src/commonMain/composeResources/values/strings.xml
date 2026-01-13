@@ -64,4 +64,7 @@
     <string name="all_changes_remove">All changes will be deleted</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="no_image_provided_error">No image provided</string>
+    <string name="profile_picture_changed_success">Profile picture changed successfully. Restart the app.</string>
+    <string name="change_profile_picture">Change profile picture</string>
 </resources>
