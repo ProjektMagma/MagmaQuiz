@@ -1,6 +1,7 @@
 package com.github.projektmagma.magmaquiz.server.controllers
 
-import com.github.projektmagma.magmaquiz.server.data.conversion.HasChildrenConversionCommand
+import com.github.projektmagma.magmaquiz.server.controllers.util.quizEntityOrNull
+import com.github.projektmagma.magmaquiz.server.data.conversion.QuizConversionCommand
 import com.github.projektmagma.magmaquiz.server.data.entities.*
 import com.github.projektmagma.magmaquiz.server.data.tables.AnswersTable
 import com.github.projektmagma.magmaquiz.server.data.tables.FavoriteQuizzesTable
@@ -189,7 +190,7 @@ class QuizDataController {
 
         val quizzesMapped = transaction {
             quizzesList.map { dbQuiz ->
-                dbQuiz.toDomain(HasChildrenConversionCommand.NoChildren).apply {
+                dbQuiz.toDomain(QuizConversionCommand.WithUserNoQuestions).apply {
                     val favoriteStatus =
                         transaction { FavoriteQuizzesEntity.find { FavoriteQuizzesTable.user eq dbUser.id and (FavoriteQuizzesTable.quiz eq dbQuiz.id) } }.firstOrNull()
                     this.likedByYou =
@@ -207,21 +208,10 @@ class QuizDataController {
         val dbUser = transaction {
             UserEntity.findById(session.userId)
         }!!
-
-        val dbQuiz = transaction {
-            QuizEntity.findById(quizId)
-        }
-
-        if (dbQuiz == null ||
-            transaction {
-                !dbQuiz.isActive || !dbQuiz.isPublic && dbQuiz.quizCreator.id != dbUser.id
-            }
-        )
-            return NetworkResource.Error(HttpStatusCode.NotFound)
-
+        val dbQuiz = quizEntityOrNull(quizId, session.userId) ?: return NetworkResource.Error(HttpStatusCode.NotFound)
 
         return NetworkResource.Success(transaction {
-            dbQuiz.toDomain(HasChildrenConversionCommand.WithChildren)
+            dbQuiz.toDomain(QuizConversionCommand.WithUserAndQuestions)
                 .apply {
                     val favoriteStatus = transaction {
                         FavoriteQuizzesEntity.find { FavoriteQuizzesTable.user eq dbUser.id and (FavoriteQuizzesTable.quiz eq dbQuiz.id) }
@@ -236,17 +226,7 @@ class QuizDataController {
         val dbUser = transaction {
             UserEntity.findById(session.userId)
         }!!
-
-        val dbQuiz = transaction {
-            QuizEntity.findById(quizId)
-        }
-
-        if (dbQuiz == null ||
-            transaction {
-                !dbQuiz.isActive || !dbQuiz.isPublic && dbQuiz.quizCreator.id != dbUser.id
-            }
-        )
-            return NetworkResource.Error(HttpStatusCode.NotFound)
+        val dbQuiz = quizEntityOrNull(quizId, session.userId) ?: return NetworkResource.Error(HttpStatusCode.NotFound)
 
         val favoriteStatus = transaction {
             FavoriteQuizzesEntity.find { FavoriteQuizzesTable.user eq dbUser.id and (FavoriteQuizzesTable.quiz eq dbQuiz.id) }
@@ -286,10 +266,27 @@ class QuizDataController {
                         (QuizzesTable.isPublic eq true or (QuizzesTable.quizCreator eq dbUser.id)) and
                         (QuizzesTable.id inList (favorites))
             }.map { dbQuiz ->
-                dbQuiz.toDomain(HasChildrenConversionCommand.NoChildren).apply { this.likedByYou = true }
+                dbQuiz.toDomain(QuizConversionCommand.WithUserNoQuestions).apply { this.likedByYou = true }
             }
         }
 
         return NetworkResource.Success(quizzesList)
+    }
+
+    fun quizFindByUserId(userId: UUID): NetworkResource<List<Quiz>> {
+        val dbUser = transaction {
+            UserEntity.findById(userId)
+        }
+
+        if (dbUser == null)
+            return NetworkResource.Error(HttpStatusCode.NotFound)
+
+        val quizList =
+            transaction {
+                dbUser.quizList.toList()
+                    .map { it.toDomain(QuizConversionCommand.WithoutUserAndQuestions) }
+            }
+
+        return NetworkResource.Success(quizList)
     }
 }

@@ -12,7 +12,7 @@ data class Quiz(
     val quizDescription: String,
     val quizImage: ByteArray? = null,
     val isPublic: Boolean,
-    val quizCreator: ForeignUser,
+    val quizCreator: ForeignUser? = null,
     var likesCount: Int,
     var likedByYou: Boolean = false,
     val createdAt: Long,

@@ -69,6 +69,11 @@ fun Application.quizRoutes(quizDataController: QuizDataController) {
                     val session = call.sessions.get<UserSession>()!!
                     call.respondToResource(quizDataController.quizMyFavorites(session))
                 }
+
+                get("/findByUser/{id}") {
+                    val userId = UUID.fromString(call.parameters["id"]!!)
+                    call.respondToResource(quizDataController.quizFindByUserId(userId))
+                }
             }
         }
     }

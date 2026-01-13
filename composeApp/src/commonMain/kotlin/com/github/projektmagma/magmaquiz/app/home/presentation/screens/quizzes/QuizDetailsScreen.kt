@@ -1,21 +1,11 @@
 package com.github.projektmagma.magmaquiz.app.home.presentation.screens.quizzes
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -28,7 +18,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.github.projektmagma.magmaquiz.app.core.util.convertLongSecondsToString
 import com.github.projektmagma.magmaquiz.app.home.presentation.QuizViewModel
-import java.util.UUID
+import java.util.*
 
 @Composable
 fun QuizDetailsScreen(
@@ -67,7 +57,7 @@ fun QuizDetailsScreen(
             Text(text = "Tytul: ${currentQuiz.quizName}")
             Text(text = "Opis: ${currentQuiz.quizDescription}")
             Text(text = "Publiczny: ${currentQuiz.isPublic}")
-            Text(text = "Autor: ${currentQuiz.quizCreator.userName}")
+            Text(text = "Autor: ${currentQuiz.quizCreator!!.userName}")
             Text(text = "Polubienia: ${currentQuiz.likesCount}")
             Text(text = "Polubiony przez Ciebie: ${currentQuiz.likedByYou}")
 

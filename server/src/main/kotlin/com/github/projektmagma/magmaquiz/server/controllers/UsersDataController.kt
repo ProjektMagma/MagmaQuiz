@@ -1,5 +1,7 @@
 package com.github.projektmagma.magmaquiz.server.controllers
 
+import com.github.projektmagma.magmaquiz.server.controllers.util.friendshipEntityOrNull
+import com.github.projektmagma.magmaquiz.server.controllers.util.isUserActive
 import com.github.projektmagma.magmaquiz.server.data.conversion.UserConversionCommand
 import com.github.projektmagma.magmaquiz.server.data.entities.FriendshipEntity
 import com.github.projektmagma.magmaquiz.server.data.entities.UserEntity
@@ -36,12 +38,12 @@ class UsersDataController {
     }
 
     fun usersUserData(userId: UUID): NetworkResource<User> {
+        if (!isUserActive(userId))
+            return NetworkResource.Error(HttpStatusCode.NotFound)
+
         val dbUser = transaction {
             UserEntity.findById(userId)
-        }
-
-        if (dbUser == null || transaction { !dbUser.isActive })
-            return NetworkResource.Error(HttpStatusCode.NotFound)
+        }!!
 
         return NetworkResource.Success(transaction {
             dbUser.toDomain(UserConversionCommand.ForeignUserWithBigPicture)
@@ -49,19 +51,15 @@ class UsersDataController {
     }
 
     fun usersFriendshipSendInvitation(session: UserSession, userId: UUID): NetworkResource<Unit> {
-        val dbUser = transaction {
-            UserEntity.findById(userId)
-        }
 
-        if (dbUser == null || transaction { !dbUser.isActive })
+        if (!isUserActive(userId))
             return NetworkResource.Error(HttpStatusCode.NotFound)
 
-        val friendship = transaction {
-            FriendshipEntity.find {
-                (FriendshipsTable.userFrom eq session.userId and (FriendshipsTable.userTo eq dbUser.id)) or
-                        (FriendshipsTable.userFrom eq dbUser.id and (FriendshipsTable.userTo eq session.userId))
-            }.firstOrNull()
-        }
+        val dbUser = transaction {
+            UserEntity.findById(userId)
+        }!!
+
+        val friendship = friendshipEntityOrNull(session.userId, userId)
 
         if (friendship != null && transaction { dbUser.isActive })
             return NetworkResource.Error(HttpStatusCode.Conflict)
@@ -77,21 +75,9 @@ class UsersDataController {
     }
 
     fun usersFriendshipAcceptInvitation(session: UserSession, userId: UUID): NetworkResource<Unit> {
-        val dbUser = transaction {
-            UserEntity.findById(userId)
-        }
+        val friendship = friendshipEntityOrNull(session.userId, userId)
 
-        if (dbUser == null || transaction { !dbUser.isActive })
-            return NetworkResource.Error(HttpStatusCode.NotFound)
-
-        val friendship = transaction {
-            FriendshipEntity.find {
-                (FriendshipsTable.userFrom eq session.userId and (FriendshipsTable.userTo eq dbUser.id)) or
-                        (FriendshipsTable.userFrom eq dbUser.id and (FriendshipsTable.userTo eq session.userId))
-            }.firstOrNull()
-        }
-
-        if (friendship == null || transaction { !dbUser.isActive })
+        if (friendship == null || !isUserActive(userId))
             return NetworkResource.Error(HttpStatusCode.NotFound)
 
         transaction { friendship.wasAccepted = true }
