@@ -1,7 +1,11 @@
 package com.github.projektmagma.magmaquiz.app.home.presentation.screens
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
@@ -9,16 +13,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowRightAlt
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -27,6 +34,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.projektmagma.magmaquiz.app.home.presentation.QuizViewModel
+import com.github.projektmagma.magmaquiz.app.home.presentation.components.ContentImage
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.game.GameCommand
 
 @Composable
 fun GameScreen(
@@ -34,48 +43,43 @@ fun GameScreen(
     navigateBack: () -> Unit
 ) {
     val quiz by quizViewModel.quiz.collectAsStateWithLifecycle()
-    val questions = quiz?.questionList ?: emptyList()
-    var currentQuestionIndex by remember { mutableIntStateOf(0) }
-    var correctAnswers by remember { mutableIntStateOf(0) }
+    val gameState by quizViewModel.gameState.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit){
+        quizViewModel.onCommand(GameCommand.StartGame)
+    }
+    
     AnimatedContent(
-        targetState = currentQuestionIndex,
+        targetState = gameState,
         transitionSpec = {
             slideInHorizontally { fullWidth -> fullWidth } togetherWith
                     slideOutHorizontally { fullWidth -> -fullWidth }
-        }
-    ) { targetIndex ->
-        if (targetIndex >= questions.size) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
+        },
+        contentKey = { state -> state.currentQuestionIndex }
+    ) { currentState ->
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            if (currentState.isQuizFinished) {
                 Text(text = "Koniec quizu")
                 Button(onClick = {
                     navigateBack()
                 }) {
                     Text("Wroc")
                 }
-                Text(text = "Poprawnie $correctAnswers / ${questions.size}")
-            }
-        } else {
-            val currentQuestion = questions[targetIndex]
-            val answerList = currentQuestion.answerList
-            
-            Column(
-                modifier = Modifier
-                    .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(text = "${currentQuestion.questionNumber}. ${currentQuestion.questionContent}")
+                Text(text = "Poprawnie ${currentState.score} / ${currentState.totalQuestions}")
+            } else {
+                ContentImage(imageData = currentState.questionImage)
+                Text(text = "${currentState.questionNumber}. ${currentState.questionContent}")
 
                 Spacer(modifier = Modifier.height(8.dp))
-                
-                if (answerList.size == 1) {
+
+                if (currentState.answers.size == 1) {
                     var inputValue by remember { mutableStateOf("") }
-                    
+
+               
                     OutlinedTextField(
                         value = inputValue,
                         onValueChange = {
@@ -84,10 +88,7 @@ fun GameScreen(
                         trailingIcon = {
                             IconButton(
                                 onClick = {
-                                    currentQuestionIndex++
-                                    if (inputValue == answerList.first().answerContent) {
-                                        correctAnswers++
-                                    }
+                                    quizViewModel.onCommand(GameCommand.AnswerClicked(content = inputValue))
                                 }
                             ) {
                                 Icon(
@@ -97,22 +98,38 @@ fun GameScreen(
                             }
                         }
                     )
+                    AnimatedVisibility(
+                        visible = currentState.isAnswered,
+                        enter = fadeIn() + slideInVertically { it },
+                        exit = fadeOut()
+                    ) {
+                        Text(
+                            text = "Poprawna odpowiedź: ${currentState.answers.first().content}",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .padding(top = 32.dp) 
+                        )
+                    }
+                    
                 } else {
-                    answerList.forEach { answer ->
+                    currentState.answers.forEach { answer ->
                         Button(
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = when {
+                                    currentState.isAnswered && answer.isCorrect -> MaterialTheme.colorScheme.primaryContainer
+                                    currentState.isAnswered && answer.isSelected -> MaterialTheme.colorScheme.error
+                                    else -> MaterialTheme.colorScheme.primary
+                                }),
                             onClick = {
-                                currentQuestionIndex++
-                                if (answer.isCorrect) {
-                                    correctAnswers++
-                                }
+                                quizViewModel.onCommand(GameCommand.AnswerClicked(answer.isCorrect, answer.content))
                             }
                         ) {
-                            Text(text = answer.answerContent)
+                            Text(text = answer.content)
                         }
                     }
                 }
             }
         }
     }
-
 }

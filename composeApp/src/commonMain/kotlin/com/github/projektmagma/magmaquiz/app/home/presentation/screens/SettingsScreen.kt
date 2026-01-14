@@ -1,13 +1,23 @@
 package com.github.projektmagma.magmaquiz.app.home.presentation.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,6 +30,7 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.github.projektmagma.magmaquiz.app.auth.presentation.AuthViewModel
 import com.github.projektmagma.magmaquiz.app.auth.presentation.model.auth.AuthCommand
+import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
 import com.github.projektmagma.magmaquiz.app.home.presentation.SettingsViewModel
@@ -33,7 +44,11 @@ import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.openFilePicker
 import io.github.vinceglb.filekit.readBytes
 import kotlinx.coroutines.launch
-import magmaquiz.composeapp.generated.resources.*
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.change_profile_picture
+import magmaquiz.composeapp.generated.resources.log_out
+import magmaquiz.composeapp.generated.resources.no_image_provided_error
+import magmaquiz.composeapp.generated.resources.save
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -52,7 +67,7 @@ fun SettingsScreen(navigateToAuth: () -> Unit) {
         authViewModel.authChannel.collect { event ->
             when (event) {
                 is NetworkEvent.Failure -> {
-                    SnackbarController.onEvent(event.networkError.name)
+                    SnackbarController.onEvent(getString(event.networkError.toResId()))
                 }
 
                 NetworkEvent.Success -> {
