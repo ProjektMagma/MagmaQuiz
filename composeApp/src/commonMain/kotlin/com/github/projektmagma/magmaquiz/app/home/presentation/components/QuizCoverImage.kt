@@ -16,18 +16,18 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import coil3.compose.SubcomposeAsyncImage
 import io.github.vinceglb.filekit.FileKit
-import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.dialogs.FileKitMode
 import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.openFilePicker
+import io.github.vinceglb.filekit.readBytes
 import kotlinx.coroutines.launch
 
 @Composable
 fun QuizCoverImage(
     height: Dp,
-    model: PlatformFile?,
+    model: ByteArray?,
     modifier: Modifier = Modifier,
-    onImageClick: ((PlatformFile?) -> Unit)? = null
+    onImageClick: ((ByteArray?) -> Unit)? = null
 ){
     val scope = rememberCoroutineScope()
     SubcomposeAsyncImage(
@@ -45,7 +45,7 @@ fun QuizCoverImage(
                                         type = FileKitType.Image,
                                         mode = FileKitMode.Single
                                     )
-                                    onImageClick(image)
+                                    onImageClick(image?.readBytes())
                                 }
                             },
                         )

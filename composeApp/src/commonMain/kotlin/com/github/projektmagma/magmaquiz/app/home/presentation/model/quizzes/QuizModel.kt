@@ -1,11 +1,12 @@
 package com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes
 
-import io.github.vinceglb.filekit.PlatformFile
+import java.util.UUID
 
 data class QuizModel(
+    val id: UUID? = null,
     val name: String = "",
     val description: String = "",
-    val image: PlatformFile? = null,
+    val image: ByteArray? = null,
     val isPublic: Boolean = false,
     val questionList: List<QuestionModel> = emptyList()
 )

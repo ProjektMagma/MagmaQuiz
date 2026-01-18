@@ -28,7 +28,13 @@ sealed interface Route : NavKey {
         data object Home : Route
 
         @Serializable
-        data object Settings : Route
+        data object Settings : Route {
+            @Serializable
+            data object Edit : Route
+            @Serializable
+            data object Profile : Route
+            @Serializable data class EditQuestion(val isMultiple: Boolean): Route
+        }
 
         @Serializable
         data object Play : Route {

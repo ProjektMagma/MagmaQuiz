@@ -7,5 +7,7 @@ data class CreateQuizState(
     val quizModel: QuizModel = QuizModel(),
     val questionModel: QuestionModel = QuestionModel(),
     val quizError: QuizError? = null,
-    val questionError: QuestionError? = null
+    val questionError: QuestionError? = null,
+    val isEditing: Boolean = false,
+    val isLoading: Boolean = false
 )

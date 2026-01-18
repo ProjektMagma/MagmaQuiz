@@ -7,15 +7,19 @@ import com.github.projektmagma.magmaquiz.app.core.util.BaseUrlProvider
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Resource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
-import io.ktor.client.*
-import io.ktor.client.request.*
-import io.ktor.http.*
-import java.util.*
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import java.util.UUID
 
 class QuizService(
     private val httpClient: HttpClient,
     private val baseUrlProvider: BaseUrlProvider,
-    private val apiDataStore: ApiDataStore
+    private val apiDataStore: ApiDataStore,
 ) {
     suspend fun getQuizByName(name: String): Resource<List<Quiz>, NetworkError> {
         return safeCall<List<Quiz>> {
@@ -25,7 +29,7 @@ class QuizService(
             }
         }
     }
-    
+
     suspend fun getQuizById(id: UUID): Resource<Quiz, NetworkError> {
         return safeCall<Quiz> {
             httpClient.get("${baseUrlProvider.getBaseUrl()}/quiz/$id") {
@@ -34,7 +38,7 @@ class QuizService(
             }
         }
     }
-    
+
     suspend fun changeFavoriteStatus(id: UUID): Resource<Unit, NetworkError> {
         return safeCall<Unit> {
             httpClient.get("${baseUrlProvider.getBaseUrl()}/quiz/changeFavoriteStatus/$id") {
@@ -43,7 +47,7 @@ class QuizService(
             }
         }
     }
-    
+
     suspend fun getMyFavorites(): Resource<List<Quiz>, NetworkError> {
         return safeCall<List<Quiz>> {
             httpClient.get("${baseUrlProvider.getBaseUrl()}/quiz/myFavorites") {
@@ -52,13 +56,32 @@ class QuizService(
             }
         }
     }
-    
+
     suspend fun createQuiz(quiz: CreateOrModifyQuizValue): Resource<Unit, NetworkError> {
         return safeCall<Unit> {
             httpClient.post("${baseUrlProvider.getBaseUrl()}/quiz/create") {
                 contentType(ContentType.Application.Json)
                 header("user_session", apiDataStore.getSessionHeader())
                 setBody(quiz)
+            }
+        }
+    }
+    
+    suspend fun modifyQuiz(quiz: CreateOrModifyQuizValue): Resource<Unit, NetworkError> {
+        return safeCall<Unit> { 
+            httpClient.post("${baseUrlProvider.getBaseUrl()}/quiz/modify") {
+                contentType(ContentType.Application.Json)
+                header("user_session", apiDataStore.getSessionHeader())
+                setBody(quiz)
+            }
+        }
+    }
+
+    suspend fun getQuizzesByUserId(id: UUID): Resource<List<Quiz>, NetworkError> {
+        return safeCall<List<Quiz>> {
+            httpClient.get("${baseUrlProvider.getBaseUrl()}/quiz/findByUser/$id") {
+                contentType(ContentType.Application.Json)
+                header("user_session", apiDataStore.getSessionHeader())
             }
         }
     }

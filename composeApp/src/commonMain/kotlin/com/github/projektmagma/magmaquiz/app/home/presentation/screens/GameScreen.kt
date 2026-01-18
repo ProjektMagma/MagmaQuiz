@@ -42,7 +42,6 @@ fun GameScreen(
     quizViewModel: QuizViewModel,
     navigateBack: () -> Unit
 ) {
-    val quiz by quizViewModel.quiz.collectAsStateWithLifecycle()
     val gameState by quizViewModel.gameState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit){

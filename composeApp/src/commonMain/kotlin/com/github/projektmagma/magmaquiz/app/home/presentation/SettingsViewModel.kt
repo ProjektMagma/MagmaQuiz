@@ -5,7 +5,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.projektmagma.magmaquiz.app.auth.data.AuthRepository
 import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
+import com.github.projektmagma.magmaquiz.app.home.data.repository.QuizRepository
 import com.github.projektmagma.magmaquiz.app.home.data.repository.SettingsRepository
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.UiEvent
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.settings.SettingsCommand
@@ -23,13 +25,19 @@ import magmaquiz.composeapp.generated.resources.no_image_provided_error
 import magmaquiz.composeapp.generated.resources.profile_picture_changed_success
 
 class SettingsViewModel(
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val quizRepository: QuizRepository,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiChannel = Channel<UiEvent>()
     val uiChannel = _uiChannel.receiveAsFlow()
 
-    private var state by mutableStateOf(SettingsState())
+    var state by mutableStateOf(SettingsState())
+
+    init {
+        getQuizzesByUserId()
+    }
 
     fun onCommand(command: SettingsCommand) {
         when (command) {
@@ -63,6 +71,13 @@ class SettingsViewModel(
                 .whenError {
                     _uiChannel.trySend(UiEvent.ShowSnackbar(it.error.toResId()))
                 }
+        }
+    }
+
+    // TODO przechwytywanie bledow
+    private fun getQuizzesByUserId() {
+        viewModelScope.launch {
+            quizRepository.getQuizzesByUserId(authRepository.thisUser.value?.userId!!).whenSuccess { state = state.copy(quizzes = it.data) }
         }
     }
 }

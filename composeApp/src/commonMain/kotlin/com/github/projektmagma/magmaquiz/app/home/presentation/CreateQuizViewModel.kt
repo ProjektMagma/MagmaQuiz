@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
 import com.github.projektmagma.magmaquiz.app.core.util.compressImage
-import com.github.projektmagma.magmaquiz.app.home.data.service.QuizService
+import com.github.projektmagma.magmaquiz.app.home.data.repository.QuizRepository
 import com.github.projektmagma.magmaquiz.app.home.domain.validators.toResId
 import com.github.projektmagma.magmaquiz.app.home.domain.validators.validateQuestion
 import com.github.projektmagma.magmaquiz.app.home.domain.validators.validateQuiz
@@ -16,6 +16,7 @@ import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.Ans
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.CreateQuizState
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuestionModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuizCommand
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.toQuestionModel
 import com.github.projektmagma.magmaquiz.shared.data.domain.Answer
 import com.github.projektmagma.magmaquiz.shared.data.domain.Question
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Resource
@@ -23,9 +24,10 @@ import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQ
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class CreateQuizViewModel(
-    private val quizService: QuizService
+    private val quizRepository: QuizRepository
 ) : ViewModel() {
     var state by mutableStateOf(CreateQuizState())
     
@@ -34,6 +36,32 @@ class CreateQuizViewModel(
     
     private val _uiChannel = Channel<UiEvent>()
     val uiChannel = _uiChannel.receiveAsFlow()
+    
+    fun getQuizForEdit(id: UUID) {
+        state = CreateQuizState(isLoading = true)
+        viewModelScope.launch { 
+            when (val result = quizRepository.getQuizById(id)) {
+                is Resource.Error -> { _quizChannel.send(NetworkEvent.Failure(result.error)) } 
+                is Resource.Success -> {
+                    val quiz = result.data
+                    state = state.copy(
+                        quizModel = state.quizModel.copy(
+                            id = quiz.id,
+                            name = quiz.quizName,
+                            description = quiz.quizDescription,
+                            image = quiz.quizImage,
+                            isPublic = quiz.isPublic,
+                            questionList = quiz.questionList.map { question ->
+                                question.toQuestionModel()
+                            }
+                        ),
+                        isEditing = true,
+                        isLoading = false
+                    )
+                } 
+            }
+        }
+    }
     
 
     fun onCommand(quizCommand: QuizCommand) {
@@ -48,7 +76,7 @@ class CreateQuizViewModel(
                     }
                     return
                 }
-                createQuiz()
+                uploadQuiz()
             }
         }
     }
@@ -67,7 +95,7 @@ class CreateQuizViewModel(
             is QuizCommand.QuestionEditor.AnswerContentChanged -> updateAnswer(index = command.index) { it.copy(content = command.content) }
             is QuizCommand.QuestionEditor.AnswerCorrectnessChanged -> updateAnswer(index = command.index) { it.copy(isCorrect = command.isCorrect) }
             is QuizCommand.QuestionEditor.ContentChanged -> state = state.copy(questionModel = state.questionModel.copy(content = command.content))
-            is QuizCommand.QuestionEditor.ImageChanged -> state = state.copy(questionModel = state.questionModel.copy(image = command.platformFile))
+            is QuizCommand.QuestionEditor.ImageChanged -> state = state.copy(questionModel = state.questionModel.copy(image = command.byteArray))
             is QuizCommand.QuestionEditor.Init -> {
                 val nextNumber = state.quizModel.questionList.size + 1
                 val newQuestionModel = if (command.isMultiple) {
@@ -111,7 +139,7 @@ class CreateQuizViewModel(
             is QuizCommand.QuestionEditor.RemoveAnswer -> {
                 state = state.copy(
                     questionModel = state.questionModel.copy(
-                        answerList = state.questionModel.answerList.filterIndexed { index, state -> index != command.index }
+                        answerList = state.questionModel.answerList.filterIndexed { index, _ -> index != command.index }
                     )
                 )
             }
@@ -136,21 +164,24 @@ class CreateQuizViewModel(
         )
     }
 
-    private fun createQuiz() {
+    private fun uploadQuiz() {
         viewModelScope.launch {
-            val result = quizService.createQuiz(
+            val value =
                 CreateOrModifyQuizValue(
+                    id = state.quizModel.id,
                     quizName = state.quizModel.name,
                     quizDescription = state.quizModel.description,
                     isPublic = state.quizModel.isPublic,
                     quizImage = state.quizModel.image.compressImage(75),
                     questionList = state.quizModel.questionList.map { question ->
                         Question(
+                            id = question.id,
                             questionNumber = question.number,
                             questionContent = question.content,
                             questionImage = question.image.compressImage(75),
                             answerList = question.answerList.map {
                                 Answer(
+                                    id = it.id,
                                     answerContent = it.content,
                                     isCorrect = it.isCorrect
                                 )
@@ -158,20 +189,20 @@ class CreateQuizViewModel(
                         )
                     }
                 )
-            )
             
+            val result = if (state.isEditing) {
+                quizRepository.modifyQuiz(value)
+            } else { 
+                quizRepository.createQuiz(value)
+            }
+
             when (result) {
-                is Resource.Error -> _quizChannel.send(NetworkEvent.Failure(result.error)) 
+                is Resource.Error -> _quizChannel.send(NetworkEvent.Failure(result.error))
                 is Resource.Success -> {
-                    clearState()
                     _quizChannel.send(NetworkEvent.Success)
                     _uiChannel.send(UiEvent.NavigateBack)
                 }
             }
         }
-    }
-    
-    fun clearState(){
-        state = CreateQuizState()
     }
 }

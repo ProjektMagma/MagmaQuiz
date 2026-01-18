@@ -43,8 +43,8 @@ fun QuizzesNavigation() {
     NavDisplay(
         backStack = quizzesBackstack,
         entryDecorators = listOf(
-            rememberSaveableStateHolderNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator()
+            rememberViewModelStoreNavEntryDecorator(),
+            rememberSaveableStateHolderNavEntryDecorator()
         ),
         entryProvider = entryProvider {
             entry<Quizzes.Find> {

@@ -29,4 +29,12 @@ class QuizRepository(
     suspend fun createQuiz(quiz: CreateOrModifyQuizValue): Resource<Unit, NetworkError> {
         return quizService.createQuiz(quiz)
     }
+    
+    suspend fun modifyQuiz(quiz: CreateOrModifyQuizValue): Resource<Unit, NetworkError> {
+        return quizService.modifyQuiz(quiz)
+    }
+
+    suspend fun getQuizzesByUserId(id: UUID): Resource<List<Quiz>, NetworkError>{
+        return quizService.getQuizzesByUserId(id)
+    }
 }

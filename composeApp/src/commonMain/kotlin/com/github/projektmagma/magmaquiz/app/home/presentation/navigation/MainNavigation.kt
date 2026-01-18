@@ -13,7 +13,6 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.HomeScreen
-import com.github.projektmagma.magmaquiz.app.home.presentation.screens.SettingsScreen
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.UsersScreen
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
@@ -83,7 +82,7 @@ fun MainNavigation(
                     UsersScreen()
                 }
                 entry<Route.Main.Settings> {
-                    SettingsScreen(navigateToAuth = { navigateToAuth() })
+                    SettingsNavigation({ navigateToAuth() })
                 }
             },
             transitionSpec = {

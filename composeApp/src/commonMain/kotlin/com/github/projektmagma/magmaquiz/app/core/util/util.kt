@@ -2,9 +2,7 @@ package com.github.projektmagma.magmaquiz.app.core.util
 
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.ImageFormat
-import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.compressImage
-import io.github.vinceglb.filekit.readBytes
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -22,11 +20,10 @@ fun convertLongSecondsToString(time: Long, pattern: String = "dd.MM.yyyy HH:mm")
     return format.format(date)
 }
 
-suspend fun PlatformFile?.compressImage(quality: Int): ByteArray? {
-    val bytes = this?.readBytes()
-    return if (bytes != null) {
+suspend fun ByteArray?.compressImage(quality: Int): ByteArray? {
+    return if (this != null) {
         FileKit.compressImage(
-            bytes = bytes,
+            bytes = this,
             quality = quality,
             maxWidth = 1024,
             maxHeight = 1024,

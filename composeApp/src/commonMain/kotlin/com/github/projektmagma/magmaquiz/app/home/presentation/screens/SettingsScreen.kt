@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -33,6 +34,7 @@ import com.github.projektmagma.magmaquiz.app.auth.presentation.model.auth.AuthCo
 import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
+import com.github.projektmagma.magmaquiz.app.home.presentation.CreateQuizViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.SettingsViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.UiEvent
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.settings.SettingsCommand
@@ -54,8 +56,11 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun SettingsScreen(navigateToAuth: () -> Unit) {
-
+fun SettingsScreen(
+    navigateToAuth: () -> Unit,
+    navigateToEditScreen: () -> Unit,
+    createQuizViewModel: CreateQuizViewModel
+) {
     val authViewModel = koinViewModel<AuthViewModel>()
     val settingsViewModel = koinViewModel<SettingsViewModel>()
     val scope = rememberCoroutineScope()
@@ -63,13 +68,14 @@ fun SettingsScreen(navigateToAuth: () -> Unit) {
     var showDialog by remember { mutableStateOf(false) }
     var isFileImageSelectorOpen by remember { mutableStateOf(false) }
 
+    val state = settingsViewModel.state
+
     LaunchedEffect(authViewModel.authChannel) {
         authViewModel.authChannel.collect { event ->
             when (event) {
                 is NetworkEvent.Failure -> {
                     SnackbarController.onEvent(getString(event.networkError.toResId()))
                 }
-
                 NetworkEvent.Success -> {
                     navigateToAuth()
                 }
@@ -156,6 +162,15 @@ fun SettingsScreen(navigateToAuth: () -> Unit) {
                     }
             }) {
                 Text(text = stringResource(Res.string.change_profile_picture))
+            }
+        }
+        items(state.quizzes) { quiz ->
+            Text(text = quiz.quizName)
+            Button(onClick = {
+                createQuizViewModel.getQuizForEdit(quiz.id!!)
+                navigateToEditScreen()
+            }) {
+                Text("Edit")
             }
         }
     }

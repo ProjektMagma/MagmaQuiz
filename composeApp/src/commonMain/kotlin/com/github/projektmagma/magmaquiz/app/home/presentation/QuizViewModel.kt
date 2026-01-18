@@ -38,7 +38,7 @@ class QuizViewModel(
     }
     
     private fun onAnswerSelected(cmd: GameCommand.AnswerClicked) {
-        if (_gameState.value.isQuizFinished) return
+        if (_gameState.value.isAnswered) return
         
         val isCorrect = cmd.isCorrect ?: _gameState.value.answers.find { it.content == cmd.content }?.isCorrect
         if (isCorrect == true) {
@@ -75,14 +75,15 @@ class QuizViewModel(
             val question = questions[_gameState.value.currentQuestionIndex]
             _gameState.update { gameState ->
                 gameState.copy(
-                questionContent = question.questionContent,
-                questionNumber = question.questionNumber,
-                questionImage = question.questionImage,
-                answers = question.answerList.map { AnswerState(it.answerContent, it.isCorrect) },
-                isAnswered = false,
-                isQuizFinished = false,
-                totalQuestions = questions.size
-            )}
+                    questionContent = question.questionContent,
+                    questionNumber = question.questionNumber,
+                    questionImage = question.questionImage,
+                    answers = question.answerList.map { AnswerState(it.answerContent, it.isCorrect) },
+                    isAnswered = false,
+                    isQuizFinished = false,
+                    totalQuestions = questions.size
+                )
+            }
         }
     }
     

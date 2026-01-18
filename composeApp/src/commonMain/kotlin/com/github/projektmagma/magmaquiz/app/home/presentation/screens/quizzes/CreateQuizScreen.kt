@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -73,7 +74,8 @@ fun CreateQuizScreen(
     val modalBottomSheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
     var showAlertDialog by remember { mutableStateOf(false) }
-    val quiz = createQuizViewModel.state.quizModel
+    val state = createQuizViewModel.state
+    val quiz = state.quizModel
 
     BackHandler {
         showAlertDialog = true
@@ -111,7 +113,6 @@ fun CreateQuizScreen(
                 Button(
                     onClick = {
                         showAlertDialog = false
-                        createQuizViewModel.clearState()
                         navigateBack()
                     }
                 ) {
@@ -128,141 +129,145 @@ fun CreateQuizScreen(
         )
     }
     
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                Button(
-                    onClick = {
-                        createQuizViewModel.onCommand(QuizCommand.CreateQuiz)
-                    }
+    if (state.isLoading) {
+        CircularProgressIndicator()
+    } else {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
+                    Button(
+                        onClick = {
+                            createQuizViewModel.onCommand(QuizCommand.CreateQuiz)
+                        }
                     ) {
-                        Icon(imageVector = Icons.Default.Save, contentDescription = stringResource(Res.string.save_icon))
-                        Text(text = stringResource(Res.string.save_quiz))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(imageVector = Icons.Default.Save, contentDescription = stringResource(Res.string.save_icon))
+                            Text(text = stringResource(Res.string.save_quiz))
+                        }
                     }
                 }
-            }
 
-            QuizCoverImage(
-                modifier = Modifier.padding(vertical = 8.dp),
-                height = 128.dp,
-                model = quiz.image,
-                onImageClick = {
-                    createQuizViewModel.onCommand(QuizCommand.QuizProperties.ImageChanged(it))
-                }
-            )
-
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                QuizDataTextField(
-                    value = quiz.name,
-                    placeholder = stringResource(Res.string.name),
-                    onValueChange = { createQuizViewModel.onCommand(QuizCommand.QuizProperties.NameChanged(it)) },
-                )
-                QuizDataTextField(
-                    value = quiz.description,
-                    placeholder = stringResource(Res.string.description),
-                    onValueChange = { createQuizViewModel.onCommand(QuizCommand.QuizProperties.DescriptionChanged(it)) }
+                QuizCoverImage(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    height = 128.dp,
+                    model = quiz.image,
+                    onImageClick = {
+                        createQuizViewModel.onCommand(QuizCommand.QuizProperties.ImageChanged(it))
+                    }
                 )
 
-                ExposedDropdownMenuBox(
-                    expanded = expanded,
-                    onExpandedChange = { expanded = !expanded }
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                            .fillMaxWidth(),
-                        readOnly = true,
-                        value = stringResource(if (quiz.isPublic) Res.string.public else Res.string.private),
-                        onValueChange = {},
-                        label = { Text(text = stringResource(Res.string.visibility)) },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
+                    QuizDataTextField(
+                        value = quiz.name,
+                        placeholder = stringResource(Res.string.name),
+                        onValueChange = { createQuizViewModel.onCommand(QuizCommand.QuizProperties.NameChanged(it)) },
+                    )
+                    QuizDataTextField(
+                        value = quiz.description,
+                        placeholder = stringResource(Res.string.description),
+                        onValueChange = { createQuizViewModel.onCommand(QuizCommand.QuizProperties.DescriptionChanged(it)) }
                     )
 
-                    ExposedDropdownMenu(
+                    ExposedDropdownMenuBox(
                         expanded = expanded,
-                        onDismissRequest = { expanded = false }
+                        onExpandedChange = { expanded = !expanded }
                     ) {
-                        DropdownMenuItem(
-                            text = { Text(text = stringResource(Res.string.public)) },
-                            onClick = {
-                                createQuizViewModel.onCommand(QuizCommand.QuizProperties.VisibilityChanged(true))
-                                expanded = false
-                            }
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                                .fillMaxWidth(),
+                            readOnly = true,
+                            value = stringResource(if (quiz.isPublic) Res.string.public else Res.string.private),
+                            onValueChange = {},
+                            label = { Text(text = stringResource(Res.string.visibility)) },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
                         )
-                        DropdownMenuItem(
-                            text = { Text(text = stringResource(Res.string.private)) },
-                            onClick = {
-                                createQuizViewModel.onCommand(QuizCommand.QuizProperties.VisibilityChanged(false))
-                                expanded = false
-                            }
-                        )
+
+                        ExposedDropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(text = stringResource(Res.string.public)) },
+                                onClick = {
+                                    createQuizViewModel.onCommand(QuizCommand.QuizProperties.VisibilityChanged(true))
+                                    expanded = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(text = stringResource(Res.string.private)) },
+                                onClick = {
+                                    createQuizViewModel.onCommand(QuizCommand.QuizProperties.VisibilityChanged(false))
+                                    expanded = false
+                                }
+                            )
+                        }
                     }
                 }
             }
-        }
 
-        items(quiz.questionList) { question ->
-            QuestionCard(
-                question = question,
-                navigateToQuestionCreate = {
-                    createQuizViewModel.onCommand(QuizCommand.QuestionEditor.SetForEditing(question))
-                    navigateToQuestionCreate(question.answerList.size > 1)
-                }
-            )
-        }
-
-        item {
-            Button(onClick = {
-                showBottomSheet = true
-            }) {
-                Text(text = stringResource(Res.string.add_question))
+            items(quiz.questionList) { question ->
+                QuestionCard(
+                    question = question,
+                    navigateToQuestionCreate = {
+                        createQuizViewModel.onCommand(QuizCommand.QuestionEditor.SetForEditing(question))
+                        navigateToQuestionCreate(question.answerList.size > 1)
+                    }
+                )
             }
-            
-            if (showBottomSheet) {
-                ModalBottomSheet(
-                    onDismissRequest = {
-                        showBottomSheet = false
-                    },
-                    sheetState = modalBottomSheetState
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(text = stringResource(Res.string.choose_type))
-                        
-                        Button(
-                            onClick = {
-                                createQuizViewModel.onCommand(QuizCommand.QuestionEditor.Init(false))
-                                navigateToQuestionCreate(false)
-                            }
-                        ) {
-                            Text(text = stringResource(Res.string.single_answer))
-                        }
 
-                        Button(
-                            onClick = {
-                                createQuizViewModel.onCommand(QuizCommand.QuestionEditor.Init(true))
-                                navigateToQuestionCreate(true)
-                            }
+            item {
+                Button(onClick = {
+                    showBottomSheet = true
+                }) {
+                    Text(text = stringResource(Res.string.add_question))
+                }
+
+                if (showBottomSheet) {
+                    ModalBottomSheet(
+                        onDismissRequest = {
+                            showBottomSheet = false
+                        },
+                        sheetState = modalBottomSheetState
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Text(text = stringResource(Res.string.multi_answer))
+                            Text(text = stringResource(Res.string.choose_type))
+
+                            Button(
+                                onClick = {
+                                    createQuizViewModel.onCommand(QuizCommand.QuestionEditor.Init(false))
+                                    navigateToQuestionCreate(false)
+                                }
+                            ) {
+                                Text(text = stringResource(Res.string.single_answer))
+                            }
+
+                            Button(
+                                onClick = {
+                                    createQuizViewModel.onCommand(QuizCommand.QuestionEditor.Init(true))
+                                    navigateToQuestionCreate(true)
+                                }
+                            ) {
+                                Text(text = stringResource(Res.string.multi_answer))
+                            }
                         }
                     }
                 }
