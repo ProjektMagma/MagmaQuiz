@@ -38,7 +38,7 @@
     <string name="name">Name</string>
     <string name="description">Description</string>
     <string name="correct_answer">Correct answer</string>
-    <string name="wrong_asnwer">Incorrect answer</string>
+    <string name="wrong_answer">Incorrect answer</string>
     <string name="content_empty">Empty content</string>
     <string name="answer_content_empty">Empty answer's content</string>
     <string name="no_correct">No selected correct answer</string>
@@ -49,7 +49,7 @@
     <string name="serialization_error">Problem with reading data</string>
     <string name="multiple_choices_error">Several users with the given email address</string>
     <string name="not_found_error">No user with the given data was found</string>
-    <string name="unathorized_error">Invalid credentials</string>
+    <string name="unauthorized_error">Invalid credentials</string>
     <string name="server_error">Server error</string>
     <string name="unknown_error">Unknown Error</string>
     <string name="success_quiz_add">quiz successfully added</string>
@@ -67,4 +67,10 @@
     <string name="no_image_provided_error">No image provided</string>
     <string name="profile_picture_changed_success">Profile picture changed successfully. Restart the app.</string>
     <string name="change_profile_picture">Change profile picture</string>
+    <string name="empty_content">Nothing to display</string>
+    <string name="try_again">Try again</string>
+    <string name="no_internet_error">No internet connection</string>
+    <string name="unknown_host_error">Server address not found</string>
+    <string name="error_announcement">An error occurred</string>
+    <string name="create">Create</string>
 </resources>

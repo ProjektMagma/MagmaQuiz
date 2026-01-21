@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.AnswerModel
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.correct_answer
-import magmaquiz.composeapp.generated.resources.wrong_asnwer
+import magmaquiz.composeapp.generated.resources.wrong_answer
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -31,7 +31,7 @@ fun AnswerCard(
         } else { 
             Icon(
                 imageVector = Icons.Outlined.Close,
-                contentDescription = stringResource(Res.string.wrong_asnwer)
+                contentDescription = stringResource(Res.string.wrong_answer)
             )
         }
         Text(

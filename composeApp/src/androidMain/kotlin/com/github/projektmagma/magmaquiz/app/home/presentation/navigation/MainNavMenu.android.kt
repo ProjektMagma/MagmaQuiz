@@ -1,9 +1,7 @@
 package com.github.projektmagma.magmaquiz.app.home.presentation.navigation
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Quiz
@@ -11,7 +9,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -20,11 +17,7 @@ import androidx.navigation3.runtime.NavKey
 import com.github.projektmagma.magmaquiz.app.auth.presentation.AuthViewModel
 import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.ProfilePictureIcon
-import magmaquiz.composeapp.generated.resources.Res
-import magmaquiz.composeapp.generated.resources.greeting
-import magmaquiz.composeapp.generated.resources.home_nav
-import magmaquiz.composeapp.generated.resources.quizzes_nav
-import magmaquiz.composeapp.generated.resources.users_nav
+import magmaquiz.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.androidx.compose.koinViewModel
 
@@ -89,7 +82,7 @@ actual fun MainNavMenu(
                         textAlign = TextAlign.Center
                     )
                 },
-                selected = backStack.last() == Route.Main.Home,
+                selected = backStack.last() == Route.Menus.Home,
             )
             NavigationBarItem(
                 onClick = {
@@ -108,7 +101,7 @@ actual fun MainNavMenu(
                         textAlign = TextAlign.Center
                     )
                 },
-                selected = backStack.last() == Route.Main.Quizzes,
+                selected = backStack.last() == Route.Menus.Quizzes,
             )
             NavigationBarItem(
                 onClick = {
@@ -127,7 +120,7 @@ actual fun MainNavMenu(
                         textAlign = TextAlign.Center
                     )
                 },
-                selected = backStack.last() == Route.Main.Users,
+                selected = backStack.last() == Route.Menus.Users,
             )
         }
     }

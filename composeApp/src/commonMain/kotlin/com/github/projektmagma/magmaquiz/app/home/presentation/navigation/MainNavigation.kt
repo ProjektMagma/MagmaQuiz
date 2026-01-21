@@ -19,46 +19,47 @@ import kotlinx.serialization.modules.polymorphic
 
 @Composable
 fun MainNavigation(
+    navigateToGameScreen: () -> Unit,
     navigateToAuth: () -> Unit
 ) {
     val mainBackStack = rememberNavBackStack(
         configuration = SavedStateConfiguration {
             serializersModule = SerializersModule {
                 polymorphic(NavKey::class) {
-                    subclass(Route.Main.Home::class, Route.Main.Home.serializer())
-                    subclass(Route.Main.Quizzes::class, Route.Main.Quizzes.serializer())
-                    subclass(Route.Main.Users::class, Route.Main.Users.serializer())
-                    subclass(Route.Main.Settings::class, Route.Main.Settings.serializer())
+                    subclass(Route.Menus.Home::class, Route.Menus.Home.serializer())
+                    subclass(Route.Menus.Quizzes::class, Route.Menus.Quizzes.serializer())
+                    subclass(Route.Menus.Users::class, Route.Menus.Users.serializer())
+                    subclass(Route.Menus.Settings::class, Route.Menus.Settings.serializer())
                 }
             }
         },
-        Route.Main.Home
+        Route.Menus.Home
     )
     MainNavMenu(
         backStack = mainBackStack,
         navigateToHome = {
-            if (mainBackStack.getOrNull(mainBackStack.size - 2) == Route.Main.Home)
+            if (mainBackStack.getOrNull(mainBackStack.size - 2) == Route.Menus.Home)
                 mainBackStack.removeLastOrNull()
             else
-                mainBackStack.add(Route.Main.Home)
+                mainBackStack.add(Route.Menus.Home)
         },
         navigateToQuizzes = {
-            if (mainBackStack.getOrNull(mainBackStack.size - 2) == Route.Main.Quizzes)
+            if (mainBackStack.getOrNull(mainBackStack.size - 2) == Route.Menus.Quizzes)
                 mainBackStack.removeLastOrNull()
             else
-                mainBackStack.add(Route.Main.Quizzes)
+                mainBackStack.add(Route.Menus.Quizzes)
         },
         navigateToUsers = {
-            if (mainBackStack.getOrNull(mainBackStack.size - 2) == Route.Main.Users)
+            if (mainBackStack.getOrNull(mainBackStack.size - 2) == Route.Menus.Users)
                 mainBackStack.removeLastOrNull()
             else
-                mainBackStack.add(Route.Main.Users)
+                mainBackStack.add(Route.Menus.Users)
         },
         navigateToSettings = {
-            if (mainBackStack.getOrNull(mainBackStack.size - 2) == Route.Main.Settings)
+            if (mainBackStack.getOrNull(mainBackStack.size - 2) == Route.Menus.Settings)
                 mainBackStack.removeLastOrNull()
             else
-                mainBackStack.add(Route.Main.Settings)
+                mainBackStack.add(Route.Menus.Settings)
         },
     ) {
         NavDisplay(
@@ -72,17 +73,17 @@ fun MainNavigation(
                 rememberSaveableStateHolderNavEntryDecorator()
             ),
             entryProvider = entryProvider {
-                entry<Route.Main.Home> {
+                entry<Route.Menus.Home> {
                     HomeScreen()
                 }
-                entry<Route.Main.Quizzes> {
-                    QuizzesNavigation()
+                entry<Route.Menus.Quizzes> {
+                    QuizzesNavigation(navigateToGameScreen = { navigateToGameScreen() })
                 }
-                entry<Route.Main.Users> {
+                entry<Route.Menus.Users> {
                     UsersScreen()
                 }
-                entry<Route.Main.Settings> {
-                    SettingsNavigation({ navigateToAuth() })
+                entry<Route.Menus.Settings> {
+                    SettingsNavigation(navigateToAuth = { navigateToAuth() })
                 }
             },
             transitionSpec = {

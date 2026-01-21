@@ -64,13 +64,16 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.content.negotiation)
-
+            implementation(libs.ktor.client.logging)
+            implementation(libs.napier)
+            
             implementation(projects.shared)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
         jvmMain.dependencies {
+            implementation(libs.logback)
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
         }

@@ -1,7 +1,6 @@
 package com.github.projektmagma.magmaquiz.app.home.presentation.components
 
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -16,6 +15,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun SearchTextField(
+    modifier: Modifier = Modifier,
     searchedText: String,
     labelText: String,
     onSearch: () -> Unit = {},
@@ -23,9 +23,7 @@ fun SearchTextField(
     trailingIcon: @Composable (() -> Unit)? = null,
 ) {
     OutlinedTextField(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp),
+        modifier = modifier,
         value = searchedText,
         shape = MaterialTheme.shapes.large,
         placeholder = {

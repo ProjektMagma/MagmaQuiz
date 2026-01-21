@@ -1,13 +1,6 @@
 package com.github.projektmagma.magmaquiz.app.home.presentation.navigation
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.PersonAdd
@@ -26,11 +19,7 @@ import com.github.projektmagma.magmaquiz.app.auth.presentation.AuthViewModel
 import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.NavButton
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.ProfilePictureIcon
-import magmaquiz.composeapp.generated.resources.Res
-import magmaquiz.composeapp.generated.resources.greeting
-import magmaquiz.composeapp.generated.resources.home_nav
-import magmaquiz.composeapp.generated.resources.quizzes_nav
-import magmaquiz.composeapp.generated.resources.users_nav
+import magmaquiz.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -65,7 +54,7 @@ actual fun MainNavMenu(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 NavButton(
-                    isCurrentRoute = backStack.last() == Route.Main.Home,
+                    isCurrentRoute = backStack.last() == Route.Menus.Home,
                     onClick = {
                         navigateToHome()
                     },
@@ -73,7 +62,7 @@ actual fun MainNavMenu(
                     contentIcon = Icons.Default.Home
                 )
                 NavButton(
-                    isCurrentRoute = backStack.last() == Route.Main.Quizzes,
+                    isCurrentRoute = backStack.last() == Route.Menus.Quizzes,
                     onClick = {
                         navigateToQuizzes()
                     },
@@ -81,7 +70,7 @@ actual fun MainNavMenu(
                     contentIcon = Icons.Default.Quiz
                 )
                 NavButton(
-                    isCurrentRoute = backStack.last() == Route.Main.Users,
+                    isCurrentRoute = backStack.last() == Route.Menus.Users,
                     onClick = {
                         navigateToUsers()
                     },

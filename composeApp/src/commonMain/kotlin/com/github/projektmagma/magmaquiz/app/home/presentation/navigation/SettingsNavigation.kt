@@ -25,13 +25,13 @@ fun SettingsNavigation(
         configuration = SavedStateConfiguration {
             serializersModule = SerializersModule {
                 polymorphic(NavKey::class){
-                    subclass(Route.Main.Settings.Edit::class, Route.Main.Settings.Edit.serializer())
-                    subclass(Route.Main.Settings.Profile::class, Route.Main.Settings.Profile.serializer())
-                    subclass(Route.Main.Settings.EditQuestion::class, Route.Main.Settings.EditQuestion.serializer())
+                    subclass(Route.Menus.Settings.Edit::class, Route.Menus.Settings.Edit.serializer())
+                    subclass(Route.Menus.Settings.Profile::class, Route.Menus.Settings.Profile.serializer())
+                    subclass(Route.Menus.Settings.EditQuestion::class, Route.Menus.Settings.EditQuestion.serializer())
                 }
             }
         },
-        Route.Main.Settings.Profile
+        Route.Menus.Settings.Profile
     )
 
     val createQuizViewModel: CreateQuizViewModel = koinViewModel()
@@ -43,21 +43,21 @@ fun SettingsNavigation(
             rememberSaveableStateHolderNavEntryDecorator()
         ),
         entryProvider = entryProvider {
-            entry<Route.Main.Settings.Edit> {
+            entry<Route.Menus.Settings.Edit> {
                 CreateQuizScreen(
-                    navigateToQuestionCreate = { settingsBackStack.add(Route.Main.Settings.EditQuestion(it)) },
+                    navigateToQuestionCreate = { settingsBackStack.add(Route.Menus.Settings.EditQuestion(it)) },
                     navigateBack = { settingsBackStack.removeLastOrNull() },
                     createQuizViewModel = createQuizViewModel
                 )
             }
-            entry<Route.Main.Settings.Profile> {
+            entry<Route.Menus.Settings.Profile> {
                 SettingsScreen(
                     navigateToAuth = { navigateToAuth() },
-                    navigateToEditScreen = {settingsBackStack.add(Route.Main.Settings.Edit)},
+                    navigateToEditScreen = { settingsBackStack.add(Route.Menus.Settings.Edit) },
                     createQuizViewModel = createQuizViewModel
                 )
             }
-            entry<Route.Main.Settings.EditQuestion> {
+            entry<Route.Menus.Settings.EditQuestion> {
                 CreateQuestionScreen(
                     it.isMultiple,
                     createQuizViewModel = createQuizViewModel,

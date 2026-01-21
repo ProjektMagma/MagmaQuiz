@@ -1,34 +1,12 @@
 package com.github.projektmagma.magmaquiz.app.home.presentation.screens.quizzes
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuAnchorType
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -38,28 +16,13 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
 import com.github.projektmagma.magmaquiz.app.home.presentation.CreateQuizViewModel
+import com.github.projektmagma.magmaquiz.app.home.presentation.components.FullSizeCircularProgressIndicator
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.QuizCoverImage
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.QuizDataTextField
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.quizzes.QuestionCard
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.UiEvent
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuizCommand
-import magmaquiz.composeapp.generated.resources.Res
-import magmaquiz.composeapp.generated.resources.add_question
-import magmaquiz.composeapp.generated.resources.all_changes_remove
-import magmaquiz.composeapp.generated.resources.are_you_sure
-import magmaquiz.composeapp.generated.resources.choose_type
-import magmaquiz.composeapp.generated.resources.description
-import magmaquiz.composeapp.generated.resources.multi_answer
-import magmaquiz.composeapp.generated.resources.name
-import magmaquiz.composeapp.generated.resources.no
-import magmaquiz.composeapp.generated.resources.private
-import magmaquiz.composeapp.generated.resources.public
-import magmaquiz.composeapp.generated.resources.save_icon
-import magmaquiz.composeapp.generated.resources.save_quiz
-import magmaquiz.composeapp.generated.resources.single_answer
-import magmaquiz.composeapp.generated.resources.success_quiz_add
-import magmaquiz.composeapp.generated.resources.visibility
-import magmaquiz.composeapp.generated.resources.yes
+import magmaquiz.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 
@@ -130,7 +93,7 @@ fun CreateQuizScreen(
     }
     
     if (state.isLoading) {
-        CircularProgressIndicator()
+        FullSizeCircularProgressIndicator()
     } else {
         LazyColumn(
             modifier = Modifier

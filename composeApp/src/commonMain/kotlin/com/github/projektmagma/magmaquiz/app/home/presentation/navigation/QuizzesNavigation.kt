@@ -8,10 +8,9 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
-import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route.Main.Quizzes
+import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route.Menus.Quizzes
 import com.github.projektmagma.magmaquiz.app.home.presentation.CreateQuizViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.QuizViewModel
-import com.github.projektmagma.magmaquiz.app.home.presentation.screens.GameScreen
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.quizzes.CreateQuestionScreen
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.quizzes.CreateQuizScreen
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.quizzes.QuizDetailsScreen
@@ -21,14 +20,16 @@ import kotlinx.serialization.modules.polymorphic
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun QuizzesNavigation() {
+fun QuizzesNavigation(
+    navigateToGameScreen: () -> Unit
+) {
     val quizzesBackstack = rememberNavBackStack(
         configuration = SavedStateConfiguration {
             serializersModule = SerializersModule {
                 polymorphic(NavKey::class) {
                     subclass(Quizzes.Find::class, Quizzes.Find.serializer())
                     subclass(Quizzes.Details::class, Quizzes.Details.serializer())
-                    subclass(Quizzes.Game::class, Quizzes.Game.serializer())
+//                    subclass(Quizzes.Game::class, Quizzes.Game.serializer())
                     subclass(Quizzes.CreateQuiz::class, Quizzes.CreateQuiz.serializer())
                     subclass(Quizzes.CreateQuestion::class, Quizzes.CreateQuestion.serializer())
                 }
@@ -62,17 +63,9 @@ fun QuizzesNavigation() {
                     id = it.id,
                     quizViewModel = quizViewModel,
                     navigateToPlayScreen = {
-                        quizzesBackstack.add(Quizzes.Game)
+                        navigateToGameScreen()
                     },
                     navigateBack = { quizzesBackstack.removeLastOrNull() }
-                )
-            }
-            entry<Quizzes.Game> {
-                GameScreen(
-                    quizViewModel = quizViewModel,
-                    navigateBack = {
-                        quizzesBackstack.removeAt(quizzesBackstack.size - 1)
-                    }
                 )
             }
             entry<Quizzes.CreateQuiz> {
