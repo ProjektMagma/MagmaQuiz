@@ -74,6 +74,21 @@ fun Application.quizRoutes(quizDataController: QuizDataController) {
                     val userId = UUID.fromString(call.parameters["id"]!!)
                     call.respondToResource(quizDataController.quizFindByUserId(userId))
                 }
+
+                get("/newest/{count}") {
+                    val count = call.parameters["count"]!!.toInt()
+                    call.respondToResource(quizDataController.quizNewest(count))
+                }
+
+                get("/mostLiked/{count}") {
+                    val count = call.parameters["count"]!!.toInt()
+                    call.respondToResource(quizDataController.quizMostLiked(count))
+                }
+
+                get("/friendsQuizzes/") {
+                    val session = call.sessions.get<UserSession>()!!
+                    call.respondToResource(quizDataController.quizFriendsQuizzes(session))
+                }
             }
         }
     }

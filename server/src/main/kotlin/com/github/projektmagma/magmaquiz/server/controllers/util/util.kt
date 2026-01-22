@@ -44,9 +44,10 @@ fun quizEntityOrNull(quizId: UUID, userId: UUID): QuizEntity? {
 // Drugi użytkownik jest aktywny (nie jest usunięty)
 // Znajomość nie jest usunięta,
 // Znajomość jest z "lewej" lub "prawej" połączona z tym użytkownikiem
-fun friendshipEntityOrNull(thisUserId: UUID, otherUserId: UUID): FriendshipEntity? {
+fun UserEntity.friendshipEntityOrNull(otherUserId: UUID): FriendshipEntity? {
+    val thisUser = this
+    
     if (!isUserActive(otherUserId)) return null
-
 
     val dbUser = transaction {
         UserEntity.findById(otherUserId)
@@ -54,11 +55,29 @@ fun friendshipEntityOrNull(thisUserId: UUID, otherUserId: UUID): FriendshipEntit
 
     val friendship = transaction {
         FriendshipEntity.find {
-            (FriendshipsTable.userFrom eq thisUserId and (FriendshipsTable.userTo eq dbUser.id)) or
-                    (FriendshipsTable.userFrom eq dbUser.id and (FriendshipsTable.userTo eq thisUserId))
+            (FriendshipsTable.userFrom eq thisUser.id and (FriendshipsTable.userTo eq dbUser.id)) or
+                    (FriendshipsTable.userFrom eq dbUser.id and (FriendshipsTable.userTo eq thisUser.id))
         }.firstOrNull()
     }
 
     return friendship
 }
 
+
+fun UserEntity.userFriendList(): List<UserEntity> {
+    val thisUser = this
+
+    val friendshipList = transaction {
+        FriendshipEntity.find {
+            FriendshipsTable.userFrom eq thisUser.id or (FriendshipsTable.userTo eq thisUser.id) and FriendshipsTable.isActive
+        }
+    }
+
+    return transaction {
+        friendshipList
+            .map { friendship ->
+                if (friendship.userTo == thisUser) friendship.userFrom
+                else friendship.userTo
+            }
+    }
+}

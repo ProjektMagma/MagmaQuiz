@@ -59,7 +59,7 @@ class UsersDataController {
             UserEntity.findById(userId)
         }!!
 
-        val friendship = friendshipEntityOrNull(session.userId, userId)
+        val friendship = transaction { UserEntity.findById(session.userId) }!!.friendshipEntityOrNull(userId)
 
         if (friendship != null && transaction { dbUser.isActive })
             return NetworkResource.Error(HttpStatusCode.Conflict)
@@ -75,7 +75,8 @@ class UsersDataController {
     }
 
     fun usersFriendshipAcceptInvitation(session: UserSession, userId: UUID): NetworkResource<Unit> {
-        val friendship = friendshipEntityOrNull(session.userId, userId)
+        val friendship =
+            transaction { UserEntity.findById(session.userId) }!!.friendshipEntityOrNull(userId)
 
         if (friendship == null || !isUserActive(userId))
             return NetworkResource.Error(HttpStatusCode.NotFound)

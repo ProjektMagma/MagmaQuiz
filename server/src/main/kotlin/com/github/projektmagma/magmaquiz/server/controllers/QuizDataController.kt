@@ -1,6 +1,7 @@
 package com.github.projektmagma.magmaquiz.server.controllers
 
 import com.github.projektmagma.magmaquiz.server.controllers.util.quizEntityOrNull
+import com.github.projektmagma.magmaquiz.server.controllers.util.userFriendList
 import com.github.projektmagma.magmaquiz.server.data.conversion.QuizConversionCommand
 import com.github.projektmagma.magmaquiz.server.data.entities.*
 import com.github.projektmagma.magmaquiz.server.data.tables.AnswersTable
@@ -288,5 +289,54 @@ class QuizDataController {
             }
 
         return NetworkResource.Success(quizList)
+    }
+
+    fun quizNewest(count: Int): NetworkResource<List<Quiz>> {
+        val quizList = transaction {
+            QuizEntity.all()
+                .filter { it.isActive && it.isPublic }
+                .sortedBy { it.createdAt }
+                .asReversed()
+                .take(count)
+                .map { it.toDomain(QuizConversionCommand.WithUserNoQuestions) }
+        }
+
+        return NetworkResource.Success(quizList)
+    }
+
+    fun quizMostLiked(count: Int): NetworkResource<List<Quiz>> {
+        val quizList = transaction {
+            QuizEntity.all()
+                .filter { it.isActive && it.isPublic }
+                .sortedBy { it.likesCount }
+                .asReversed()
+                .take(count)
+                .map { it.toDomain(QuizConversionCommand.WithUserNoQuestions) }
+        }
+
+        return NetworkResource.Success(quizList)
+    }
+
+
+    // TODO: Sprawdzić czy działa
+    fun quizFriendsQuizzes(session: UserSession): NetworkResource<List<Quiz>> {
+        val quizzesList = mutableListOf<Quiz>()
+
+        val friendList = transaction {
+            UserEntity.findById(session.userId)
+        }!!.userFriendList()
+
+        transaction {
+            friendList.forEach {
+                it.quizList.forEach { quiz -> quizzesList.add(quiz.toDomain(QuizConversionCommand.WithUserNoQuestions)) }
+            }
+
+            quizzesList.apply {
+                this.sortBy { it.createdAt }
+                this.reverse()
+            }
+        }
+
+        return NetworkResource.Success(quizzesList)
     }
 }
