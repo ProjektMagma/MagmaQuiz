@@ -2,7 +2,11 @@ package com.github.projektmagma.magmaquiz.server.controllers
 
 import com.github.projektmagma.magmaquiz.server.controllers.util.quizEntityOrNull
 import com.github.projektmagma.magmaquiz.server.data.conversion.QuizConversionCommand
-import com.github.projektmagma.magmaquiz.server.data.entities.*
+import com.github.projektmagma.magmaquiz.server.data.entities.AnswerEntity
+import com.github.projektmagma.magmaquiz.server.data.entities.FavoriteQuizzesEntity
+import com.github.projektmagma.magmaquiz.server.data.entities.QuestionEntity
+import com.github.projektmagma.magmaquiz.server.data.entities.QuizEntity
+import com.github.projektmagma.magmaquiz.server.data.entities.UserEntity
 import com.github.projektmagma.magmaquiz.server.data.tables.AnswersTable
 import com.github.projektmagma.magmaquiz.server.data.tables.FavoriteQuizzesTable
 import com.github.projektmagma.magmaquiz.server.data.tables.QuestionsTable
@@ -11,13 +15,13 @@ import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkResource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
-import io.ktor.http.*
+import io.ktor.http.HttpStatusCode
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.lowerCase
 import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.util.*
+import java.util.UUID
 
 class QuizDataController {
 
@@ -273,20 +277,57 @@ class QuizDataController {
         return NetworkResource.Success(quizzesList)
     }
 
-    fun quizFindByUserId(userId: UUID): NetworkResource<List<Quiz>> {
-        val dbUser = transaction {
-            UserEntity.findById(userId)
+    fun quizFindByUserId(
+        userId: UUID,
+        session: UserSession
+    ): NetworkResource<List<Quiz>> = transaction {
+        val profileUser = UserEntity.findById(userId)
+            ?: return@transaction NetworkResource.Error(HttpStatusCode.NotFound)
+
+        val viewerUser = UserEntity.findById(session.userId)
+            ?: return@transaction NetworkResource.Error(HttpStatusCode.Unauthorized)
+
+        val isOwner = profileUser.id.value == viewerUser.id.value
+
+        val quizzes: List<QuizEntity> = profileUser.quizList
+            .filter { it.isActive }
+            .filter { isOwner || it.isPublic }
+            .toList()
+
+        val likedQuizIds =
+            FavoriteQuizzesEntity.find {
+                (FavoriteQuizzesTable.user eq viewerUser.id) and
+                        (FavoriteQuizzesTable.isActive eq true)
+            }.map { it.quiz.id }
+
+        val mapped = quizzes.map { dbQuiz ->
+            dbQuiz.toDomain(QuizConversionCommand.WithUserNoQuestions).apply {
+                likedByYou = dbQuiz.id in likedQuizIds
+            }
         }
 
-        if (dbUser == null)
-            return NetworkResource.Error(HttpStatusCode.NotFound)
+        NetworkResource.Success(mapped)
+    }
 
-        val quizList =
-            transaction {
-                dbUser.quizList.toList()
-                    .map { it.toDomain(QuizConversionCommand.WithoutUserAndQuestions) }
-            }
+    fun quizDelete(quizId: UUID): NetworkResource<Unit> = transaction {
+        val dbQuiz = QuizEntity.findById(quizId) ?: return@transaction NetworkResource.Error(HttpStatusCode.NotFound)
 
-        return NetworkResource.Success(quizList)
+        dbQuiz.isActive = false
+
+        QuestionEntity.find {
+            (QuestionsTable.quiz eq dbQuiz.id) and (QuestionsTable.isActive eq true)
+        }.forEach { q ->
+            q.isActive = false
+            AnswerEntity.find {
+                (AnswersTable.question eq q.id) and (AnswersTable.isActive eq true)
+            }.forEach { a -> a.isActive = false }
+        }
+
+        FavoriteQuizzesEntity.find {
+            (FavoriteQuizzesTable.quiz eq dbQuiz.id) and (FavoriteQuizzesTable.isActive eq true)
+        }.forEach { fav -> fav.isActive = false }
+
+
+        return@transaction NetworkResource.Success(Unit, HttpStatusCode.OK)
     }
 }
