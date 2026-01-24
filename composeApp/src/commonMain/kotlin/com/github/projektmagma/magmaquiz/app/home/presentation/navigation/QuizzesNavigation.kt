@@ -8,6 +8,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
+import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route
 import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route.Menus.Quizzes
 import com.github.projektmagma.magmaquiz.app.home.presentation.CreateQuizViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.QuizViewModel
@@ -18,29 +19,41 @@ import com.github.projektmagma.magmaquiz.app.home.presentation.screens.quizzes.Q
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import org.koin.compose.viewmodel.koinViewModel
+import java.util.UUID
 
 @Composable
 fun QuizzesNavigation(
-    navigateToGameScreen: () -> Unit
+    startDestination: Route,
+    navigateToUserDetails: (id: UUID) -> Unit,
+    navigateToGameScreen: () -> Unit,
+    onSystemBack: () -> Unit,
 ) {
     val quizzesBackstack = rememberNavBackStack(
         configuration = SavedStateConfiguration {
             serializersModule = SerializersModule {
                 polymorphic(NavKey::class) {
                     subclass(Quizzes.Find::class, Quizzes.Find.serializer())
-                    subclass(Quizzes.Details::class, Quizzes.Details.serializer())
 //                    subclass(Quizzes.Game::class, Quizzes.Game.serializer())
                     subclass(Quizzes.CreateQuiz::class, Quizzes.CreateQuiz.serializer())
                     subclass(Quizzes.CreateQuestion::class, Quizzes.CreateQuestion.serializer())
+                    subclass(Quizzes.QuizDetails::class, Quizzes.QuizDetails.serializer())
                 }
             }
         },
-        Quizzes.Find
+        startDestination
     )
+
+    fun navigateBack() {
+        if (quizzesBackstack.size > 1) {
+            quizzesBackstack.removeLastOrNull()
+        } else {
+            onSystemBack()
+        }
+    }
 
     val quizViewModel: QuizViewModel = koinViewModel()
     val createQuizViewModel: CreateQuizViewModel = koinViewModel()
-
+    
     NavDisplay(
         backStack = quizzesBackstack,
         entryDecorators = listOf(
@@ -51,30 +64,34 @@ fun QuizzesNavigation(
             entry<Quizzes.Find> {
                 QuizzesScreen(
                     navigateToCreateQuizScreen = {
-                        quizzesBackstack.add(Quizzes.CreateQuiz)
+                        quizzesBackstack.add(Quizzes.CreateQuiz())
+                    },
+                    navigateToUserDetails = {
+                        navigateToUserDetails(it)
                     },
                     navigateToQuizDetails = { id ->
-                        quizzesBackstack.add(Quizzes.Details(id))
+                        quizzesBackstack.add(Quizzes.QuizDetails(id))
                     }
                 )
             }
-            entry<Quizzes.Details> {
+            entry<Quizzes.QuizDetails> {
                 QuizDetailsScreen(
                     id = it.id,
                     quizViewModel = quizViewModel,
                     navigateToPlayScreen = {
                         navigateToGameScreen()
                     },
-                    navigateBack = { quizzesBackstack.removeLastOrNull() }
+                    navigateBack = { navigateBack() }
                 )
             }
             entry<Quizzes.CreateQuiz> {
                 CreateQuizScreen(
-                    navigateToQuestionCreate = {
-                        quizzesBackstack.add(Quizzes.CreateQuestion(it))
+                    id = it.id,
+                    navigateToQuestionCreate = { id ->
+                        quizzesBackstack.add(Quizzes.CreateQuestion(id))
                     },
                     navigateBack = {
-                        quizzesBackstack.removeLastOrNull()
+                        navigateBack()
                     },
                     createQuizViewModel = createQuizViewModel
                 )

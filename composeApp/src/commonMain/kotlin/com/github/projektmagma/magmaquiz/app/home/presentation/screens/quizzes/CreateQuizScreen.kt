@@ -25,10 +25,12 @@ import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.Qui
 import magmaquiz.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun CreateQuizScreen(
+    id: UUID? = null,
     navigateToQuestionCreate: (Boolean) -> Unit,
     navigateBack: () -> Unit,
     createQuizViewModel: CreateQuizViewModel
@@ -42,6 +44,14 @@ fun CreateQuizScreen(
 
     BackHandler {
         showAlertDialog = true
+    }
+    
+    LaunchedEffect(Unit){
+        if (id == null) {
+            createQuizViewModel.onCommand(QuizCommand.ResetState)
+        } else if (id != quiz.id) {
+            createQuizViewModel.onCommand(QuizCommand.SetForEdit(id))
+        }
     }
 
     LaunchedEffect(createQuizViewModel.quizChannel) {

@@ -28,6 +28,7 @@ import java.util.*
 fun QuizzesScreen(
     navigateToCreateQuizScreen: () -> Unit,
     navigateToQuizDetails: (id: UUID) -> Unit,
+    navigateToUserDetails: (id: UUID) -> Unit,
     quizzesListViewModel: QuizzesListViewModel = koinViewModel()
 ) {
     val quizzes by quizzesListViewModel.quizzes.collectAsStateWithLifecycle()
@@ -95,7 +96,7 @@ fun QuizzesScreen(
                             navigateToQuizDetails(quiz.id!!)
                         },
                         navigateToUserDetails = {
-                            // TODO: Nawigacja (na początek zakładka users a potem szczegóły jak będą)
+                            navigateToUserDetails(quiz.quizCreator?.userId!!)
                         },
                         changeFavoriteStatus = {
                             quizzesListViewModel.changeFavoriteStatus(quiz.id!!)

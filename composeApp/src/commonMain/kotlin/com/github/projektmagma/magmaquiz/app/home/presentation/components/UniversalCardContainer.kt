@@ -11,9 +11,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun UniversalCardContainer(onClick: () -> Unit, content: @Composable () -> Unit) {
+fun UniversalCardContainer(modifier: Modifier = Modifier, onClick: () -> Unit, content: @Composable () -> Unit) {
     Card(
-        modifier = Modifier.padding(8.dp),
+        modifier = modifier.padding(8.dp),
         border = BorderStroke(2.dp, MaterialTheme.colorScheme.surfaceTint),
         shape = MaterialTheme.shapes.large,
         onClick = {

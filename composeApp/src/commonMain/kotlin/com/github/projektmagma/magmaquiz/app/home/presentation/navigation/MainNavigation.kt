@@ -11,17 +11,20 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
+import com.github.projektmagma.magmaquiz.app.auth.data.AuthRepository
 import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.HomeScreen
-import com.github.projektmagma.magmaquiz.app.home.presentation.screens.UsersScreen
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
+import org.koin.compose.koinInject
 
 @Composable
 fun MainNavigation(
     navigateToGameScreen: () -> Unit,
     navigateToAuth: () -> Unit
 ) {
+    val authRepository: AuthRepository = koinInject()
+    
     val mainBackStack = rememberNavBackStack(
         configuration = SavedStateConfiguration {
             serializersModule = SerializersModule {
@@ -29,12 +32,12 @@ fun MainNavigation(
                     subclass(Route.Menus.Home::class, Route.Menus.Home.serializer())
                     subclass(Route.Menus.Quizzes::class, Route.Menus.Quizzes.serializer())
                     subclass(Route.Menus.Users::class, Route.Menus.Users.serializer())
-                    subclass(Route.Menus.Settings::class, Route.Menus.Settings.serializer())
                 }
             }
         },
         Route.Menus.Home
     )
+    
     MainNavMenu(
         backStack = mainBackStack,
         navigateToHome = {
@@ -47,19 +50,20 @@ fun MainNavigation(
             if (mainBackStack.getOrNull(mainBackStack.size - 2) == Route.Menus.Quizzes)
                 mainBackStack.removeLastOrNull()
             else
-                mainBackStack.add(Route.Menus.Quizzes)
+                mainBackStack.add(Route.Menus.Quizzes())
         },
         navigateToUsers = {
             if (mainBackStack.getOrNull(mainBackStack.size - 2) == Route.Menus.Users)
                 mainBackStack.removeLastOrNull()
             else
-                mainBackStack.add(Route.Menus.Users)
+                mainBackStack.add(Route.Menus.Users())
         },
-        navigateToSettings = {
-            if (mainBackStack.getOrNull(mainBackStack.size - 2) == Route.Menus.Settings)
+        navigateToUserProfile = {
+            val route = Route.Menus.Users(Route.Menus.Users.UserDetails(authRepository.thisUser.value?.userId!!))
+            if (mainBackStack.getOrNull(mainBackStack.size - 2) == route)
                 mainBackStack.removeLastOrNull()
             else
-                mainBackStack.add(Route.Menus.Settings)
+                mainBackStack.add(route)
         },
     ) {
         NavDisplay(
@@ -76,14 +80,26 @@ fun MainNavigation(
                 entry<Route.Menus.Home> {
                     HomeScreen()
                 }
-                entry<Route.Menus.Quizzes> {
-                    QuizzesNavigation(navigateToGameScreen = { navigateToGameScreen() })
+                entry<Route.Menus.Quizzes> { parameters ->
+                    QuizzesNavigation(
+                        startDestination = parameters.route,
+                        navigateToUserDetails = { mainBackStack.add(Route.Menus.Users(Route.Menus.Users.UserDetails(it))) },
+                        navigateToGameScreen = { navigateToGameScreen() },
+                        onSystemBack = { mainBackStack.removeLastOrNull() }
+                    )
                 }
-                entry<Route.Menus.Users> {
-                    UsersScreen()
+                entry<Route.Menus.Users> { parameters ->
+                    UsersNavigation(
+                        startDestination = parameters.route,
+                        navigateToQuizDetails = { mainBackStack.add(Route.Menus.Quizzes(Route.Menus.Quizzes.QuizDetails(it))) },
+                        navigateToEditScreen = { mainBackStack.add(Route.Menus.Quizzes(Route.Menus.Quizzes.CreateQuiz(it))) },
+                        navigateToSettingScreen = { mainBackStack.add(Route.Menus.Settings) }
+                    )
                 }
-                entry<Route.Menus.Settings> {
-                    SettingsNavigation(navigateToAuth = { navigateToAuth() })
+                entry<Route.Menus.Settings> { 
+                    SettingsNavigation(
+                        navigateToAuth = { navigateToAuth() },
+                    )
                 }
             },
             transitionSpec = {

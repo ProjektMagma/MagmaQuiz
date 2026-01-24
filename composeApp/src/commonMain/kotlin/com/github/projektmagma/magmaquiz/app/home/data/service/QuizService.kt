@@ -8,10 +8,13 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Resource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import java.util.UUID
@@ -80,6 +83,15 @@ class QuizService(
     suspend fun getQuizzesByUserId(id: UUID): Resource<List<Quiz>, NetworkError> {
         return safeCall<List<Quiz>> {
             httpClient.get("${baseUrlProvider.getBaseUrl()}/quiz/findByUser/$id") {
+                contentType(ContentType.Application.Json)
+                header("user_session", apiDataStore.getSessionHeader())
+            }
+        }
+    }
+    
+    suspend fun deleteQuiz(id: UUID): Resource<Unit, NetworkError> {
+        return safeCall<Unit> { 
+            httpClient.delete("${baseUrlProvider.getBaseUrl()}/quiz/$id"){
                 contentType(ContentType.Application.Json)
                 header("user_session", apiDataStore.getSessionHeader())
             }

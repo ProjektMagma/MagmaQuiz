@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -34,7 +33,6 @@ import com.github.projektmagma.magmaquiz.app.auth.presentation.model.auth.AuthCo
 import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
-import com.github.projektmagma.magmaquiz.app.home.presentation.CreateQuizViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.SettingsViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.UiEvent
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.settings.SettingsCommand
@@ -58,13 +56,10 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun SettingsScreen(
     navigateToAuth: () -> Unit,
-    navigateToEditScreen: () -> Unit,
-    createQuizViewModel: CreateQuizViewModel
 ) {
     val authViewModel = koinViewModel<AuthViewModel>()
     val settingsViewModel = koinViewModel<SettingsViewModel>()
     val scope = rememberCoroutineScope()
-    var image by remember { mutableStateOf<ByteArray?>(null) }
     var showDialog by remember { mutableStateOf(false) }
     var isFileImageSelectorOpen by remember { mutableStateOf(false) }
 
@@ -76,6 +71,7 @@ fun SettingsScreen(
                 is NetworkEvent.Failure -> {
                     SnackbarController.onEvent(getString(event.networkError.toResId()))
                 }
+
                 NetworkEvent.Success -> {
                     navigateToAuth()
                 }
@@ -109,7 +105,7 @@ fun SettingsScreen(
                         .clip(CircleShape),
                     model = ImageRequest.Builder(LocalPlatformContext.current)
                         .crossfade(true)
-                        .data(image)
+                        .data(state.profilePicture)
                         .build(),
                     contentScale = ContentScale.Fit,
                     contentDescription = "ProfilePicture"
@@ -127,51 +123,41 @@ fun SettingsScreen(
         }
     }
 
-    LazyColumn(
+    Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        item {
-            Button(onClick = {
-                authViewModel.onCommand(AuthCommand.Logout)
-            }) {
-                Text(text = stringResource(Res.string.log_out))
-            }
 
-            Button(onClick = {
-                if (!isFileImageSelectorOpen)
-                    scope.launch {
-                        isFileImageSelectorOpen = true
-                        val takenImage = FileKit.openFilePicker(
-                            type = FileKitType.Image,
-                            mode = FileKitMode.Single
-                        )
-                        if (takenImage != null) {
-                            image = FileKit.compressImage(
-                                bytes = takenImage.readBytes(),
-                                quality = 75,
-                                maxWidth = 512,
-                                maxHeight = 512,
-                                imageFormat = ImageFormat.JPEG
-                            )
-                            settingsViewModel.onCommand(SettingsCommand.ImageChanged(image))
-                            showDialog = true
-                        } else SnackbarController.onEvent(getString(Res.string.no_image_provided_error))
-                        isFileImageSelectorOpen = false
-                    }
-            }) {
-                Text(text = stringResource(Res.string.change_profile_picture))
-            }
+        Button(onClick = {
+            authViewModel.onCommand(AuthCommand.Logout)
+        }) {
+            Text(text = stringResource(Res.string.log_out))
         }
-        items(state.quizzes) { quiz ->
-            Text(text = quiz.quizName)
-            Button(onClick = {
-                createQuizViewModel.getQuizForEdit(quiz.id!!)
-                navigateToEditScreen()
-            }) {
-                Text("Edit")
-            }
+
+        Button(onClick = {
+            if (!isFileImageSelectorOpen)
+                scope.launch {
+                    isFileImageSelectorOpen = true
+                    val takenImage = FileKit.openFilePicker(
+                        type = FileKitType.Image,
+                        mode = FileKitMode.Single
+                    )
+                    if (takenImage != null) {
+                        val image = FileKit.compressImage(
+                            bytes = takenImage.readBytes(),
+                            quality = 75,
+                            maxWidth = 512,
+                            maxHeight = 512,
+                            imageFormat = ImageFormat.JPEG
+                        )
+                        settingsViewModel.onCommand(SettingsCommand.ImageChanged(image))
+                        showDialog = true
+                    } else SnackbarController.onEvent(getString(Res.string.no_image_provided_error))
+                    isFileImageSelectorOpen = false
+                }
+        }) {
+            Text(text = stringResource(Res.string.change_profile_picture))
         }
     }
 }

@@ -23,6 +23,7 @@ val homeModule = module {
     singleOf(::UsersService)
     singleOf(::UsersRepository)
     viewModelOf(::UsersViewModel)
+    viewModelOf(::UserDetailsViewModel)
 
     // Settings
     singleOf(::SettingsService)

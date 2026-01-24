@@ -1,5 +1,7 @@
 package com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes
 
+import java.util.UUID
+
 sealed interface QuizCommand {
     sealed interface QuizProperties : QuizCommand {
         data class NameChanged(val name: String) : QuizProperties
@@ -21,4 +23,6 @@ sealed interface QuizCommand {
     }
     
     data object CreateQuiz : QuizCommand
+    data class SetForEdit(val id: UUID) : QuizCommand
+    data object ResetState : QuizCommand
 }

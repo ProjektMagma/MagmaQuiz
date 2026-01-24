@@ -29,7 +29,7 @@ actual fun MainNavMenu(
     navigateToHome: () -> Unit,
     navigateToQuizzes: () -> Unit,
     navigateToUsers: () -> Unit,
-    navigateToSettings: () -> Unit,
+    navigateToUserProfile: () -> Unit,
     content: @Composable (() -> Unit)
 ) {
 
@@ -84,7 +84,7 @@ actual fun MainNavMenu(
             )
             Spacer(modifier = Modifier.width(20.dp))
             IconButton(
-                onClick = { navigateToSettings() },
+                onClick = { navigateToUserProfile() },
             ) {
                 ProfilePictureIcon(thisUser.value!!.userProfilePicture)
             }

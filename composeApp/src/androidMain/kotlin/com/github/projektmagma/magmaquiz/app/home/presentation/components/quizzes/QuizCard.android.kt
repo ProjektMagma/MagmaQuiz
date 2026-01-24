@@ -30,12 +30,14 @@ actual fun QuizCard(
     quiz: Quiz,
     navigateToQuizDetails: (id: UUID) -> Unit,
     navigateToUserDetails: (id: UUID) -> Unit,
-    changeFavoriteStatus: () -> Unit
+    changeFavoriteStatus: () -> Unit,
+    modifier: Modifier 
 ) {
     var isLiked by remember { mutableStateOf(quiz.likedByYou) }
     var likesCount by remember { mutableIntStateOf(quiz.likesCount) }
 
     UniversalCardContainer(
+        modifier = modifier,
         onClick = {
             navigateToQuizDetails(quiz.id!!)
         }

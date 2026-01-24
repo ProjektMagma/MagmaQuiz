@@ -12,6 +12,7 @@ import com.github.projektmagma.magmaquiz.app.home.domain.validators.toResId
 import com.github.projektmagma.magmaquiz.app.home.domain.validators.validateQuestion
 import com.github.projektmagma.magmaquiz.app.home.domain.validators.validateQuiz
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.UiEvent
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.UiEvent.*
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.AnswerModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.CreateQuizState
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuestionModel
@@ -24,6 +25,7 @@ import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQ
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import magmaquiz.composeapp.generated.resources._collectCommonMainString0Resources
 import java.util.UUID
 
 class CreateQuizViewModel(
@@ -37,33 +39,6 @@ class CreateQuizViewModel(
     private val _uiChannel = Channel<UiEvent>()
     val uiChannel = _uiChannel.receiveAsFlow()
     
-    fun getQuizForEdit(id: UUID) {
-        state = CreateQuizState(isLoading = true)
-        viewModelScope.launch { 
-            when (val result = quizRepository.getQuizById(id)) {
-                is Resource.Error -> { _quizChannel.send(NetworkEvent.Failure(result.error)) } 
-                is Resource.Success -> {
-                    val quiz = result.data
-                    state = state.copy(
-                        quizModel = state.quizModel.copy(
-                            id = quiz.id,
-                            name = quiz.quizName,
-                            description = quiz.quizDescription,
-                            image = quiz.quizImage,
-                            isPublic = quiz.isPublic,
-                            questionList = quiz.questionList.map { question ->
-                                question.toQuestionModel()
-                            }
-                        ),
-                        isEditing = true,
-                        isLoading = false
-                    )
-                } 
-            }
-        }
-    }
-    
-
     fun onCommand(quizCommand: QuizCommand) {
         when (quizCommand) {
             is QuizCommand.QuestionEditor -> questionOptions(quizCommand)
@@ -72,12 +47,14 @@ class CreateQuizViewModel(
                 state = state.copy(quizError = validateQuiz(state.quizModel))
                 if (state.quizError != null) {
                     viewModelScope.launch { 
-                        _uiChannel.send(UiEvent.ShowSnackbar(state.quizError?.toResId()))
+                        _uiChannel.send(ShowSnackbar(state.quizError?.toResId()))
                     }
                     return
                 }
                 uploadQuiz()
             }
+            is QuizCommand.SetForEdit -> getQuizForEdit(quizCommand.id)
+            QuizCommand.ResetState -> state = CreateQuizState()
         }
     }
     
@@ -201,6 +178,32 @@ class CreateQuizViewModel(
                 is Resource.Success -> {
                     _quizChannel.send(NetworkEvent.Success)
                     _uiChannel.send(UiEvent.NavigateBack)
+                }
+            }
+        }
+    }
+
+    private fun getQuizForEdit(id: UUID) {
+        state = CreateQuizState(isLoading = true)
+        viewModelScope.launch {
+            when (val result = quizRepository.getQuizById(id)) {
+                is Resource.Error -> { _quizChannel.send(NetworkEvent.Failure(result.error)) }
+                is Resource.Success -> {
+                    val quiz = result.data
+                    state = state.copy(
+                        quizModel = state.quizModel.copy(
+                            id = quiz.id,
+                            name = quiz.quizName,
+                            description = quiz.quizDescription,
+                            image = quiz.quizImage,
+                            isPublic = quiz.isPublic,
+                            questionList = quiz.questionList.map { question ->
+                                question.toQuestionModel()
+                            }
+                        ),
+                        isEditing = true,
+                        isLoading = false
+                    )
                 }
             }
         }
