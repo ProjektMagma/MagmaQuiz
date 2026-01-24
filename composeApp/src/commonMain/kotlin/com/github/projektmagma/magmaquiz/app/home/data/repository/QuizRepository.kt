@@ -43,8 +43,20 @@ class QuizRepository(
     suspend fun getQuizzesByUserId(id: UUID): Resource<List<Quiz>, NetworkError> {
         return quizService.getQuizzesByUserId(id)
     }
-    
-    suspend fun deleteQuiz(id: UUID): Resource<Unit, NetworkError>{
+
+    suspend fun deleteQuiz(id: UUID): Resource<Unit, NetworkError> {
         return quizService.deleteQuiz(id)
+    }
+
+    suspend fun getFriendsQuizzes(): Resource<List<Quiz>, NetworkError> {
+        return quizService.getFriendsQuizzes()
+    }
+
+    suspend fun getRecentlyAddedQuizzes(): Resource<List<Quiz>, NetworkError> {
+        return quizService.getRecentlyAddedQuizzes()
+    }
+
+    suspend fun getMostLikedQuizzes(): Resource<List<Quiz>, NetworkError> {
+        return quizService.getMostLikedQuizzes()
     }
 }

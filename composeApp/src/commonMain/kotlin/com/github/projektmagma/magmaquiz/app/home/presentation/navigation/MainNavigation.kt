@@ -47,13 +47,13 @@ fun MainNavigation(
                 mainBackStack.add(Route.Menus.Home)
         },
         navigateToQuizzes = {
-            if (mainBackStack.getOrNull(mainBackStack.size - 2) == Route.Menus.Quizzes)
+            if (mainBackStack.getOrNull(mainBackStack.size - 2) is Route.Menus.Quizzes)
                 mainBackStack.removeLastOrNull()
             else
                 mainBackStack.add(Route.Menus.Quizzes())
         },
         navigateToUsers = {
-            if (mainBackStack.getOrNull(mainBackStack.size - 2) == Route.Menus.Users)
+            if (mainBackStack.getOrNull(mainBackStack.size - 2) is Route.Menus.Users)
                 mainBackStack.removeLastOrNull()
             else
                 mainBackStack.add(Route.Menus.Users())

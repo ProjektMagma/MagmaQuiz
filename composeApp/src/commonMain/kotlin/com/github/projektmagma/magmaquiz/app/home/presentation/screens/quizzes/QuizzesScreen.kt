@@ -3,12 +3,8 @@ package com.github.projektmagma.magmaquiz.app.home.presentation.screens.quizzes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -16,10 +12,8 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiStat
 import com.github.projektmagma.magmaquiz.app.home.presentation.QuizzesListViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.*
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.quizzes.QuizCard
-import magmaquiz.composeapp.generated.resources.Res
-import magmaquiz.composeapp.generated.resources.create
-import magmaquiz.composeapp.generated.resources.favorites
-import magmaquiz.composeapp.generated.resources.quiz_title
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuizFilters
+import magmaquiz.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import java.util.*
@@ -33,7 +27,18 @@ fun QuizzesScreen(
 ) {
     val quizzes by quizzesListViewModel.quizzes.collectAsStateWithLifecycle()
     val uiState by quizzesListViewModel.uiState.collectAsStateWithLifecycle()
-    var isOnFavorites by remember { quizzesListViewModel.isOnFavorites }
+    var quizFilters by remember { quizzesListViewModel.quizFilters }
+
+
+    LaunchedEffect(quizFilters) {
+        when (quizFilters) {
+            QuizFilters.Favorites -> quizzesListViewModel.getMyFavorites()
+            QuizFilters.MostLiked -> quizzesListViewModel.getMostLikedQuizzes()
+            QuizFilters.Friends -> quizzesListViewModel.getFriendsQuizzes()
+            QuizFilters.RecentlyAdded -> quizzesListViewModel.getRecentlyAddedQuizzes()
+            QuizFilters.None -> quizzesListViewModel.getQuizByName(false)
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -54,21 +59,61 @@ fun QuizzesScreen(
         )
 
         LazyRow(
-            modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 4.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             item {
                 FilterButton(
-                    selected = isOnFavorites,
+                    selected = quizFilters == QuizFilters.Favorites,
                     onClick = {
-                        isOnFavorites = !isOnFavorites
-                        if (isOnFavorites) quizzesListViewModel.getMyFavorites()
-                        else quizzesListViewModel.getQuizByName(false)
+                        quizFilters = if (quizFilters == QuizFilters.Favorites)
+                            QuizFilters.None
+                        else QuizFilters.Favorites
                     },
                     contentLabel = stringResource(Res.string.favorites),
                     contentIcon = Icons.Default.Favorite
                 )
             }
+
+            item {
+                FilterButton(
+                    selected = quizFilters == QuizFilters.MostLiked,
+                    onClick = {
+                        quizFilters = if (quizFilters == QuizFilters.MostLiked)
+                            QuizFilters.None
+                        else QuizFilters.MostLiked
+                    },
+                    contentLabel = stringResource(Res.string.most_liked),
+                    contentIcon = Icons.Default.Recommend
+                )
+            }
+
+            item {
+                FilterButton(
+                    selected = quizFilters == QuizFilters.Friends,
+                    onClick = {
+                        quizFilters = if (quizFilters == QuizFilters.Friends)
+                            QuizFilters.None
+                        else QuizFilters.Friends
+                    },
+                    contentLabel = stringResource(Res.string.friends_quizzes),
+                    contentIcon = Icons.Default.Groups
+                )
+            }
+
+            item {
+                FilterButton(
+                    selected = quizFilters == QuizFilters.RecentlyAdded,
+                    onClick = {
+                        quizFilters = if (quizFilters == QuizFilters.RecentlyAdded)
+                            QuizFilters.None
+                        else QuizFilters.RecentlyAdded
+                    },
+                    contentLabel = stringResource(Res.string.recently_added),
+                    contentIcon = Icons.Default.Upload
+                )
+            }
+
             item {
                 ButtonWithIcon(
                     contentLabel = stringResource(Res.string.create),

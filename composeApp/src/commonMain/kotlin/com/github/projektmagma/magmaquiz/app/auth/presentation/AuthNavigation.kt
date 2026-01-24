@@ -63,6 +63,9 @@ fun AuthNavigation(
                 RegisterScreen(
                     navigateToLogin = {
                         navigateToLogin()
+                    },
+                    navigateToHome = {
+                        navigateToMain()
                     }
                 )
             }

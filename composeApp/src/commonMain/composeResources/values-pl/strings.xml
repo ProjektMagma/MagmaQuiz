@@ -43,11 +43,11 @@
     <string name="name_empty">Pusta nazwa</string>
     <string name="no_questions">Brak pytań</string>
     <string name="network_error">Problem z internetem</string>
-    <string name="conflict_error">Użytkownik z podanym emailem juz istnieje</string>
+    <string name="auth_conflict_error">Użytkownik z podanym emailem juz istnieje</string>
     <string name="serialization_error">Problem z odczytem danych</string>
-    <string name="multiple_choices_error">Kilka użytkowników z podanym emailem</string>
-    <string name="not_found_error">Nie znaleziono użytkownika o takich danych</string>
-    <string name="unauthorized_error">Blednę dane</string>
+    <string name="auth_multiple_choices_error">Kilka użytkowników z podanym emailem</string>
+    <string name="auth_not_found_error">Nie znaleziono użytkownika o takich danych</string>
+    <string name="auth_unauthorized_error">Blednę dane</string>
     <string name="server_error">Problem z serwerem</string>
     <string name="unknown_error">Nieznany błąd</string>
     <string name="success_quiz_add">Pomyślnie dodano quiz</string>
@@ -71,4 +71,12 @@
     <string name="unknown_host_error">Adres serwera nie został znaleziony</string>
     <string name="error_announcement">Wystąpił błąd</string>
     <string name="create">Stwórz</string>
+    <string name="conflict_error">Na serwerze występują sprzeczne dane</string>
+    <string name="multiple_choices_error">Istnieje wiele możliwości wyboru</string>
+    <string name="not_found_error">Dane nie zostały znalezione</string>
+    <string name="unauthorized_error">Nie masz uprawnień do tych danych</string>
+    <string name="work_in_progress">Prace w trakcie</string>
+    <string name="most_liked">Najbardziej lubiane</string>
+    <string name="friends_quizzes">Quizy znajomych</string>
+    <string name="recently_added">Ostatnio dodane</string>
 </resources>

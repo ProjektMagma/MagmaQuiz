@@ -2,8 +2,9 @@ package com.github.projektmagma.magmaquiz.app.home.presentation.navigation
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Quiz
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -16,6 +17,7 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import com.github.projektmagma.magmaquiz.app.auth.presentation.AuthViewModel
 import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route
+import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.ProfilePictureIcon
 import magmaquiz.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
@@ -33,95 +35,124 @@ actual fun MainNavMenu(
     val viewModel = koinViewModel<AuthViewModel>()
     val thisUser = viewModel.thisUser.collectAsStateWithLifecycle()
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Spacer(modifier = Modifier.size(25.dp))
-            Text(
-                text = "${stringResource(Res.string.greeting)}, ${thisUser.value!!.userName}!",
-                style = MaterialTheme.typography.titleLarge
-            )
-            IconButton(
-                onClick = { navigateToUserProfile() },
+    Scaffold(
+        floatingActionButtonPosition = FabPosition.Center,
+        floatingActionButton = {
+            val workInProgress = stringResource(Res.string.work_in_progress)
+            if (backStack.last() is Route.Menus.Quizzes)
+                IconButton(
+                    modifier = Modifier.size(50.dp),
+                    colors = IconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                        disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        disabledContentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                    ),
+                    onClick = {
+                        SnackbarController.onEvent(workInProgress)
+                    }) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null,
+                    )
+                }
+        },
+        bottomBar = {
+            BottomAppBar(
+                modifier = Modifier.fillMaxWidth(),
             ) {
-                ProfilePictureIcon(thisUser.value!!.userProfilePicture)
+                NavigationBarItem(
+                    onClick = {
+                        navigateToHome()
+                    },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.Home,
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            contentDescription = "HomeButton",
+                        )
+                    },
+                    label = {
+                        Text(
+                            text = stringResource(Res.string.home_nav),
+                            textAlign = TextAlign.Center
+                        )
+                    },
+                    selected = backStack.last() == Route.Menus.Home,
+                )
+                NavigationBarItem(
+                    onClick = {
+                        navigateToQuizzes()
+                    },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.Quiz,
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            contentDescription = "QuizzesButton",
+                        )
+                    },
+                    label = {
+                        Text(
+                            text = stringResource(Res.string.quizzes_nav),
+                            textAlign = TextAlign.Center
+                        )
+                    },
+                    selected = backStack.last() is Route.Menus.Quizzes,
+                )
+                NavigationBarItem(
+                    onClick = {
+                        navigateToUsers()
+                    },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.Groups,
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            contentDescription = "UsersButton",
+                        )
+                    },
+                    label = {
+                        Text(
+                            text = stringResource(Res.string.users_nav),
+                            textAlign = TextAlign.Center
+                        )
+                    },
+                    selected = backStack.last() is Route.Menus.Users,
+                )
             }
         }
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .weight(1f),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(paddingValues)
         ) {
-            content()
-        }
-
-        BottomAppBar(
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            NavigationBarItem(
-                onClick = {
-                    navigateToHome()
-                },
-                icon = {
-                    Icon(
-                        imageVector = Icons.Default.Home,
-                        tint = MaterialTheme.colorScheme.onSurface,
-                        contentDescription = "HomeButton",
-                    )
-                },
-                label = {
-                    Text(
-                        text = stringResource(Res.string.home_nav),
-                        textAlign = TextAlign.Center
-                    )
-                },
-                selected = backStack.last() == Route.Menus.Home,
-            )
-            NavigationBarItem(
-                onClick = {
-                    navigateToQuizzes()
-                },
-                icon = {
-                    Icon(
-                        imageVector = Icons.Default.Quiz,
-                        tint = MaterialTheme.colorScheme.onSurface,
-                        contentDescription = "QuizzesButton",
-                    )
-                },
-                label = {
-                    Text(
-                        text = stringResource(Res.string.quizzes_nav),
-                        textAlign = TextAlign.Center
-                    )
-                },
-                selected = backStack.last() == Route.Menus.Quizzes,
-            )
-            NavigationBarItem(
-                onClick = {
-                    navigateToUsers()
-                },
-                icon = {
-                    Icon(
-                        imageVector = Icons.Default.PersonAdd,
-                        tint = MaterialTheme.colorScheme.onSurface,
-                        contentDescription = "UsersButton",
-                    )
-                },
-                label = {
-                    Text(
-                        text = stringResource(Res.string.users_nav),
-                        textAlign = TextAlign.Center
-                    )
-                },
-                selected = backStack.last() == Route.Menus.Users,
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Spacer(modifier = Modifier.size(25.dp))
+                Text(
+                    text = "${stringResource(Res.string.greeting)}, ${thisUser.value!!.userName}!",
+                    style = MaterialTheme.typography.titleLarge
+                )
+                IconButton(
+                    onClick = { navigateToUserProfile() },
+                ) {
+                    ProfilePictureIcon(thisUser.value!!.userProfilePicture)
+                }
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(1f),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                content()
+            }
         }
     }
 }

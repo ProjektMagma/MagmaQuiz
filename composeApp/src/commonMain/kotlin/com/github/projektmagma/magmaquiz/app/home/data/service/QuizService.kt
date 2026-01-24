@@ -7,17 +7,10 @@ import com.github.projektmagma.magmaquiz.app.core.util.BaseUrlProvider
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Resource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.request.delete
-import io.ktor.client.request.get
-import io.ktor.client.request.header
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
-import java.util.UUID
+import io.ktor.client.*
+import io.ktor.client.request.*
+import io.ktor.http.*
+import java.util.*
 
 class QuizService(
     private val httpClient: HttpClient,
@@ -92,6 +85,33 @@ class QuizService(
     suspend fun deleteQuiz(id: UUID): Resource<Unit, NetworkError> {
         return safeCall<Unit> { 
             httpClient.delete("${baseUrlProvider.getBaseUrl()}/quiz/$id"){
+                contentType(ContentType.Application.Json)
+                header("user_session", apiDataStore.getSessionHeader())
+            }
+        }
+    }
+
+    suspend fun getMostLikedQuizzes(count: Long = 100): Resource<List<Quiz>, NetworkError> {
+        return safeCall<List<Quiz>> {
+            httpClient.get("${baseUrlProvider.getBaseUrl()}/quiz/mostLiked/${count}") {
+                contentType(ContentType.Application.Json)
+                header("user_session", apiDataStore.getSessionHeader())
+            }
+        }
+    }
+
+    suspend fun getFriendsQuizzes(): Resource<List<Quiz>, NetworkError> {
+        return safeCall<List<Quiz>> {
+            httpClient.get("${baseUrlProvider.getBaseUrl()}/quiz/friendsQuizzes/") {
+                contentType(ContentType.Application.Json)
+                header("user_session", apiDataStore.getSessionHeader())
+            }
+        }
+    }
+
+    suspend fun getRecentlyAddedQuizzes(count: Long = 100): Resource<List<Quiz>, NetworkError> {
+        return safeCall<List<Quiz>> {
+            httpClient.get("${baseUrlProvider.getBaseUrl()}/quiz/newest/${count}") {
                 contentType(ContentType.Application.Json)
                 header("user_session", apiDataStore.getSessionHeader())
             }

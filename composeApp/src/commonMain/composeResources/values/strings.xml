@@ -45,11 +45,11 @@
     <string name="name_empty">Empty name</string>
     <string name="no_questions">No questions</string>
     <string name="network_error">Internet problem</string>
-    <string name="conflict_error">A user with the given email already exists</string>
+    <string name="auth_conflict_error">A user with the given email already exists</string>
     <string name="serialization_error">Problem with reading data</string>
-    <string name="multiple_choices_error">Several users with the given email address</string>
-    <string name="not_found_error">No user with the given data was found</string>
-    <string name="unauthorized_error">Invalid credentials</string>
+    <string name="auth_multiple_choices_error">Several users with the given email address</string>
+    <string name="auth_not_found_error">No user with the given data was found</string>
+    <string name="auth_unauthorized_error">Invalid credentials</string>
     <string name="server_error">Server error</string>
     <string name="unknown_error">Unknown Error</string>
     <string name="success_quiz_add">quiz successfully added</string>
@@ -73,4 +73,12 @@
     <string name="unknown_host_error">Server address not found</string>
     <string name="error_announcement">An error occurred</string>
     <string name="create">Create</string>
+    <string name="conflict_error">There is conflicted data on server</string>
+    <string name="multiple_choices_error">There are multiple choices</string>
+    <string name="not_found_error">Data not found</string>
+    <string name="unauthorized_error">You are not authorized for this data</string>
+    <string name="work_in_progress">Work in progress</string>
+    <string name="most_liked">Most liked</string>
+    <string name="friends_quizzes">Friends quizzes</string>
+    <string name="recently_added">Recently added</string>
 </resources>

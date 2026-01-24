@@ -9,6 +9,7 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
 import com.github.projektmagma.magmaquiz.app.core.util.withSearchDelay
 import com.github.projektmagma.magmaquiz.app.home.data.repository.QuizRepository
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuizFilters
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenError
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
@@ -28,7 +29,7 @@ class QuizzesListViewModel(
     private val _quizzes = MutableStateFlow<List<Quiz>>(emptyList())
     val quizzes = _quizzes.asStateFlow()
 
-    val isOnFavorites = mutableStateOf(false)
+    val quizFilters = mutableStateOf<QuizFilters>(QuizFilters.None)
 
     var searchLock = false
 
@@ -73,6 +74,45 @@ class QuizzesListViewModel(
         viewModelScope.launch {
             _uiState.value = UiState.Loading
             quizRepository.getMyFavorites()
+                .whenSuccess {
+                    _quizzes.value = it.data
+                    _uiState.value = UiState.Success
+                }.whenError {
+                    _uiState.value = UiState.Error(it.error.toResId())
+                }
+        }
+    }
+
+    fun getMostLikedQuizzes() {
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
+            quizRepository.getMostLikedQuizzes()
+                .whenSuccess {
+                    _quizzes.value = it.data
+                    _uiState.value = UiState.Success
+                }.whenError {
+                    _uiState.value = UiState.Error(it.error.toResId())
+                }
+        }
+    }
+
+    fun getFriendsQuizzes() {
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
+            quizRepository.getFriendsQuizzes()
+                .whenSuccess {
+                    _quizzes.value = it.data
+                    _uiState.value = UiState.Success
+                }.whenError {
+                    _uiState.value = UiState.Error(it.error.toResId())
+                }
+        }
+    }
+
+    fun getRecentlyAddedQuizzes() {
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
+            quizRepository.getRecentlyAddedQuizzes()
                 .whenSuccess {
                     _quizzes.value = it.data
                     _uiState.value = UiState.Success

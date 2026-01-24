@@ -2,7 +2,6 @@ package com.github.projektmagma.magmaquiz.app
 
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import androidx.compose.ui.window.rememberWindowState
 import com.github.projektmagma.magmaquiz.app.core.di.initKoin
 import com.github.projektmagma.magmaquiz.app.core.presentation.App
 import magmaquiz.composeapp.generated.resources.Res
@@ -23,7 +22,7 @@ fun main() {
             title = stringResource(Res.string.app_name),
             icon = painterResource(Res.drawable.app_icon),
         ) {
-            window.minimumSize = Dimension(750, 750)
+            window.minimumSize = Dimension(1000, 750)
             App()
         }
     }
