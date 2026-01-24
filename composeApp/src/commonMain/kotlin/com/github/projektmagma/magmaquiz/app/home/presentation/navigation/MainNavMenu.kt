@@ -10,6 +10,6 @@ expect fun MainNavMenu(
     navigateToHome: () -> Unit,
     navigateToQuizzes: () -> Unit,
     navigateToUsers: () -> Unit,
-    navigateToSettings: () -> Unit,
+    navigateToUserProfile: () -> Unit,
     content: @Composable () -> Unit
 )

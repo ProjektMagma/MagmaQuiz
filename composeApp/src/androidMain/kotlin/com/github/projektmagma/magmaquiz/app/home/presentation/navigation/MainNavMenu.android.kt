@@ -27,7 +27,7 @@ actual fun MainNavMenu(
     navigateToHome: () -> Unit,
     navigateToQuizzes: () -> Unit,
     navigateToUsers: () -> Unit,
-    navigateToSettings: () -> Unit,
+    navigateToUserProfile: () -> Unit,
     content: @Composable (() -> Unit)
 ) {
     val viewModel = koinViewModel<AuthViewModel>()
@@ -47,7 +47,7 @@ actual fun MainNavMenu(
                 style = MaterialTheme.typography.titleLarge
             )
             IconButton(
-                onClick = { navigateToSettings() },
+                onClick = { navigateToUserProfile() },
             ) {
                 ProfilePictureIcon(thisUser.value!!.userProfilePicture)
             }

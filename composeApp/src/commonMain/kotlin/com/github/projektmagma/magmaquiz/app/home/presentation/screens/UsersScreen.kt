@@ -17,10 +17,12 @@ import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.username
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import java.util.UUID
 
 @Composable
-fun UsersScreen() {
-
+fun UsersScreen(
+    navigateToUserDetails: (id: UUID) -> Unit
+) {
     val usersViewModel: UsersViewModel = koinViewModel()
     val userList by usersViewModel.userList.collectAsStateWithLifecycle()
     val uiState by usersViewModel.uiState.collectAsStateWithLifecycle()
@@ -53,7 +55,10 @@ fun UsersScreen() {
             UiState.Loading -> FullSizeCircularProgressIndicator()
             UiState.Success ->
                 AutoScalableLazyColumn(userList, key = { it.userId!! }) { user ->
-                    UserCard(user, navigateToUserDetails = {}) // TODO: Szczegóły użytkownika
+                    UserCard(
+                        user, 
+                        navigateToUserDetails = { navigateToUserDetails(it) }
+                    ) 
                 }
         }
 

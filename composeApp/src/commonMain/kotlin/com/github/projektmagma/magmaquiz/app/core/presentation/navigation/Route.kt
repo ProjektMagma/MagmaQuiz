@@ -4,6 +4,7 @@ import androidx.navigation3.runtime.NavKey
 import com.github.projektmagma.magmaquiz.shared.data.domain.serializers.UUIDSerializer
 import kotlinx.serialization.Serializable
 import java.util.*
+import javax.print.attribute.standard.Destination
 
 @Serializable
 sealed interface Route : NavKey {
@@ -35,7 +36,7 @@ sealed interface Route : NavKey {
     data object Menus : Route {
         @Serializable
         data object Home : Route
-
+        
         @Serializable
         data object Settings : Route {
             @Serializable
@@ -43,29 +44,30 @@ sealed interface Route : NavKey {
 
             @Serializable
             data object Profile : Route
-            @Serializable
-            data class EditQuestion(val isMultiple: Boolean) : Route
         }
 
         @Serializable
-        data object Quizzes : Route {
+        data class Quizzes(val route: Route = Find) : Route {
             @Serializable
             data object Find : Route
 
             @Serializable
-            data class Details(@Serializable(UUIDSerializer::class) val id: UUID) : Route
-
-            @Serializable
-            data object CreateQuiz : Route
+            data class CreateQuiz(@Serializable(UUIDSerializer::class)val id: UUID? = null) : Route
 
             @Serializable
             data class CreateQuestion(val isMultiple: Boolean) : Route
+
+            @Serializable
+            data class QuizDetails(@Serializable(UUIDSerializer::class) val id: UUID) : Route
         }
 
         @Serializable
-        data object Users : Route {
+        data class Users(val route: Route = Find) : Route {
             @Serializable
             data object Find : Route
+
+            @Serializable
+            data class UserDetails(@Serializable(UUIDSerializer::class) val id: UUID): Route
 
             @Serializable
             data object Friends : Route

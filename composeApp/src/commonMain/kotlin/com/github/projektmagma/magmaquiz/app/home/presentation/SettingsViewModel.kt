@@ -26,18 +26,12 @@ import magmaquiz.composeapp.generated.resources.profile_picture_changed_success
 
 class SettingsViewModel(
     private val settingsRepository: SettingsRepository,
-    private val quizRepository: QuizRepository,
-    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiChannel = Channel<UiEvent>()
     val uiChannel = _uiChannel.receiveAsFlow()
 
     var state by mutableStateOf(SettingsState())
-
-    init {
-        getQuizzesByUserId()
-    }
 
     fun onCommand(command: SettingsCommand) {
         when (command) {
@@ -71,13 +65,6 @@ class SettingsViewModel(
                 .whenError {
                     _uiChannel.trySend(UiEvent.ShowSnackbar(it.error.toResId()))
                 }
-        }
-    }
-
-    // TODO przechwytywanie bledow
-    private fun getQuizzesByUserId() {
-        viewModelScope.launch {
-            quizRepository.getQuizzesByUserId(authRepository.thisUser.value?.userId!!).whenSuccess { state = state.copy(quizzes = it.data) }
         }
     }
 }
