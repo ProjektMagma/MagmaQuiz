@@ -10,7 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.AnswerModel
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.create.AnswerModel
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.correct_answer
 import magmaquiz.composeapp.generated.resources.wrong_answer

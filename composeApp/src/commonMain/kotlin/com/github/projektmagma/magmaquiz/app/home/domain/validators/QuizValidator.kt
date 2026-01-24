@@ -3,7 +3,7 @@ package com.github.projektmagma.magmaquiz.app.home.domain.validators
 import com.github.projektmagma.magmaquiz.app.home.domain.validators.QuizError.DESCRIPTION_EMPTY
 import com.github.projektmagma.magmaquiz.app.home.domain.validators.QuizError.NAME_EMPTY
 import com.github.projektmagma.magmaquiz.app.home.domain.validators.QuizError.NO_QUESTIONS
-import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuizModel
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.create.QuizModel
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Error
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.description_not_provided

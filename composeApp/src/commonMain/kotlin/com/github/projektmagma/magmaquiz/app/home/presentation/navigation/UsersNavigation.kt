@@ -14,9 +14,7 @@ import com.github.projektmagma.magmaquiz.app.home.presentation.screens.UserDetai
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.UsersScreen
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
-import org.koin.compose.viewmodel.koinViewModel
 import java.util.UUID
-import kotlin.collections.listOf
 
 @Composable
 fun UsersNavigation(
@@ -24,6 +22,7 @@ fun UsersNavigation(
     navigateToQuizDetails: (id: UUID) -> Unit,
     navigateToEditScreen: (id: UUID) -> Unit,
     navigateToSettingScreen: () -> Unit,
+    createQuizViewModel: CreateQuizViewModel
 ) {
     val usersNavBackStack = rememberNavBackStack(
         configuration = SavedStateConfiguration {
@@ -37,8 +36,6 @@ fun UsersNavigation(
         },
         startDestination
     )
-
-    val createQuizViewModel: CreateQuizViewModel = koinViewModel()
 
     NavDisplay(
         backStack = usersNavBackStack,

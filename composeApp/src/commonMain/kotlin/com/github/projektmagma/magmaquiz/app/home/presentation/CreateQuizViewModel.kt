@@ -12,20 +12,20 @@ import com.github.projektmagma.magmaquiz.app.home.domain.validators.toResId
 import com.github.projektmagma.magmaquiz.app.home.domain.validators.validateQuestion
 import com.github.projektmagma.magmaquiz.app.home.domain.validators.validateQuiz
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.UiEvent
-import com.github.projektmagma.magmaquiz.app.home.presentation.model.UiEvent.*
-import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.AnswerModel
-import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.CreateQuizState
-import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuestionModel
-import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuizCommand
-import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.toQuestionModel
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.UiEvent.ShowSnackbar
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.create.AnswerModel
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.create.CreateQuizState
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.create.QuestionModel
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.create.QuizCommand
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.create.toQuestionModel
 import com.github.projektmagma.magmaquiz.shared.data.domain.Answer
 import com.github.projektmagma.magmaquiz.shared.data.domain.Question
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Resource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import magmaquiz.composeapp.generated.resources._collectCommonMainString0Resources
 import java.util.UUID
 
 class CreateQuizViewModel(
@@ -54,7 +54,7 @@ class CreateQuizViewModel(
                 uploadQuiz()
             }
             is QuizCommand.SetForEdit -> getQuizForEdit(quizCommand.id)
-            QuizCommand.ResetState -> state = CreateQuizState()
+            QuizCommand.ResetState -> resetState()
         }
     }
     
@@ -178,6 +178,8 @@ class CreateQuizViewModel(
                 is Resource.Success -> {
                     _quizChannel.send(NetworkEvent.Success)
                     _uiChannel.send(UiEvent.NavigateBack)
+                    delay(400)
+                    resetState()
                 }
             }
         }
@@ -207,5 +209,9 @@ class CreateQuizViewModel(
                 }
             }
         }
+    }
+    
+    private fun resetState() {
+        state = CreateQuizState()
     }
 }

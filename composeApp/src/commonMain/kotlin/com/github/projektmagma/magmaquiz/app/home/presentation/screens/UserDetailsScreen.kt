@@ -1,10 +1,8 @@
 package com.github.projektmagma.magmaquiz.app.home.presentation.screens
 
-import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,14 +26,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.projektmagma.magmaquiz.app.home.presentation.CreateQuizViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.UserDetailsViewModel
-import com.github.projektmagma.magmaquiz.app.home.presentation.components.AutoScalableLazyColumn
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.ContentImage
-import com.github.projektmagma.magmaquiz.app.home.presentation.components.QuizCoverImage
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.quizzes.QuizCard
-import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuizCommand
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.create.QuizCommand
 import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
-import java.awt.Button
 import java.util.UUID
 
 @Composable

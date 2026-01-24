@@ -1,43 +1,56 @@
 package com.github.projektmagma.magmaquiz.app.home.presentation.screens.quizzes
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.Recommend
+import androidx.compose.material.icons.filled.Upload
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
 import com.github.projektmagma.magmaquiz.app.home.presentation.QuizzesListViewModel
-import com.github.projektmagma.magmaquiz.app.home.presentation.components.*
+import com.github.projektmagma.magmaquiz.app.home.presentation.components.AutoScalableLazyColumn
+import com.github.projektmagma.magmaquiz.app.home.presentation.components.ButtonWithIcon
+import com.github.projektmagma.magmaquiz.app.home.presentation.components.FilterButton
+import com.github.projektmagma.magmaquiz.app.home.presentation.components.FullSizeCircularProgressIndicator
+import com.github.projektmagma.magmaquiz.app.home.presentation.components.FullSizeErrorIndicator
+import com.github.projektmagma.magmaquiz.app.home.presentation.components.SearchTextField
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.quizzes.QuizCard
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuizFilters
-import magmaquiz.composeapp.generated.resources.*
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuizListCommand
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.create
+import magmaquiz.composeapp.generated.resources.favorites
+import magmaquiz.composeapp.generated.resources.friends_quizzes
+import magmaquiz.composeapp.generated.resources.most_liked
+import magmaquiz.composeapp.generated.resources.quiz_title
+import magmaquiz.composeapp.generated.resources.recently_added
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
-import java.util.*
+import java.util.UUID
 
 @Composable
 fun QuizzesScreen(
     navigateToCreateQuizScreen: () -> Unit,
     navigateToQuizDetails: (id: UUID) -> Unit,
     navigateToUserDetails: (id: UUID) -> Unit,
-    quizzesListViewModel: QuizzesListViewModel = koinViewModel()
+    quizzesListViewModel: QuizzesListViewModel
 ) {
-    val quizzes by quizzesListViewModel.quizzes.collectAsStateWithLifecycle()
+    val state = quizzesListViewModel.quizListState
     val uiState by quizzesListViewModel.uiState.collectAsStateWithLifecycle()
-    var quizFilters by remember { quizzesListViewModel.quizFilters }
 
-
-    LaunchedEffect(quizFilters) {
-        when (quizFilters) {
-            QuizFilters.Favorites -> quizzesListViewModel.getMyFavorites()
-            QuizFilters.MostLiked -> quizzesListViewModel.getMostLikedQuizzes()
-            QuizFilters.Friends -> quizzesListViewModel.getFriendsQuizzes()
-            QuizFilters.RecentlyAdded -> quizzesListViewModel.getRecentlyAddedQuizzes()
-            QuizFilters.None -> quizzesListViewModel.getQuizByName(false)
-        }
+    LaunchedEffect(state.quizFilter) {
+        if (!state.isLoaded) quizzesListViewModel.onCommand(QuizListCommand.LoadByFilter)
     }
 
     Column(
@@ -47,14 +60,14 @@ fun QuizzesScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp),
-            searchedText = quizzesListViewModel.quizName,
+            searchedText = state.quizName,
             labelText = stringResource(Res.string.quiz_title),
             onSearch = {
-                quizzesListViewModel.getQuizByName()
+                quizzesListViewModel.onCommand(QuizListCommand.LoadByName())
             },
             onValueChange = {
-                quizzesListViewModel.quizName = it
-                quizzesListViewModel.getQuizByName(true)
+                quizzesListViewModel.onCommand(QuizListCommand.NameChanged(it))
+                quizzesListViewModel.onCommand(QuizListCommand.LoadByName(true))
             },
         )
 
@@ -64,11 +77,13 @@ fun QuizzesScreen(
         ) {
             item {
                 FilterButton(
-                    selected = quizFilters == QuizFilters.Favorites,
+                    selected = state.quizFilter == QuizFilters.Favorites,
                     onClick = {
-                        quizFilters = if (quizFilters == QuizFilters.Favorites)
-                            QuizFilters.None
-                        else QuizFilters.Favorites
+                        quizzesListViewModel.onCommand(QuizListCommand.FilterChanged(
+                            if (state.quizFilter == QuizFilters.Favorites)
+                                QuizFilters.None
+                            else QuizFilters.Favorites)
+                        )
                     },
                     contentLabel = stringResource(Res.string.favorites),
                     contentIcon = Icons.Default.Favorite
@@ -77,11 +92,13 @@ fun QuizzesScreen(
 
             item {
                 FilterButton(
-                    selected = quizFilters == QuizFilters.MostLiked,
+                    selected = state.quizFilter == QuizFilters.MostLiked,
                     onClick = {
-                        quizFilters = if (quizFilters == QuizFilters.MostLiked)
-                            QuizFilters.None
-                        else QuizFilters.MostLiked
+                        quizzesListViewModel.onCommand(QuizListCommand.FilterChanged(
+                            if (state.quizFilter == QuizFilters.MostLiked)
+                                QuizFilters.None
+                            else QuizFilters.MostLiked)
+                        )
                     },
                     contentLabel = stringResource(Res.string.most_liked),
                     contentIcon = Icons.Default.Recommend
@@ -90,11 +107,13 @@ fun QuizzesScreen(
 
             item {
                 FilterButton(
-                    selected = quizFilters == QuizFilters.Friends,
+                    selected = state.quizFilter == QuizFilters.Friends,
                     onClick = {
-                        quizFilters = if (quizFilters == QuizFilters.Friends)
-                            QuizFilters.None
-                        else QuizFilters.Friends
+                        quizzesListViewModel.onCommand(QuizListCommand.FilterChanged(
+                            if (state.quizFilter == QuizFilters.Friends)
+                                QuizFilters.None
+                            else QuizFilters.Friends)
+                        )
                     },
                     contentLabel = stringResource(Res.string.friends_quizzes),
                     contentIcon = Icons.Default.Groups
@@ -103,11 +122,13 @@ fun QuizzesScreen(
 
             item {
                 FilterButton(
-                    selected = quizFilters == QuizFilters.RecentlyAdded,
+                    selected = state.quizFilter == QuizFilters.RecentlyAdded,
                     onClick = {
-                        quizFilters = if (quizFilters == QuizFilters.RecentlyAdded)
-                            QuizFilters.None
-                        else QuizFilters.RecentlyAdded
+                        quizzesListViewModel.onCommand(QuizListCommand.FilterChanged(
+                            if (state.quizFilter == QuizFilters.RecentlyAdded)
+                                QuizFilters.None
+                            else QuizFilters.RecentlyAdded)
+                        )
                     },
                     contentLabel = stringResource(Res.string.recently_added),
                     contentIcon = Icons.Default.Upload
@@ -128,13 +149,13 @@ fun QuizzesScreen(
             is UiState.Error -> FullSizeErrorIndicator(
                 message = (uiState as UiState.Error).errorMessage,
                 onRetry = {
-                    quizzesListViewModel.getQuizByName()
+                    quizzesListViewModel.onCommand(QuizListCommand.LoadByName())
                 }
             )
 
             UiState.Loading -> FullSizeCircularProgressIndicator()
             UiState.Success ->
-                AutoScalableLazyColumn(quizzes, { it.id!! }) { quiz ->
+                AutoScalableLazyColumn(state.quizzes, { it.id!! }) { quiz ->
                     QuizCard(
                         quiz = quiz,
                         navigateToQuizDetails = {
@@ -144,7 +165,7 @@ fun QuizzesScreen(
                             navigateToUserDetails(quiz.quizCreator?.userId!!)
                         },
                         changeFavoriteStatus = {
-                            quizzesListViewModel.changeFavoriteStatus(quiz.id!!)
+                            quizzesListViewModel.onCommand(QuizListCommand.FavoriteStatusChanged(quiz.id!!))
                         }
                     )
                 }
