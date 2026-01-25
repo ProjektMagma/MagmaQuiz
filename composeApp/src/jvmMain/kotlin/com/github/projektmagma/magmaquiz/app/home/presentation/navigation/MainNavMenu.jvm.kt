@@ -60,14 +60,15 @@ actual fun MainNavMenu(
                 }
         },
         topBar = {
-
             MainWindow.frameWindowScope.WindowDraggableArea {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth().weight(1f).padding(12.dp),
+                        modifier = Modifier.fillMaxWidth()
+                            .weight(1f)
+                            .padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Row(
@@ -110,9 +111,10 @@ actual fun MainNavMenu(
                         ) {
                             ProfilePictureIcon(thisUser.value!!.userProfilePicture)
                         }
+                        Spacer(modifier = Modifier.width(20.dp))
                     }
 
-                    NavButtonsRow()
+                    WindowActionsButtonsRow()
                 }
             }
         }) { paddingValues ->

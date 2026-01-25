@@ -4,6 +4,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Fullscreen
@@ -16,14 +18,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowPlacement
 import com.github.projektmagma.magmaquiz.app.core.MainWindow
 
 @Composable
-fun NavButtonsRow(
+fun WindowActionsButtonsRow(
     modifier: Modifier = Modifier,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.End,
-    verticalAlignment: Alignment.Vertical = Alignment.Top,
+    verticalAlignment: Alignment.Vertical = Alignment.CenterVertically
 ) {
     Row(
         modifier = modifier,
@@ -40,6 +43,7 @@ fun NavButtonsRow(
         val isHovered by mutableInteractionSource.collectIsHoveredAsState()
 
         IconButton(
+            modifier = Modifier.size(50.dp).padding(0.dp),
             shape = RectangleShape,
             onClick = {
                 MainWindow.windowState.isMinimized = !MainWindow.windowState.isMinimized
@@ -52,6 +56,7 @@ fun NavButtonsRow(
 
 
         IconButton(
+            modifier = Modifier.size(50.dp).padding(0.dp),
             shape = RectangleShape,
             onClick = {
                 MainWindow.windowState.placement =
@@ -65,6 +70,7 @@ fun NavButtonsRow(
         }
 
         IconButton(
+            modifier = Modifier.size(50.dp).padding(0.dp),
             shape = RectangleShape,
             colors = if (isHovered) colorHover else IconButtonDefaults.iconButtonColors(),
             interactionSource = mutableInteractionSource,

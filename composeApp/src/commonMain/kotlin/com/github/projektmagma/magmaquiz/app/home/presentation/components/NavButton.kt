@@ -42,7 +42,7 @@ fun NavButton(
         ) {
             Text(
                 text = contentLabel,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.bodyLarge
             )
             if (contentIcon != null)
                 Icon(

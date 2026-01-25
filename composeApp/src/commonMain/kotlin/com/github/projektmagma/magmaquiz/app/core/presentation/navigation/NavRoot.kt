@@ -1,5 +1,7 @@
 package com.github.projektmagma.magmaquiz.app.core.presentation.navigation
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -15,6 +17,7 @@ import com.github.projektmagma.magmaquiz.app.auth.presentation.AuthNavigation
 import com.github.projektmagma.magmaquiz.app.core.presentation.RootViewModel
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.AuthState
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.FullSizeCircularProgressIndicator
+import com.github.projektmagma.magmaquiz.app.home.presentation.navigation.CustomWindowDraggableArea
 import com.github.projektmagma.magmaquiz.app.home.presentation.navigation.MainNavigation
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.GameScreen
 import kotlinx.serialization.modules.SerializersModule
@@ -30,7 +33,10 @@ fun NavRoot(
 
     when (authState) {
         AuthState.Loading -> {
-            FullSizeCircularProgressIndicator()
+            Column(modifier = Modifier.fillMaxSize()) {
+                CustomWindowDraggableArea()
+                FullSizeCircularProgressIndicator()
+            }
         }
 
         AuthState.Unauthenticated -> {

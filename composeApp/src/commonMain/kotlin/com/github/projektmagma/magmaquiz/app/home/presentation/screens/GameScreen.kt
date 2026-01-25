@@ -15,6 +15,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.projektmagma.magmaquiz.app.home.presentation.QuizViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.ContentImage
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.game.GameCommand
+import com.github.projektmagma.magmaquiz.app.home.presentation.navigation.CustomWindowDraggableArea
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -33,85 +34,87 @@ fun GameScreen(
     BackHandler(gameState.isQuizFinished) {
         navigateOnGameFinnish()
     }
+    Column(modifier = Modifier.fillMaxSize()) {
+        CustomWindowDraggableArea()
+        AnimatedContent(
+            targetState = gameState,
+            transitionSpec = {
+                slideInHorizontally { fullWidth -> fullWidth } togetherWith
+                        slideOutHorizontally { fullWidth -> -fullWidth }
+            },
+            contentKey = { state -> state.currentQuestionIndex }
+        ) { currentState ->
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                if (currentState.isQuizFinished) {
+                    Text(text = "Koniec quizu")
+                    Button(onClick = {
+                        navigateOnGameFinnish()
+                    }) {
+                        Text("Wroc")
+                    }
+                    Text(text = "Poprawnie ${currentState.score} / ${currentState.totalQuestions}")
+                } else {
+                    ContentImage(imageData = currentState.questionImage)
+                    Text(text = "${currentState.questionNumber}. ${currentState.questionContent}")
 
-    AnimatedContent(
-        targetState = gameState,
-        transitionSpec = {
-            slideInHorizontally { fullWidth -> fullWidth } togetherWith
-                    slideOutHorizontally { fullWidth -> -fullWidth }
-        },
-        contentKey = { state -> state.currentQuestionIndex }
-    ) { currentState ->
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            if (currentState.isQuizFinished) {
-                Text(text = "Koniec quizu")
-                Button(onClick = {
-                    navigateOnGameFinnish()
-                }) {
-                    Text("Wroc")
-                }
-                Text(text = "Poprawnie ${currentState.score} / ${currentState.totalQuestions}")
-            } else {
-                ContentImage(imageData = currentState.questionImage)
-                Text(text = "${currentState.questionNumber}. ${currentState.questionContent}")
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                Spacer(modifier = Modifier.height(8.dp))
-
-                if (currentState.answers.size == 1) {
-                    var inputValue by remember { mutableStateOf("") }
+                    if (currentState.answers.size == 1) {
+                        var inputValue by remember { mutableStateOf("") }
 
 
-                    OutlinedTextField(
-                        value = inputValue,
-                        onValueChange = {
-                            inputValue = it
-                        },
-                        trailingIcon = {
-                            IconButton(
+                        OutlinedTextField(
+                            value = inputValue,
+                            onValueChange = {
+                                inputValue = it
+                            },
+                            trailingIcon = {
+                                IconButton(
+                                    onClick = {
+                                        quizViewModel.onCommand(GameCommand.AnswerClicked(content = inputValue))
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Default.ArrowRightAlt,
+                                        contentDescription = "Strzalka do akceptacji"
+                                    )
+                                }
+                            }
+                        )
+                        AnimatedVisibility(
+                            visible = currentState.isAnswered,
+                            enter = fadeIn() + slideInVertically { it },
+                            exit = fadeOut()
+                        ) {
+                            Text(
+                                text = "Poprawna odpowiedź: ${currentState.answers.first().content}",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier
+                                    .padding(top = 32.dp)
+                            )
+                        }
+
+                    } else {
+                        currentState.answers.forEach { answer ->
+                            Button(
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = when {
+                                        currentState.isAnswered && answer.isCorrect -> MaterialTheme.colorScheme.primaryContainer
+                                        currentState.isAnswered && answer.isSelected -> MaterialTheme.colorScheme.error
+                                        else -> MaterialTheme.colorScheme.primary
+                                    }
+                                ),
                                 onClick = {
-                                    quizViewModel.onCommand(GameCommand.AnswerClicked(content = inputValue))
+                                    quizViewModel.onCommand(GameCommand.AnswerClicked(answer.isCorrect, answer.content))
                                 }
                             ) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Default.ArrowRightAlt,
-                                    contentDescription = "Strzalka do akceptacji"
-                                )
+                                Text(text = answer.content)
                             }
-                        }
-                    )
-                    AnimatedVisibility(
-                        visible = currentState.isAnswered,
-                        enter = fadeIn() + slideInVertically { it },
-                        exit = fadeOut()
-                    ) {
-                        Text(
-                            text = "Poprawna odpowiedź: ${currentState.answers.first().content}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier
-                                .padding(top = 32.dp)
-                        )
-                    }
-
-                } else {
-                    currentState.answers.forEach { answer ->
-                        Button(
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = when {
-                                    currentState.isAnswered && answer.isCorrect -> MaterialTheme.colorScheme.primaryContainer
-                                    currentState.isAnswered && answer.isSelected -> MaterialTheme.colorScheme.error
-                                    else -> MaterialTheme.colorScheme.primary
-                                }
-                            ),
-                            onClick = {
-                                quizViewModel.onCommand(GameCommand.AnswerClicked(answer.isCorrect, answer.content))
-                            }
-                        ) {
-                            Text(text = answer.content)
                         }
                     }
                 }

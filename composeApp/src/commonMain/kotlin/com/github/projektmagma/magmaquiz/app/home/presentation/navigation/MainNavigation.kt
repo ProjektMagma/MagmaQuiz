@@ -27,7 +27,7 @@ fun MainNavigation(
     navigateToAuth: () -> Unit
 ) {
     val authRepository: AuthRepository = koinInject()
-    
+
     val mainBackStack = rememberNavBackStack(
         configuration = SavedStateConfiguration {
             serializersModule = SerializersModule {
@@ -35,6 +35,7 @@ fun MainNavigation(
                     subclass(Route.Menus.Home::class, Route.Menus.Home.serializer())
                     subclass(Route.Menus.Quizzes::class, Route.Menus.Quizzes.serializer())
                     subclass(Route.Menus.Users::class, Route.Menus.Users.serializer())
+                    subclass(Route.Menus.Settings::class, Route.Menus.Settings.serializer())
                 }
             }
         },
@@ -43,7 +44,7 @@ fun MainNavigation(
 
     val quizzesListViewModel: QuizzesListViewModel = koinViewModel()
     val createQuizViewModel: CreateQuizViewModel = koinViewModel()
-    
+
     MainNavMenu(
         backStack = mainBackStack,
         navigateToHome = {
@@ -54,7 +55,7 @@ fun MainNavigation(
         },
         navigateToQuizzes = {
             if (mainBackStack.getOrNull(mainBackStack.size - 2) is Route.Menus.Quizzes)
-                 mainBackStack.removeLastOrNull()
+                mainBackStack.removeLastOrNull()
             else mainBackStack.add(Route.Menus.Quizzes())
         },
         navigateToUsers = {
@@ -98,13 +99,21 @@ fun MainNavigation(
                 entry<Route.Menus.Users> { parameters ->
                     UsersNavigation(
                         startDestination = parameters.route,
-                        navigateToQuizDetails = { mainBackStack.add(Route.Menus.Quizzes(Route.Menus.Quizzes.QuizDetails(it))) },
+                        navigateToQuizDetails = {
+                            mainBackStack.add(
+                                Route.Menus.Quizzes(
+                                    Route.Menus.Quizzes.QuizDetails(
+                                        it
+                                    )
+                                )
+                            )
+                        },
                         navigateToEditScreen = { mainBackStack.add(Route.Menus.Quizzes(Route.Menus.Quizzes.CreateQuiz)) },
                         navigateToSettingScreen = { mainBackStack.add(Route.Menus.Settings) },
                         createQuizViewModel = createQuizViewModel
                     )
                 }
-                entry<Route.Menus.Settings> { 
+                entry<Route.Menus.Settings> {
                     SettingsNavigation(
                         navigateToAuth = { navigateToAuth() },
                     )

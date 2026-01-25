@@ -1,6 +1,9 @@
 package com.github.projektmagma.magmaquiz.app.auth.presentation
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -13,6 +16,7 @@ import com.github.projektmagma.magmaquiz.app.auth.presentation.screens.OnBoardin
 import com.github.projektmagma.magmaquiz.app.auth.presentation.screens.RegisterScreen
 import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route
 import com.github.projektmagma.magmaquiz.app.core.presentation.screens.ServerConfigScreen
+import com.github.projektmagma.magmaquiz.app.home.presentation.navigation.CustomWindowDraggableArea
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 
@@ -33,56 +37,58 @@ fun AuthNavigation(
         },
         Route.Auth.OnBoarding
     )
-    
+
     fun navigateToRegister() {
         authBackStack.add(Route.Auth.Register)
     }
-    
+
     fun navigateToLogin() {
         authBackStack.add(Route.Auth.Login)
     }
-
-    NavDisplay(
-        backStack = authBackStack,
-        entryDecorators = listOf(
-            rememberSaveableStateHolderNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator()
-        ),
-        entryProvider = entryProvider {
-            entry<Route.Auth.Login> {
-                LoginScreen(
-                    navigateToRegister = {
-                        navigateToRegister()
-                    },
-                    navigateToHome = {
-                        navigateToMain()
-                    }
-                )
+    Column(modifier = Modifier.fillMaxSize()) {
+        CustomWindowDraggableArea()
+        NavDisplay(
+            backStack = authBackStack,
+            entryDecorators = listOf(
+                rememberSaveableStateHolderNavEntryDecorator(),
+                rememberViewModelStoreNavEntryDecorator()
+            ),
+            entryProvider = entryProvider {
+                entry<Route.Auth.Login> {
+                    LoginScreen(
+                        navigateToRegister = {
+                            navigateToRegister()
+                        },
+                        navigateToHome = {
+                            navigateToMain()
+                        }
+                    )
+                }
+                entry<Route.Auth.Register> {
+                    RegisterScreen(
+                        navigateToLogin = {
+                            navigateToLogin()
+                        },
+                        navigateToHome = {
+                            navigateToMain()
+                        }
+                    )
+                }
+                entry<Route.Auth.OnBoarding> {
+                    OnBoardingScreen(
+                        navigateToLogin = { navigateToLogin() },
+                        navigateToRegister = { navigateToRegister() },
+                        navigateToServerConfig = { authBackStack.add(Route.Auth.ServerConfig) }
+                    )
+                }
+                entry<Route.Auth.ServerConfig> {
+                    ServerConfigScreen(
+                        navigateBack = {
+                            authBackStack.removeAt(authBackStack.count() - 1)
+                        }
+                    )
+                }
             }
-            entry<Route.Auth.Register> {
-                RegisterScreen(
-                    navigateToLogin = {
-                        navigateToLogin()
-                    },
-                    navigateToHome = {
-                        navigateToMain()
-                    }
-                )
-            }
-            entry<Route.Auth.OnBoarding> {
-                OnBoardingScreen(
-                    navigateToLogin = { navigateToLogin() },
-                    navigateToRegister = { navigateToRegister() },
-                    navigateToServerConfig = { authBackStack.add(Route.Auth.ServerConfig) }
-                )
-            }
-            entry<Route.Auth.ServerConfig> {
-                ServerConfigScreen(
-                    navigateBack = {
-                        authBackStack.removeAt(authBackStack.count() - 1)
-                    }
-                )
-            }
-        }
-    )
+        )
+    }
 }

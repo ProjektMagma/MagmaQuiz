@@ -8,4 +8,6 @@ object MainWindow {
     lateinit var frameWindowScope: FrameWindowScope
     lateinit var applicationScope: ApplicationScope
     lateinit var windowState: WindowState
+
 }
+
