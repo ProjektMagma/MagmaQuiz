@@ -1,4 +1,4 @@
-package com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes
+package com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.create
 
 import com.github.projektmagma.magmaquiz.shared.data.domain.Answer
 import java.util.UUID

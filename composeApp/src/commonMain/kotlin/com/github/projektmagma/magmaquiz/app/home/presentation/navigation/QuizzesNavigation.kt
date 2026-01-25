@@ -12,6 +12,7 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route
 import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route.Menus.Quizzes
 import com.github.projektmagma.magmaquiz.app.home.presentation.CreateQuizViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.QuizViewModel
+import com.github.projektmagma.magmaquiz.app.home.presentation.QuizzesListViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.quizzes.CreateQuestionScreen
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.quizzes.CreateQuizScreen
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.quizzes.QuizDetailsScreen
@@ -27,6 +28,8 @@ fun QuizzesNavigation(
     navigateToUserDetails: (id: UUID) -> Unit,
     navigateToGameScreen: () -> Unit,
     onSystemBack: () -> Unit,
+    quizzesListViewModel: QuizzesListViewModel,
+    createQuizViewModel: CreateQuizViewModel
 ) {
     val quizzesBackstack = rememberNavBackStack(
         configuration = SavedStateConfiguration {
@@ -52,7 +55,6 @@ fun QuizzesNavigation(
     }
 
     val quizViewModel: QuizViewModel = koinViewModel()
-    val createQuizViewModel: CreateQuizViewModel = koinViewModel()
     
     NavDisplay(
         backStack = quizzesBackstack,
@@ -64,14 +66,15 @@ fun QuizzesNavigation(
             entry<Quizzes.Find> {
                 QuizzesScreen(
                     navigateToCreateQuizScreen = {
-                        quizzesBackstack.add(Quizzes.CreateQuiz())
+                        quizzesBackstack.add(Quizzes.CreateQuiz)
                     },
                     navigateToUserDetails = {
                         navigateToUserDetails(it)
                     },
                     navigateToQuizDetails = { id ->
                         quizzesBackstack.add(Quizzes.QuizDetails(id))
-                    }
+                    },
+                    quizzesListViewModel = quizzesListViewModel
                 )
             }
             entry<Quizzes.QuizDetails> {
@@ -86,7 +89,6 @@ fun QuizzesNavigation(
             }
             entry<Quizzes.CreateQuiz> {
                 CreateQuizScreen(
-                    id = it.id,
                     navigateToQuestionCreate = { id ->
                         quizzesBackstack.add(Quizzes.CreateQuestion(id))
                     },

@@ -1,4 +1,4 @@
-package com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes
+package com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.create
 
 import com.github.projektmagma.magmaquiz.app.home.domain.validators.QuestionError
 import com.github.projektmagma.magmaquiz.app.home.domain.validators.QuizError

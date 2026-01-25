@@ -10,42 +10,61 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiStat
 import com.github.projektmagma.magmaquiz.app.core.util.withSearchDelay
 import com.github.projektmagma.magmaquiz.app.home.data.repository.QuizRepository
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuizFilters
-import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuizListCommand
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuizListState
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenError
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.UUID
 
 class QuizzesListViewModel(
     private val quizRepository: QuizRepository
 ) : ViewModel() {
-    var quizName by mutableStateOf("")
-
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState = _uiState.asStateFlow()
-
-    private val _quizzes = MutableStateFlow<List<Quiz>>(emptyList())
-    val quizzes = _quizzes.asStateFlow()
-
-    val quizFilters = mutableStateOf<QuizFilters>(QuizFilters.None)
+    
+    var quizListState by mutableStateOf(QuizListState())
 
     var searchLock = false
 
     init {
         getQuizByName(false)
     }
+    
+    fun onCommand(command: QuizListCommand){
+        when (command) {
+            is QuizListCommand.NameChanged -> quizListState = quizListState.copy(quizName = command.name)
+            is QuizListCommand.FilterChanged -> {
+                quizListState = quizListState.copy(isLoaded = false)
+                quizListState = quizListState.copy(quizFilter = command.filter)
+            }
+            is QuizListCommand.ListChanged -> quizListState = quizListState.copy(quizzes = command.list)
+            QuizListCommand.LoadByFilter -> loadByFilter()
+            is QuizListCommand.LoadByName -> getQuizByName(command.delay)
+            is QuizListCommand.FavoriteStatusChanged -> changeFavoriteStatus(command.id)
+        }
+    }
+    
+    private fun loadByFilter() {
+        when (quizListState.quizFilter){
+            QuizFilters.Favorites -> getMyFavorites()
+            QuizFilters.Friends -> getFriendsQuizzes()
+            QuizFilters.MostLiked -> getMostLikedQuizzes()
+            QuizFilters.None -> getQuizByName(false)
+            QuizFilters.RecentlyAdded -> getRecentlyAddedQuizzes()
+        }
+    }
 
-    // Todo przechwytywanie bledow
-    fun getQuizByName(withDelay: Boolean = false) {
+    private fun getQuizByName(withDelay: Boolean = false) {
         viewModelScope.launch {
             if (searchLock && withDelay) return@launch
             _uiState.value = UiState.Loading
             searchLock = true
             withSearchDelay(withDelay) {
-                quizRepository.getQuizByName(quizName).whenSuccess {
-                    _quizzes.value = it.data
+                quizRepository.getQuizByName(quizListState.quizName).whenSuccess {
+                    quizListState = quizListState.copy(quizzes = it.data, isLoaded = true)
                     _uiState.value = UiState.Success
                 }.whenError {
                     _uiState.value = UiState.Error(it.error.toResId())
@@ -55,10 +74,10 @@ class QuizzesListViewModel(
         }
     }
 
-    fun changeFavoriteStatus(id: UUID) {
+    private fun changeFavoriteStatus(id: UUID) {
         viewModelScope.launch {
             quizRepository.changeFavoriteStatus(id)
-            _quizzes.value.first { it.id == id }.apply {
+            quizListState.quizzes.first { it.id == id }.apply {
                 if (likedByYou) {
                     likedByYou = false
                     likesCount--
@@ -70,12 +89,12 @@ class QuizzesListViewModel(
         }
     }
 
-    fun getMyFavorites() {
+    private fun getMyFavorites() {
         viewModelScope.launch {
             _uiState.value = UiState.Loading
             quizRepository.getMyFavorites()
                 .whenSuccess {
-                    _quizzes.value = it.data
+                    quizListState = quizListState.copy(quizzes = it.data, isLoaded = true)
                     _uiState.value = UiState.Success
                 }.whenError {
                     _uiState.value = UiState.Error(it.error.toResId())
@@ -83,12 +102,12 @@ class QuizzesListViewModel(
         }
     }
 
-    fun getMostLikedQuizzes() {
+    private fun getMostLikedQuizzes() {
         viewModelScope.launch {
             _uiState.value = UiState.Loading
             quizRepository.getMostLikedQuizzes()
                 .whenSuccess {
-                    _quizzes.value = it.data
+                    quizListState = quizListState.copy(quizzes = it.data, isLoaded = true)
                     _uiState.value = UiState.Success
                 }.whenError {
                     _uiState.value = UiState.Error(it.error.toResId())
@@ -96,12 +115,12 @@ class QuizzesListViewModel(
         }
     }
 
-    fun getFriendsQuizzes() {
+    private fun getFriendsQuizzes() {
         viewModelScope.launch {
             _uiState.value = UiState.Loading
             quizRepository.getFriendsQuizzes()
                 .whenSuccess {
-                    _quizzes.value = it.data
+                    quizListState = quizListState.copy(quizzes = it.data, isLoaded = true)
                     _uiState.value = UiState.Success
                 }.whenError {
                     _uiState.value = UiState.Error(it.error.toResId())
@@ -109,12 +128,12 @@ class QuizzesListViewModel(
         }
     }
 
-    fun getRecentlyAddedQuizzes() {
+    private fun getRecentlyAddedQuizzes() {
         viewModelScope.launch {
             _uiState.value = UiState.Loading
             quizRepository.getRecentlyAddedQuizzes()
                 .whenSuccess {
-                    _quizzes.value = it.data
+                    quizListState = quizListState.copy(quizzes = it.data, isLoaded = true)
                     _uiState.value = UiState.Success
                 }.whenError {
                     _uiState.value = UiState.Error(it.error.toResId())

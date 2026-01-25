@@ -13,10 +13,13 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.github.projektmagma.magmaquiz.app.auth.data.AuthRepository
 import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route
+import com.github.projektmagma.magmaquiz.app.home.presentation.CreateQuizViewModel
+import com.github.projektmagma.magmaquiz.app.home.presentation.QuizzesListViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.HomeScreen
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun MainNavigation(
@@ -37,6 +40,9 @@ fun MainNavigation(
         },
         Route.Menus.Home
     )
+
+    val quizzesListViewModel: QuizzesListViewModel = koinViewModel()
+    val createQuizViewModel: CreateQuizViewModel = koinViewModel()
     
     MainNavMenu(
         backStack = mainBackStack,
@@ -48,9 +54,8 @@ fun MainNavigation(
         },
         navigateToQuizzes = {
             if (mainBackStack.getOrNull(mainBackStack.size - 2) is Route.Menus.Quizzes)
-                mainBackStack.removeLastOrNull()
-            else
-                mainBackStack.add(Route.Menus.Quizzes())
+                 mainBackStack.removeLastOrNull()
+            else mainBackStack.add(Route.Menus.Quizzes())
         },
         navigateToUsers = {
             if (mainBackStack.getOrNull(mainBackStack.size - 2) is Route.Menus.Users)
@@ -85,15 +90,18 @@ fun MainNavigation(
                         startDestination = parameters.route,
                         navigateToUserDetails = { mainBackStack.add(Route.Menus.Users(Route.Menus.Users.UserDetails(it))) },
                         navigateToGameScreen = { navigateToGameScreen() },
-                        onSystemBack = { mainBackStack.removeLastOrNull() }
+                        onSystemBack = { mainBackStack.removeLastOrNull() },
+                        quizzesListViewModel = quizzesListViewModel,
+                        createQuizViewModel = createQuizViewModel
                     )
                 }
                 entry<Route.Menus.Users> { parameters ->
                     UsersNavigation(
                         startDestination = parameters.route,
                         navigateToQuizDetails = { mainBackStack.add(Route.Menus.Quizzes(Route.Menus.Quizzes.QuizDetails(it))) },
-                        navigateToEditScreen = { mainBackStack.add(Route.Menus.Quizzes(Route.Menus.Quizzes.CreateQuiz(it))) },
-                        navigateToSettingScreen = { mainBackStack.add(Route.Menus.Settings) }
+                        navigateToEditScreen = { mainBackStack.add(Route.Menus.Quizzes(Route.Menus.Quizzes.CreateQuiz)) },
+                        navigateToSettingScreen = { mainBackStack.add(Route.Menus.Settings) },
+                        createQuizViewModel = createQuizViewModel
                     )
                 }
                 entry<Route.Menus.Settings> { 

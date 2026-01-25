@@ -10,7 +10,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.QuizCoverImage
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.UniversalCardContainer
-import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuestionModel
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.create.QuestionModel
 
 @Composable
 fun QuestionCard(

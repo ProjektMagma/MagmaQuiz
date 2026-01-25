@@ -30,7 +30,7 @@ import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
 import com.github.projektmagma.magmaquiz.app.home.presentation.CreateQuizViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.QuizCoverImage
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.UiEvent
-import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuizCommand
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.create.QuizCommand
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.content
 import magmaquiz.composeapp.generated.resources.delete_answer
