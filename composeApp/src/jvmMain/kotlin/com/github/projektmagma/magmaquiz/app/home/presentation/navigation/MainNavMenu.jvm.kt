@@ -1,6 +1,7 @@
 package com.github.projektmagma.magmaquiz.app.home.presentation.navigation
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Groups
@@ -15,6 +16,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import com.github.projektmagma.magmaquiz.app.auth.presentation.AuthViewModel
+import com.github.projektmagma.magmaquiz.app.core.MainWindow
 import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.NavButton
@@ -58,55 +60,60 @@ actual fun MainNavMenu(
                 }
         },
         topBar = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
 
+            MainWindow.frameWindowScope.WindowDraggableArea {
                 Row(
-                    modifier = Modifier.weight(1f),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    NavButton(
-                        isCurrentRoute = backStack.last() == Route.Menus.Home,
-                        onClick = {
-                            navigateToHome()
-                        },
-                        contentLabel = stringResource(Res.string.home_nav),
-                        contentIcon = Icons.Default.Home
-                    )
-                    NavButton(
-                        isCurrentRoute = backStack.last() is Route.Menus.Quizzes,
-                        onClick = {
-                            navigateToQuizzes()
-                        },
-                        contentLabel = stringResource(Res.string.quizzes_nav),
-                        contentIcon = Icons.Default.Quiz
-                    )
-                    NavButton(
-                        isCurrentRoute = backStack.last() is Route.Menus.Users,
-                        onClick = {
-                            navigateToUsers()
-                        },
-                        contentLabel = stringResource(Res.string.users_nav),
-                        contentIcon = Icons.Default.Groups
-                    )
-                }
-                Text(
-                    text = "${stringResource(Res.string.greeting)}, ${thisUser.value!!.userName}!",
-                    style = MaterialTheme.typography.titleLarge
-                )
-                Spacer(modifier = Modifier.width(20.dp))
-                IconButton(
-                    onClick = { navigateToUserProfile() },
-                ) {
-                    ProfilePictureIcon(thisUser.value!!.userProfilePicture)
-                }
+                    Row(
+                        modifier = Modifier.fillMaxWidth().weight(1f).padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            modifier = Modifier.weight(1f),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            NavButton(
+                                isCurrentRoute = backStack.last() == Route.Menus.Home,
+                                onClick = {
+                                    navigateToHome()
+                                },
+                                contentLabel = stringResource(Res.string.home_nav),
+                                contentIcon = Icons.Default.Home
+                            )
+                            NavButton(
+                                isCurrentRoute = backStack.last() is Route.Menus.Quizzes,
+                                onClick = {
+                                    navigateToQuizzes()
+                                },
+                                contentLabel = stringResource(Res.string.quizzes_nav),
+                                contentIcon = Icons.Default.Quiz
+                            )
+                            NavButton(
+                                isCurrentRoute = backStack.last() is Route.Menus.Users,
+                                onClick = {
+                                    navigateToUsers()
+                                },
+                                contentLabel = stringResource(Res.string.users_nav),
+                                contentIcon = Icons.Default.Groups
+                            )
+                        }
+                        Text(
+                            text = "${stringResource(Res.string.greeting)}, ${thisUser.value!!.userName}!",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        Spacer(modifier = Modifier.width(20.dp))
+                        IconButton(
+                            onClick = { navigateToUserProfile() },
+                        ) {
+                            ProfilePictureIcon(thisUser.value!!.userProfilePicture)
+                        }
+                    }
 
+                    NavButtonsRow()
+                }
             }
         }) { paddingValues ->
         Column(

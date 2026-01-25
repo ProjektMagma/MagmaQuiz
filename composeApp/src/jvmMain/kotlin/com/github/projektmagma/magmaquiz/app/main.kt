@@ -2,6 +2,8 @@ package com.github.projektmagma.magmaquiz.app
 
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberWindowState
+import com.github.projektmagma.magmaquiz.app.core.MainWindow
 import com.github.projektmagma.magmaquiz.app.core.di.initKoin
 import com.github.projektmagma.magmaquiz.app.core.presentation.App
 import magmaquiz.composeapp.generated.resources.Res
@@ -14,14 +16,20 @@ import java.awt.Dimension
 fun main() {
     initKoin()
     application {
+        val windowState = rememberWindowState()
 
+        MainWindow.windowState = windowState
+        MainWindow.applicationScope = this
 
         Window(
             onCloseRequest = ::exitApplication,
             alwaysOnTop = System.getenv("ALWAYS_ON_TOP").toBoolean(),
             title = stringResource(Res.string.app_name),
             icon = painterResource(Res.drawable.app_icon),
+            state = windowState,
+            undecorated = true
         ) {
+            MainWindow.frameWindowScope = this
             window.minimumSize = Dimension(1000, 750)
             App()
         }
