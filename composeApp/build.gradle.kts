@@ -25,6 +25,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
+            implementation(libs.core.splashscreen)
             runtimeOnly(libs.slf4j.android)
         }
         commonMain.dependencies {
