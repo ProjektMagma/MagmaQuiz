@@ -46,7 +46,7 @@ fun QuizzesScreen(
     navigateToUserDetails: (id: UUID) -> Unit,
     quizzesListViewModel: QuizzesListViewModel
 ) {
-    val state = quizzesListViewModel.quizListState
+    val state by quizzesListViewModel.quizListState.collectAsStateWithLifecycle()
     val uiState by quizzesListViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(state.quizFilter) {

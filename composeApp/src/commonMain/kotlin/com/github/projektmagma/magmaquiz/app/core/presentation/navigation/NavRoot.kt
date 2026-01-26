@@ -103,10 +103,11 @@ private fun AppNavigation(
             }
             entry<Route.Game> {
                 GameScreen(
-                    navigateOnGameFinnish = {
+                    navigateOnGameFinish = {
                         rootBackStack.clear()
                         rootBackStack.add(Route.Menus)
-                    })
+                    }
+                )
             }
         }
     )

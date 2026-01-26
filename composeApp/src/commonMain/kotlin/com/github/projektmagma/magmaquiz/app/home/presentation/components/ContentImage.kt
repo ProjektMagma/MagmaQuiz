@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
@@ -16,10 +17,13 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 
 @Composable
-fun ContentImage(imageData: ByteArray?) {
+fun ContentImage(
+    imageData: ByteArray?,
+    imageSize: Dp = 200.dp,
+) {
     if (imageData == null)
         Icon(
-            modifier = Modifier.size(200.dp),
+            modifier = Modifier.size(imageSize),
             imageVector = Icons.Default.ImageNotSupported,
             tint = MaterialTheme.colorScheme.onSurface,
             contentDescription = "NoPicture",
@@ -27,7 +31,7 @@ fun ContentImage(imageData: ByteArray?) {
     else
         AsyncImage(
             modifier = Modifier
-                .size(200.dp)
+                .size(imageSize)
                 .clip(MaterialTheme.shapes.large),
             model = ImageRequest.Builder(LocalPlatformContext.current)
                 .crossfade(true)

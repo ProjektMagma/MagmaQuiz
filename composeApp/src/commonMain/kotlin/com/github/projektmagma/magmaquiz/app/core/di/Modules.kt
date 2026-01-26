@@ -1,30 +1,54 @@
 package com.github.projektmagma.magmaquiz.app.core.di
 
+import com.github.projektmagma.magmaquiz.app.core.data.ApiDataStore
+import com.github.projektmagma.magmaquiz.app.core.data.ServerConfigDataStore
 import com.github.projektmagma.magmaquiz.app.core.presentation.RootViewModel
 import com.github.projektmagma.magmaquiz.app.core.presentation.ServerConfigViewModel
-import com.github.projektmagma.magmaquiz.app.core.util.BaseUrlProvider
+import com.github.projektmagma.magmaquiz.shared.data.domain.CustomHeaders
 import io.github.aakira.napier.Napier
-import io.ktor.client.*
-import io.ktor.client.engine.okhttp.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.plugins.cookies.*
-import io.ktor.client.plugins.logging.*
-import io.ktor.serialization.kotlinx.json.*
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.api.createClientPlugin
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.cookies.HttpCookies
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.request.header
+import io.ktor.http.URLProtocol
+import io.ktor.http.encodedPath
+import io.ktor.http.path
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.koin.core.module.Module
-import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 val sharedModule = module {
-    singleOf(::BaseUrlProvider)
-
     viewModelOf(::ServerConfigViewModel)
     viewModelOf(::RootViewModel)
 
 
     single {
         HttpClient(OkHttp) {
+            val defaultCredentialsPlugin = createClientPlugin("DefaultCredentialsPlugin"){
+                onRequest { request, _ ->
+                    val config = get<ServerConfigDataStore>().getServerConfig()
+                    val sessionHeader = get<ApiDataStore>().getSessionHeader()
+                    
+                    request.url {
+                        protocol = URLProtocol.createOrDefault(config.protocol.toString())
+                        host = config.ip
+                        port = config.port
+                        path(request.url.encodedPath)
+                    }
+                    
+                    if (sessionHeader.isNotBlank()){
+                        request.header(CustomHeaders.UserSession, sessionHeader)
+                    }
+                }
+            }
+            
             install(ContentNegotiation) {
                 json(Json)
             }
@@ -37,6 +61,7 @@ val sharedModule = module {
                 }
                 level = LogLevel.HEADERS
             }
+            install(defaultCredentialsPlugin)
         }
     }
 }

@@ -5,26 +5,24 @@ import androidx.lifecycle.viewModelScope
 import com.github.projektmagma.magmaquiz.app.home.data.repository.QuizRepository
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.game.AnswerState
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.game.GameCommand
-import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.*
 
-class QuizViewModel(
-    private val quizRepository: QuizRepository
+class GameQuizViewModel(
+    quizRepository: QuizRepository
 ) : ViewModel() {
 
     private val _gameState = quizRepository.gameState
     val gameState = _gameState.asStateFlow()
+    
     private val _quiz = quizRepository.quiz
     val quiz = _quiz.asStateFlow()
 
     fun onCommand(command: GameCommand) {
         when (command) {
             is GameCommand.AnswerClicked -> onAnswerSelected(command)
-            is GameCommand.GetQuizById -> getQuizById(command.id)
             GameCommand.StartGame -> startGame()
         }
     }
@@ -81,15 +79,6 @@ class QuizViewModel(
                     totalQuestions = questions.size
                 )
             }
-        }
-    }
-
-
-    // Todo przechwytywanie bledow
-    private fun getQuizById(id: UUID) {
-        viewModelScope.launch {
-            _quiz.value = null
-            quizRepository.getQuizById(id).whenSuccess { _quiz.value = it.data }
         }
     }
 }

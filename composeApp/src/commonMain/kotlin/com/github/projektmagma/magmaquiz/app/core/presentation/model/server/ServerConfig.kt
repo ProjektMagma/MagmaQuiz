@@ -4,6 +4,6 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.screens.Protocols
 
 data class ServerConfig(
     val ip: String = "",
-    val port: String = "",
+    val port: Int = 8080,
     val protocol: Protocols = Protocols.HTTPS
 )

@@ -5,11 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.github.projektmagma.magmaquiz.app.auth.data.AuthRepository
 import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
-import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route
 import com.github.projektmagma.magmaquiz.app.home.data.repository.QuizRepository
 import com.github.projektmagma.magmaquiz.app.home.data.repository.UsersRepository
-import com.github.projektmagma.magmaquiz.app.home.presentation.model.UiEvent
-import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.User
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenError
@@ -65,16 +62,14 @@ class UserDetailsViewModel(
 
     fun changeFavoriteStatus(id: UUID) {
         viewModelScope.launch {
-            quizRepository.changeFavoriteStatus(id)
-            _quizzes.value.first { it.id == id }.apply {
-                if (likedByYou) {
-                    likedByYou = false
-                    likesCount--
-                } else {
-                    likedByYou = true
-                    likesCount++
+            quizRepository.changeFavoriteStatus(id, _quizzes.value)
+                .whenSuccess { 
+                    _quizzes.value = it.data
+                    _uiState.value = UiState.Success
                 }
-            }
+                .whenError { 
+                    _uiState.value = UiState.Error(it.error.toResId())
+                }
         }
     }
     

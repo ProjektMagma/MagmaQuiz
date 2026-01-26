@@ -17,3 +17,10 @@ inline fun <D, E : RootError> Resource<D, E>.whenError(block: (Resource.Error<E>
     if (this is Resource.Error) block(this)
     return this
 }
+
+inline fun <T, E: RootError, R> Resource<T, E>.map(map: (T) -> R): Resource<R, E> {
+    return when(this) {
+        is Resource.Error -> Resource.Error(error)
+        is Resource.Success -> Resource.Success(map(data))
+    }
+}
