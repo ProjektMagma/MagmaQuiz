@@ -16,10 +16,10 @@ fun Application.mainModule() {
     configureDatabase()
     configureAuth()
     configureCORS()
-    configureSessions()
+    configureSessions(get())
     configureContentNegotiation()
 
-    authRoutes(get())
+    authRoutes(get(), get())
     settingsRoutes(get())
     quizRoutes(get())
     usersRoutes(get())

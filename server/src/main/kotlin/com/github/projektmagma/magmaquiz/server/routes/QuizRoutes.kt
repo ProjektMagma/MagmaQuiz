@@ -1,24 +1,20 @@
 package com.github.projektmagma.magmaquiz.server.routes
 
 import com.github.projektmagma.magmaquiz.server.controllers.QuizDataController
+import com.github.projektmagma.magmaquiz.server.data.util.AuthTypes
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import com.github.projektmagma.magmaquiz.server.data.util.respondToResource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
-import io.ktor.server.application.Application
-import io.ktor.server.auth.authenticate
-import io.ktor.server.request.receive
-import io.ktor.server.routing.delete
-import io.ktor.server.routing.get
-import io.ktor.server.routing.post
-import io.ktor.server.routing.route
-import io.ktor.server.routing.routing
-import io.ktor.server.sessions.get
-import io.ktor.server.sessions.sessions
-import java.util.UUID
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.request.*
+import io.ktor.server.routing.*
+import io.ktor.server.sessions.*
+import java.util.*
 
 fun Application.quizRoutes(quizDataController: QuizDataController) {
     routing {
-        authenticate("session-auth") {
+        authenticate(AuthTypes.SessionAuth) {
             route("/quiz") {
                 get("/{id}") {
                     val session = call.sessions.get<UserSession>()!!
@@ -87,13 +83,15 @@ fun Application.quizRoutes(quizDataController: QuizDataController) {
                 }
 
                 get("/newest/{count}") {
+                    val session = call.sessions.get<UserSession>()!!
                     val count = call.parameters["count"]!!.toInt()
-                    call.respondToResource(quizDataController.quizNewest(count))
+                    call.respondToResource(quizDataController.quizNewest(session, count))
                 }
 
                 get("/mostLiked/{count}") {
+                    val session = call.sessions.get<UserSession>()!!
                     val count = call.parameters["count"]!!.toInt()
-                    call.respondToResource(quizDataController.quizMostLiked(count))
+                    call.respondToResource(quizDataController.quizMostLiked(session, count))
                 }
 
                 get("/friendsQuizzes/") {

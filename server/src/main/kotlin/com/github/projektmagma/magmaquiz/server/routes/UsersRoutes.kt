@@ -1,6 +1,7 @@
 package com.github.projektmagma.magmaquiz.server.routes
 
 import com.github.projektmagma.magmaquiz.server.controllers.UsersDataController
+import com.github.projektmagma.magmaquiz.server.data.util.AuthTypes
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import com.github.projektmagma.magmaquiz.server.data.util.respondToResource
 import io.ktor.server.application.*
@@ -11,7 +12,7 @@ import java.util.*
 
 fun Application.usersRoutes(usersDataController: UsersDataController) {
     routing {
-        authenticate("session-auth") {
+        authenticate(AuthTypes.SessionAuth) {
             route("/users") {
                 route("/friendship") {
                     get("/sendInvitation/{userId}") {

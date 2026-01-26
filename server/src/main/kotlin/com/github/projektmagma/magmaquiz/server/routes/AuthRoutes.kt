@@ -1,8 +1,10 @@
 package com.github.projektmagma.magmaquiz.server.routes
 
 import com.github.projektmagma.magmaquiz.server.controllers.AuthDataController
+import com.github.projektmagma.magmaquiz.server.data.util.AuthTypes
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import com.github.projektmagma.magmaquiz.server.data.util.respondToResource
+import com.github.projektmagma.magmaquiz.server.storage.ExposedSessionStorage
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkResource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateUserValue
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.LoginUserValue
@@ -14,7 +16,10 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 
-fun Application.authRoutes(authDataController: AuthDataController) {
+fun Application.authRoutes(
+    authDataController: AuthDataController,
+    exposedSessionStorage: ExposedSessionStorage
+) {
     routing {
         route("/auth") {
             post("/login") {
@@ -46,7 +51,7 @@ fun Application.authRoutes(authDataController: AuthDataController) {
 
             }
 
-            authenticate("session-auth") {
+            authenticate(AuthTypes.SessionAuth) {
 
                 get("/whoami") {
                     val session = call.sessions.get<UserSession>()!!
@@ -56,6 +61,13 @@ fun Application.authRoutes(authDataController: AuthDataController) {
 
                 get("/logout") {
                     call.sessions.clear<UserSession>()
+                    call.respond(HttpStatusCode.OK)
+                }
+
+                get("/logoutAll") {
+                    val session = call.sessions.get<UserSession>()!!
+                    call.sessions.clear<UserSession>()
+                    exposedSessionStorage.clearAllUserSessions(session.userId)
                     call.respond(HttpStatusCode.OK)
                 }
             }

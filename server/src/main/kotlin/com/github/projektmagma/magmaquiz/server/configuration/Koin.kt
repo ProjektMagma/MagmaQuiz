@@ -4,6 +4,7 @@ import com.github.projektmagma.magmaquiz.server.controllers.AuthDataController
 import com.github.projektmagma.magmaquiz.server.controllers.QuizDataController
 import com.github.projektmagma.magmaquiz.server.controllers.SettingsDataController
 import com.github.projektmagma.magmaquiz.server.controllers.UsersDataController
+import com.github.projektmagma.magmaquiz.server.storage.ExposedSessionStorage
 import io.ktor.server.application.*
 import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
@@ -17,6 +18,8 @@ fun Application.configureKoin() {
 }
 
 val serverMainModule = module {
+    single { ExposedSessionStorage() }
+
     single { AuthDataController() }
     single { SettingsDataController() }
     single { QuizDataController() }

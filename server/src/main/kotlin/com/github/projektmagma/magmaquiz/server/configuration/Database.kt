@@ -21,6 +21,7 @@ fun Application.configureDatabase() {
     transaction {
         SchemaUtils.create(
             UsersTable,
+            UsersSessionsTable,
             QuizzesTable,
             QuestionsTable,
             AnswersTable,
@@ -29,6 +30,7 @@ fun Application.configureDatabase() {
         )
         SchemaUtils.addMissingColumnsStatements(
             UsersTable,
+            UsersSessionsTable,
             QuizzesTable,
             QuestionsTable,
             AnswersTable,

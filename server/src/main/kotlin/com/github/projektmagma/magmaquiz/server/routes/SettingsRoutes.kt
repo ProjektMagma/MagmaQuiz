@@ -1,6 +1,7 @@
 package com.github.projektmagma.magmaquiz.server.routes
 
 import com.github.projektmagma.magmaquiz.server.controllers.SettingsDataController
+import com.github.projektmagma.magmaquiz.server.data.util.AuthTypes
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import com.github.projektmagma.magmaquiz.server.data.util.respondToResource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangeEmailValue
@@ -16,7 +17,7 @@ import io.ktor.server.sessions.*
 
 fun Application.settingsRoutes(settingsDataController: SettingsDataController) {
     routing {
-        authenticate("session-auth") {
+        authenticate(AuthTypes.SessionAuth) {
             route("/settings") {
 
                 route("/change") {

@@ -1,9 +1,12 @@
 package com.github.projektmagma.magmaquiz.server.controllers.util
 
+import com.github.projektmagma.magmaquiz.server.data.entities.FavoriteQuizzesEntity
 import com.github.projektmagma.magmaquiz.server.data.entities.FriendshipEntity
 import com.github.projektmagma.magmaquiz.server.data.entities.QuizEntity
 import com.github.projektmagma.magmaquiz.server.data.entities.UserEntity
+import com.github.projektmagma.magmaquiz.server.data.tables.FavoriteQuizzesTable
 import com.github.projektmagma.magmaquiz.server.data.tables.FriendshipsTable
+import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesTable
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -46,7 +49,7 @@ fun quizEntityOrNull(quizId: UUID, userId: UUID): QuizEntity? {
 // Znajomość jest z "lewej" lub "prawej" połączona z tym użytkownikiem
 fun UserEntity.friendshipEntityOrNull(otherUserId: UUID): FriendshipEntity? {
     val thisUser = this
-    
+
     if (!isUserActive(otherUserId)) return null
 
     val dbUser = transaction {
@@ -79,5 +82,25 @@ fun UserEntity.userFriendList(): List<UserEntity> {
                 if (friendship.userTo == thisUser) friendship.userFrom
                 else friendship.userTo
             }
+    }
+}
+
+fun UserEntity.favoritesQuizzes(): List<QuizEntity> {
+    val thisUser = this
+
+    val favorites =
+        transaction {
+            FavoriteQuizzesEntity.find {
+                FavoriteQuizzesTable.user eq thisUser.id and
+                        (FavoriteQuizzesTable.isActive)
+            }
+                .map { it.quiz.id }
+        }
+    return transaction {
+        QuizEntity.find {
+            QuizzesTable.isActive eq true and
+                    (QuizzesTable.isPublic eq true or (QuizzesTable.quizCreator eq thisUser.id)) and
+                    (QuizzesTable.id inList (favorites))
+        }.toList()
     }
 }
