@@ -16,9 +16,9 @@ fun Application.quizRoutes(quizDataController: QuizDataController) {
     routing {
         authenticate(AuthTypes.SessionAuth) {
             route("/quiz") {
-                get("/{id}") {
+                get("/{quizId}") {
                     val session = call.sessions.get<UserSession>()!!
-                    val quizId = UUID.fromString(call.parameters["id"]!!)
+                    val quizId = UUID.fromString(call.parameters["quizId"]!!)
                     call.respondToResource(quizDataController.quizFromId(quizId, session))
 
                 }
@@ -60,9 +60,9 @@ fun Application.quizRoutes(quizDataController: QuizDataController) {
                     )
                 }
 
-                get("/changeFavoriteStatus/{id}") {
+                get("/changeFavoriteStatus/{quizId}") {
                     val session = call.sessions.get<UserSession>()!!
-                    val quizId = UUID.fromString(call.parameters["id"]!!)
+                    val quizId = UUID.fromString(call.parameters["quizId"]!!)
                     call.respondToResource(quizDataController.quizChangeFavoriteStatus(quizId, session))
                 }
 
@@ -71,14 +71,14 @@ fun Application.quizRoutes(quizDataController: QuizDataController) {
                     call.respondToResource(quizDataController.quizMyFavorites(session))
                 }
 
-                get("/findByUser/{id}") {
+                get("/findByUser/{userId}") {
                     val session = call.sessions.get<UserSession>()!!
-                    val userId = UUID.fromString(call.parameters["id"]!!)
+                    val userId = UUID.fromString(call.parameters["userId"]!!)
                     call.respondToResource(quizDataController.quizFindByUserId(userId, session))
                 }
 
-                delete("/{id}") {
-                    val quizId = UUID.fromString(call.parameters["id"]!!)
+                delete("/{quizId}") {
+                    val quizId = UUID.fromString(call.parameters["quizId"]!!)
                     call.respondToResource(quizDataController.quizDelete(quizId))
                 }
 

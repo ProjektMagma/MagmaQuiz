@@ -52,6 +52,9 @@ class UsersDataController {
 
     fun usersFriendshipSendInvitation(session: UserSession, userId: UUID): NetworkResource<Unit> {
 
+        if (session.userId == userId)
+            return NetworkResource.Error(HttpStatusCode.BadRequest)
+
         if (!isUserActive(userId))
             return NetworkResource.Error(HttpStatusCode.NotFound)
 
@@ -93,16 +96,18 @@ class UsersDataController {
 
         val friendshipList = transaction {
             FriendshipEntity.find {
-                FriendshipsTable.userFrom eq dbUser.id or (FriendshipsTable.userTo eq dbUser.id) and FriendshipsTable.isActive
+                FriendshipsTable.userFrom eq dbUser.id or (FriendshipsTable.userTo eq dbUser.id) and FriendshipsTable.isActive and FriendshipsTable.wasAccepted
             }
         }
 
         val friendList = transaction {
             friendshipList
                 .map { friendship ->
-                    if (friendship.userTo == dbUser) friendship.userFrom
+                    if (friendship.userTo != dbUser) friendship.userFrom
                     else friendship.userTo
-                }.map {
+                }
+                .filterNot { it.id == dbUser.id }
+                .map {
                     it.toDomain(UserConversionCommand.ForeignUserWithSmallPicture)
                 }
         }
