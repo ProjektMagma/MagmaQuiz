@@ -6,19 +6,15 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.RootViewModel
 import com.github.projektmagma.magmaquiz.app.core.presentation.ServerConfigViewModel
 import com.github.projektmagma.magmaquiz.shared.data.domain.CustomHeaders
 import io.github.aakira.napier.Napier
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.okhttp.OkHttp
-import io.ktor.client.plugins.api.createClientPlugin
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.cookies.HttpCookies
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logger
-import io.ktor.client.plugins.logging.Logging
-import io.ktor.client.request.header
-import io.ktor.http.URLProtocol
-import io.ktor.http.encodedPath
-import io.ktor.http.path
-import io.ktor.serialization.kotlinx.json.json
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.api.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.cookies.*
+import io.ktor.client.plugins.logging.*
+import io.ktor.client.request.*
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModelOf
@@ -30,7 +26,7 @@ val sharedModule = module {
 
 
     single {
-        HttpClient(OkHttp) {
+        HttpClient(CIO) {
             val defaultCredentialsPlugin = createClientPlugin("DefaultCredentialsPlugin"){
                 onRequest { request, _ ->
                     val config = get<ServerConfigDataStore>().getServerConfig()

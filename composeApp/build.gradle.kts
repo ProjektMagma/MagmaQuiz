@@ -42,7 +42,7 @@ kotlin {
             implementation(libs.jetbrains.material.icons.extended)
 
             implementation(libs.coil.compose)
-            
+
             implementation(libs.filekit.core)
             implementation(libs.filekit.dialogs)
             implementation(libs.filekit.dialogs.compose)
@@ -53,44 +53,47 @@ kotlin {
 
             implementation(libs.jetbrains.navigation3.ui)
             implementation(libs.jetbrains.navigation3.adaptive)
-            
+
             implementation(libs.androidx.navigation3.runtime)
             implementation(libs.androidx.lifecycle.viewmodel.navigation3)
 
             api(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewModel)
-            
+
             implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.okhttp)
+            implementation(libs.ktor.client.cio)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.client.logging)
             implementation(libs.napier)
-            
+
             implementation(projects.shared)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
         jvmMain.dependencies {
-            implementation(libs.logback)
+//            implementation(libs.logback)
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
         }
     }
 }
 
+val appPackageRoute = "com.github.projektmagma.magmaquiz"
+val appVersion = "0.1.0"
+
 android {
-    namespace = "com.github.projektmagma.magmaquiz"
+    namespace = appPackageRoute
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.github.projektmagma.magmaquiz"
+        applicationId = appPackageRoute
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
-        versionName = "1.0"
+        versionName = appVersion
     }
     packaging {
         resources {
@@ -99,7 +102,17 @@ android {
     }
     buildTypes {
         getByName("release") {
+            isMinifyEnabled = true
+            isDebuggable = false
+            applicationIdSuffix = ".release"
+        }
+
+        getByName("debug") {
             isMinifyEnabled = false
+            isDebuggable = true
+            applicationIdSuffix = ".debug"
+
+            resValue("string", "app_name", "Magma Quiz Debug")
         }
     }
     compileOptions {
@@ -114,12 +127,22 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "com.github.projektmagma.magmaquiz.app.MainKt"
+        mainClass = "${appPackageRoute}.app.MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.github.projektmagma.magmaquiz"
-            packageVersion = "1.0.0"
+            targetFormats(TargetFormat.Msi, TargetFormat.Exe, TargetFormat.Deb)
+            packageName = "Magma Quiz"
+            packageVersion = appVersion
+            includeAllModules = true
+            vendor = "Projekt Magma"
+
+            windows {
+                dirChooser = false
+                shortcut = true
+                menu = true
+                installationPath = "C:\\Program Files\\ProjektMagma\\MagmaQuiz\\"
+                iconFile = project.file(".\\src\\commonMain\\composeResources\\drawable\\app_icon_windows.ico")
+            }
         }
     }
 }
