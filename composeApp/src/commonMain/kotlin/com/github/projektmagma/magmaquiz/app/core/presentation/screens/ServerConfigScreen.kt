@@ -61,8 +61,8 @@ fun ServerConfigScreen(
             onValueChange = { serverConfigViewModel.onCommand(ServerCommand.IpChanged(it)) }
         )
         OutlinedTextField(
-            value = serverConfig.port.toString(),
-            onValueChange = { serverConfigViewModel.onCommand(ServerCommand.PortChanged(it.toIntOrNull() ?: 8080)) }
+            value = serverConfig.port, 
+            onValueChange = { serverConfigViewModel.onCommand(ServerCommand.PortChanged(it)) }
         )
 
         ExposedDropdownMenuBox(

@@ -20,7 +20,7 @@ class ServerConfigDataStore(private val dataStore: DataStore<Preferences>) {
         try {
             dataStore.edit {
                 it[SERVER_IP_KEY] = serverConfig.ip
-                it[SERVER_PORT_KEY] = serverConfig.port.toString()
+                it[SERVER_PORT_KEY] = serverConfig.port
                 it[SERVER_PROTOCOL_KEY] = serverConfig.protocol.name
             }
         } catch (_: IOException) {
@@ -32,8 +32,8 @@ class ServerConfigDataStore(private val dataStore: DataStore<Preferences>) {
     suspend fun getServerConfig(): ServerConfig {
         val preferences = dataStore.data.first()
         return ServerConfig(
-            ip = preferences[SERVER_IP_KEY] ?: "menito.eu",
-            port = (preferences[SERVER_PORT_KEY] ?: "8080").toInt(),
+            ip = preferences[SERVER_IP_KEY] ?: "api.projektmagma.pl",
+            port = (preferences[SERVER_PORT_KEY] ?: ""),
             protocol = Protocols.valueOf(preferences[SERVER_PROTOCOL_KEY] ?: Protocols.HTTPS.name)
         )
     }
