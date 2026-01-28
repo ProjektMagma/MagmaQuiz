@@ -2,7 +2,6 @@ package com.github.projektmagma.magmaquiz.app.home.presentation.navigation
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Quiz
@@ -10,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -17,7 +17,7 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import com.github.projektmagma.magmaquiz.app.auth.presentation.AuthViewModel
 import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route
-import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
+import com.github.projektmagma.magmaquiz.app.home.presentation.components.AnimatedVisibilityFloatingButton
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.ProfilePictureIcon
 import magmaquiz.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
@@ -25,7 +25,8 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 actual fun MainNavMenu(
-    backStack: NavBackStack<NavKey>,
+    mainBackStack: NavBackStack<NavKey>,
+    quizzesBackstack: NavBackStack<NavKey>,
     navigateToHome: () -> Unit,
     navigateToQuizzes: () -> Unit,
     navigateToUsers: () -> Unit,
@@ -38,24 +39,14 @@ actual fun MainNavMenu(
     Scaffold(
         floatingActionButtonPosition = FabPosition.Center,
         floatingActionButton = {
-            val workInProgress = stringResource(Res.string.work_in_progress)
-            if (backStack.last() is Route.Menus.Quizzes)
-                IconButton(
-                    modifier = Modifier.size(50.dp),
-                    colors = IconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
-                        disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        disabledContentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                    ),
-                    onClick = {
-                        SnackbarController.onEvent(workInProgress)
-                    }) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = null,
-                    )
+            AnimatedVisibilityFloatingButton(
+                isShown = quizzesBackstack.lastOrNull() == Route.Menus.Quizzes.Find &&
+                        mainBackStack.lastOrNull() is Route.Menus.Quizzes,
+                animationPositionMultiplier = 4,
+                onClick = {
+                    quizzesBackstack.add(Route.Menus.Quizzes.CreateQuiz)
                 }
+            )
         },
         bottomBar = {
             BottomAppBar(
@@ -78,7 +69,7 @@ actual fun MainNavMenu(
                             textAlign = TextAlign.Center
                         )
                     },
-                    selected = backStack.last() == Route.Menus.Home,
+                    selected = mainBackStack.last() == Route.Menus.Home,
                 )
                 NavigationBarItem(
                     onClick = {
@@ -97,7 +88,7 @@ actual fun MainNavMenu(
                             textAlign = TextAlign.Center
                         )
                     },
-                    selected = backStack.last() is Route.Menus.Quizzes,
+                    selected = mainBackStack.last() is Route.Menus.Quizzes,
                 )
                 NavigationBarItem(
                     onClick = {
@@ -116,7 +107,7 @@ actual fun MainNavMenu(
                             textAlign = TextAlign.Center
                         )
                     },
-                    selected = backStack.last() is Route.Menus.Users,
+                    selected = mainBackStack.last() is Route.Menus.Users,
                 )
             }
         }
@@ -133,10 +124,10 @@ actual fun MainNavMenu(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Spacer(modifier = Modifier.size(25.dp))
                 Text(
                     text = "${stringResource(Res.string.greeting)}, ${thisUser.value!!.userName}!",
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
                 )
                 IconButton(
                     onClick = { navigateToUserProfile() },

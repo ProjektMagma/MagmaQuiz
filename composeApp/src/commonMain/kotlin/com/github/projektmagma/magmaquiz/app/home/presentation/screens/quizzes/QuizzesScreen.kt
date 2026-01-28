@@ -1,13 +1,8 @@
 package com.github.projektmagma.magmaquiz.app.home.presentation.screens.quizzes
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Recommend
@@ -20,28 +15,16 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
 import com.github.projektmagma.magmaquiz.app.home.presentation.QuizzesListViewModel
-import com.github.projektmagma.magmaquiz.app.home.presentation.components.AutoScalableLazyColumn
-import com.github.projektmagma.magmaquiz.app.home.presentation.components.ButtonWithIcon
-import com.github.projektmagma.magmaquiz.app.home.presentation.components.FilterButton
-import com.github.projektmagma.magmaquiz.app.home.presentation.components.FullSizeCircularProgressIndicator
-import com.github.projektmagma.magmaquiz.app.home.presentation.components.FullSizeErrorIndicator
-import com.github.projektmagma.magmaquiz.app.home.presentation.components.SearchTextField
+import com.github.projektmagma.magmaquiz.app.home.presentation.components.*
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.quizzes.QuizCard
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuizFilters
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuizListCommand
-import magmaquiz.composeapp.generated.resources.Res
-import magmaquiz.composeapp.generated.resources.create
-import magmaquiz.composeapp.generated.resources.favorites
-import magmaquiz.composeapp.generated.resources.friends_quizzes
-import magmaquiz.composeapp.generated.resources.most_liked
-import magmaquiz.composeapp.generated.resources.quiz_title
-import magmaquiz.composeapp.generated.resources.recently_added
+import magmaquiz.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
-import java.util.UUID
+import java.util.*
 
 @Composable
 fun QuizzesScreen(
-    navigateToCreateQuizScreen: () -> Unit,
     navigateToQuizDetails: (id: UUID) -> Unit,
     navigateToUserDetails: (id: UUID) -> Unit,
     quizzesListViewModel: QuizzesListViewModel
@@ -132,16 +115,6 @@ fun QuizzesScreen(
                     },
                     contentLabel = stringResource(Res.string.recently_added),
                     contentIcon = Icons.Default.Upload
-                )
-            }
-
-            item {
-                ButtonWithIcon(
-                    contentLabel = stringResource(Res.string.create),
-                    contentIcon = Icons.Default.Add,
-                    onClick = {
-                        navigateToCreateQuizScreen()
-                    }
                 )
             }
         }

@@ -6,7 +6,8 @@ import androidx.navigation3.runtime.NavKey
 
 @Composable
 expect fun MainNavMenu(
-    backStack: NavBackStack<NavKey>,
+    mainBackStack: NavBackStack<NavKey> = NavStackHolder.mainBackStack,
+    quizzesBackstack: NavBackStack<NavKey> = NavStackHolder.quizzesBackstack,
     navigateToHome: () -> Unit,
     navigateToQuizzes: () -> Unit,
     navigateToUsers: () -> Unit,

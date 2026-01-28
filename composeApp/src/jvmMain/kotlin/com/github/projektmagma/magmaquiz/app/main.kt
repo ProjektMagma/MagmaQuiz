@@ -4,8 +4,10 @@ import androidx.compose.foundation.border
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.github.projektmagma.magmaquiz.app.core.MainWindow
@@ -39,8 +41,18 @@ fun main() {
             MagmaQuizTheme {
                 App(
                     modifier = Modifier
-                        .border(1.dp, MaterialTheme.colorScheme.primaryContainer, MaterialTheme.shapes.large)
-                        .clip(MaterialTheme.shapes.large)
+                        .border(
+                            1.dp,
+                            MaterialTheme.colorScheme.primaryContainer,
+                            if (MainWindow.windowState.placement == WindowPlacement.Floating)
+                                MaterialTheme.shapes.large
+                            else RectangleShape
+                        )
+                        .clip(
+                            if (MainWindow.windowState.placement == WindowPlacement.Floating)
+                                MaterialTheme.shapes.large
+                            else RectangleShape
+                        )
                 )
             }
         }
