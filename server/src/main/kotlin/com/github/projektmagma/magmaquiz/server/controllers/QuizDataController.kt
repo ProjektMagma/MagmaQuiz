@@ -1,8 +1,9 @@
 package com.github.projektmagma.magmaquiz.server.controllers
 
 import com.github.projektmagma.magmaquiz.server.controllers.util.favoritesQuizzes
+import com.github.projektmagma.magmaquiz.server.controllers.util.friendships
 import com.github.projektmagma.magmaquiz.server.controllers.util.quizEntityOrNull
-import com.github.projektmagma.magmaquiz.server.controllers.util.userFriendList
+import com.github.projektmagma.magmaquiz.server.controllers.util.toUserList
 import com.github.projektmagma.magmaquiz.server.data.conversion.QuizConversionCommand
 import com.github.projektmagma.magmaquiz.server.data.entities.*
 import com.github.projektmagma.magmaquiz.server.data.tables.AnswersTable
@@ -361,7 +362,7 @@ class QuizDataController {
     fun quizFriendsQuizzes(session: UserSession): NetworkResource<List<Quiz>> {
         val quizzesList = mutableListOf<Quiz>()
         val dbUser = transaction { UserEntity.findById(session.userId)!! }
-        val friendList = transaction { dbUser.userFriendList() }
+        val friendList = transaction { dbUser.friendships(true).toUserList(dbUser) }
         val userFavorites = transaction { dbUser.favoritesQuizzes() }
 
         transaction {

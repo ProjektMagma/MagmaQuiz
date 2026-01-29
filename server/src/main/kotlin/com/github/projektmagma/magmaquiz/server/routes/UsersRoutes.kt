@@ -17,7 +17,7 @@ fun Application.usersRoutes(usersDataController: UsersDataController) {
                 route("/friendship") {
                     get("/sendInvitation/{userId}") {
                         val session = call.sessions.get<UserSession>()!!
-                        val userId = UUID.fromString(call.parameters["id"]!!)
+                        val userId = UUID.fromString(call.parameters["userId"]!!)
 
                         call.respondToResource(
                             usersDataController.usersFriendshipSendInvitation(session, userId)
@@ -26,7 +26,7 @@ fun Application.usersRoutes(usersDataController: UsersDataController) {
 
                     get("/acceptInvitation/{userId}") {
                         val session = call.sessions.get<UserSession>()!!
-                        val userId = UUID.fromString(call.parameters["id"]!!)
+                        val userId = UUID.fromString(call.parameters["userId"]!!)
 
                         call.respondToResource(
                             usersDataController.usersFriendshipAcceptInvitation(session, userId)
@@ -38,6 +38,22 @@ fun Application.usersRoutes(usersDataController: UsersDataController) {
 
                         call.respondToResource(
                             usersDataController.usersFriendshipFriendList(session)
+                        )
+                    }
+
+                    get("/incoming") {
+                        val session = call.sessions.get<UserSession>()!!
+
+                        call.respondToResource(
+                            usersDataController.usersFriendshipIncoming(session)
+                        )
+                    }
+
+                    get("/outgoing") {
+                        val session = call.sessions.get<UserSession>()!!
+
+                        call.respondToResource(
+                            usersDataController.usersFriendshipOutgoing(session)
                         )
                     }
                 }
@@ -56,8 +72,8 @@ fun Application.usersRoutes(usersDataController: UsersDataController) {
                     )
                 }
 
-                get("/userData/{id}") {
-                    val userId = UUID.fromString(call.parameters["id"]!!)
+                get("/userData/{userId}") {
+                    val userId = UUID.fromString(call.parameters["userId"]!!)
 
                     call.respondToResource(
                         usersDataController.usersUserData(userId)
