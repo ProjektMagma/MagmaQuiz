@@ -40,6 +40,22 @@ fun Application.usersRoutes(usersDataController: UsersDataController) {
                             usersDataController.usersFriendshipFriendList(session)
                         )
                     }
+
+                    get("/incoming") {
+                        val session = call.sessions.get<UserSession>()!!
+
+                        call.respondToResource(
+                            usersDataController.usersFriendshipIncoming(session)
+                        )
+                    }
+
+                    get("/outgoing") {
+                        val session = call.sessions.get<UserSession>()!!
+
+                        call.respondToResource(
+                            usersDataController.usersFriendshipOutgoing(session)
+                        )
+                    }
                 }
 
                 get("/find/") {
