@@ -4,6 +4,7 @@ import com.github.projektmagma.magmaquiz.app.core.domain.NetworkError
 import com.github.projektmagma.magmaquiz.app.home.data.service.QuizService
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.game.GameState
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.QuizListState
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.create.CreateQuizState
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Resource
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.map
@@ -19,6 +20,8 @@ class QuizRepository(
 
     val gameState = MutableStateFlow(GameState())
     val quizListState = MutableStateFlow(QuizListState())
+
+    val createQuizState = MutableStateFlow(CreateQuizState())
 
     suspend fun getQuizByName(name: String): Resource<List<Quiz>, NetworkError> {
         return quizService.getQuizByName(name)

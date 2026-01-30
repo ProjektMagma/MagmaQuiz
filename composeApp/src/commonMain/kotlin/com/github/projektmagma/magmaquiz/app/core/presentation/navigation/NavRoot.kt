@@ -1,5 +1,8 @@
 package com.github.projektmagma.magmaquiz.app.core.presentation.navigation
 
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -7,30 +10,28 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
-import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import androidx.savedstate.serialization.SavedStateConfiguration
-import com.github.projektmagma.magmaquiz.app.auth.presentation.AuthNavigation
+import com.github.projektmagma.magmaquiz.app.auth.data.AuthRepository
+import com.github.projektmagma.magmaquiz.app.core.di.Navigator
 import com.github.projektmagma.magmaquiz.app.core.presentation.RootViewModel
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.AuthState
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.FullSizeCircularProgressIndicator
 import com.github.projektmagma.magmaquiz.app.home.presentation.navigation.CustomWindowDraggableArea
-import com.github.projektmagma.magmaquiz.app.home.presentation.navigation.MainNavigation
-import com.github.projektmagma.magmaquiz.app.home.presentation.screens.GameScreen
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.polymorphic
+import com.github.projektmagma.magmaquiz.app.home.presentation.navigation.MainNavMenu
+import org.koin.compose.koinInject
+import org.koin.compose.navigation3.koinEntryProvider
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.annotation.KoinExperimentalAPI
 
 @Composable
 fun NavRoot(
     modifier: Modifier = Modifier,
     rootViewModel: RootViewModel = koinViewModel()
 ) {
+    val navigator: Navigator = koinInject()
     val authState by rootViewModel.state.collectAsStateWithLifecycle()
-
+    
     when (authState) {
         AuthState.Loading -> {
             Column(modifier = Modifier.fillMaxSize()) {
@@ -39,76 +40,62 @@ fun NavRoot(
             }
         }
 
-        AuthState.Unauthenticated -> {
-            AppNavigation(
-                Route.Auth,
-                modifier
-            )
-        }
-
+        AuthState.Unauthenticated -> AppNavigation(navigator, modifier)
+        
         AuthState.Authenticated -> {
-            AppNavigation(
-                Route.Menus,
-                modifier
-            )
+            navigator.clearAndGoTo(Route.Menus.Home)
+            AppNavigation(navigator, modifier)
         }
     }
 }
 
+@OptIn(KoinExperimentalAPI::class)
 @Composable
 private fun AppNavigation(
-    startRoute: Route,
+    navigator: Navigator,
+    modifier: Modifier = Modifier,
+    authRepository: AuthRepository = koinInject()
+) {
+    if (navigator.backstack.last() is Route.Menus) {
+        MainNavMenu(
+            navigator = navigator,
+            navigateToHome = { navigator.checkAndNavigate(Route.Menus.Home) },
+            navigateToQuizzes = { navigator.checkAndNavigate(Route.Menus.Quizzes.Find) },
+            navigateToUsers = { navigator.checkAndNavigate(Route.Menus.Users.Find) },
+            navigateToUserProfile = { navigator.checkAndNavigate(Route.Menus.Users.UserDetails(authRepository.thisUser.value?.userId!!)) },
+        ) {
+            Navigation(navigator, modifier)
+        }
+    } else {
+        Navigation(navigator, modifier)
+    }
+}
+
+@OptIn(KoinExperimentalAPI::class)
+@Composable
+fun Navigation(
+    navigator: Navigator,
     modifier: Modifier = Modifier
 ) {
-    val rootBackStack = rememberNavBackStack(
-        configuration = SavedStateConfiguration {
-            serializersModule = SerializersModule {
-                polymorphic(NavKey::class) {
-                    subclass(Route.Auth::class, Route.Auth.serializer())
-                    subclass(Route.Menus::class, Route.Menus.serializer())
-                    subclass(Route.Game::class, Route.Game.serializer())
-                }
-            }
-        },
-        startRoute
-    )
-
     NavDisplay(
         modifier = modifier,
-        backStack = rootBackStack,
+        backStack = navigator.backstack,
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator(),
             rememberViewModelStoreNavEntryDecorator()
         ),
-        entryProvider = entryProvider {
-            entry<Route.Auth> {
-                AuthNavigation(
-                    navigateToMain = {
-                        rootBackStack.clear()
-                        rootBackStack.add(Route.Menus)
-                    }
-                )
-            }
-            entry<Route.Menus> {
-                MainNavigation(
-                    navigateToGameScreen = {
-                        rootBackStack.clear()
-                        rootBackStack.add(Route.Game)
-                    },
-                    navigateToAuth = {
-                        rootBackStack.clear()
-                        rootBackStack.add(Route.Auth)
-                    }
-                )
-            }
-            entry<Route.Game> {
-                GameScreen(
-                    navigateOnGameFinish = {
-                        rootBackStack.clear()
-                        rootBackStack.add(Route.Menus)
-                    }
-                )
-            }
-        }
+        entryProvider = koinEntryProvider(),
+        transitionSpec = {
+            slideInHorizontally(initialOffsetX = { it }) togetherWith
+                    slideOutHorizontally(targetOffsetX = { -it })
+        },
+        popTransitionSpec = {
+            slideInHorizontally(initialOffsetX = { -it }) togetherWith
+                    slideOutHorizontally(targetOffsetX = { it })
+        },
+        predictivePopTransitionSpec = {
+            slideInHorizontally(initialOffsetX = { -it }) togetherWith
+                    slideOutHorizontally(targetOffsetX = { it })
+        },
     )
 }

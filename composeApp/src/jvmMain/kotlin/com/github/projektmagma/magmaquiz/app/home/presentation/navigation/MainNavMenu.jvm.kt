@@ -1,6 +1,13 @@
 package com.github.projektmagma.magmaquiz.app.home.presentation.navigation
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Groups
@@ -15,22 +22,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.NavBackStack
-import androidx.navigation3.runtime.NavKey
 import com.github.projektmagma.magmaquiz.app.auth.presentation.AuthViewModel
 import com.github.projektmagma.magmaquiz.app.core.MainWindow
+import com.github.projektmagma.magmaquiz.app.core.di.Navigator
 import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.AnimatedVisibilityFloatingButton
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.NavButton
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.ProfilePictureIcon
-import magmaquiz.composeapp.generated.resources.*
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.greeting
+import magmaquiz.composeapp.generated.resources.home_nav
+import magmaquiz.composeapp.generated.resources.quizzes_nav
+import magmaquiz.composeapp.generated.resources.users_nav
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 actual fun MainNavMenu(
-    mainBackStack: NavBackStack<NavKey>,
-    quizzesBackstack: NavBackStack<NavKey>,
+    navigator: Navigator,
     navigateToHome: () -> Unit,
     navigateToQuizzes: () -> Unit,
     navigateToUsers: () -> Unit,
@@ -44,10 +53,9 @@ actual fun MainNavMenu(
     Scaffold(
         floatingActionButton = {
             AnimatedVisibilityFloatingButton(
-                isShown = quizzesBackstack.last() == Route.Menus.Quizzes.Find &&
-                        mainBackStack.last() is Route.Menus.Quizzes,
+                isShown = navigator.backstack.last() == Route.Menus.Quizzes.Find,
                 onClick = {
-                    quizzesBackstack.add(Route.Menus.Quizzes.CreateQuiz)
+                    navigator.goTo(Route.Menus.Quizzes.CreateQuiz)
                 }
             )
         },
@@ -69,7 +77,7 @@ actual fun MainNavMenu(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             NavButton(
-                                isCurrentRoute = mainBackStack.last() == Route.Menus.Home,
+                                isCurrentRoute = navigator.backstack.last() == Route.Menus.Home,
                                 onClick = {
                                     navigateToHome()
                                 },
@@ -77,7 +85,7 @@ actual fun MainNavMenu(
                                 contentIcon = Icons.Default.Home
                             )
                             NavButton(
-                                isCurrentRoute = mainBackStack.last() is Route.Menus.Quizzes,
+                                isCurrentRoute = navigator.backstack.last() is Route.Menus.Quizzes,
                                 onClick = {
                                     navigateToQuizzes()
                                 },
@@ -85,7 +93,7 @@ actual fun MainNavMenu(
                                 contentIcon = Icons.Default.Quiz
                             )
                             NavButton(
-                                isCurrentRoute = mainBackStack.last() is Route.Menus.Users,
+                                isCurrentRoute = navigator.backstack.last() is Route.Menus.Users,
                                 onClick = {
                                     navigateToUsers()
                                 },

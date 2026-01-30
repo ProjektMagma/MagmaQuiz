@@ -33,6 +33,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
@@ -62,20 +63,21 @@ import magmaquiz.composeapp.generated.resources.visibility
 import magmaquiz.composeapp.generated.resources.yes
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun CreateQuizScreen(
     navigateToQuestionCreate: (Boolean) -> Unit,
     navigateBack: () -> Unit,
-    createQuizViewModel: CreateQuizViewModel
+    createQuizViewModel: CreateQuizViewModel = koinViewModel()
 ) {
     var expanded by remember { mutableStateOf(false) }
     val modalBottomSheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
     var showAlertDialog by remember { mutableStateOf(false) }
-    val state = createQuizViewModel.state
-    val quiz = state.quizModel
+    val state = createQuizViewModel.state.collectAsStateWithLifecycle()
+    val quiz = state.value.quizModel
 
     BackHandler {
         showAlertDialog = true
@@ -130,7 +132,7 @@ fun CreateQuizScreen(
         )
     }
     
-    if (state.isLoading) {
+    if (state.value.isLoading) {
         FullSizeCircularProgressIndicator()
     } else {
         LazyColumn(

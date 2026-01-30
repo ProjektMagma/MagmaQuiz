@@ -26,6 +26,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
 import com.github.projektmagma.magmaquiz.app.home.presentation.CreateQuizViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.QuizCoverImage
@@ -37,14 +38,16 @@ import magmaquiz.composeapp.generated.resources.delete_answer
 import magmaquiz.composeapp.generated.resources.save_question
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun CreateQuestionScreen(
     isMultiple: Boolean,
     navigateBack: () -> Unit,
-    createQuizViewModel: CreateQuizViewModel
+    createQuizViewModel: CreateQuizViewModel = koinViewModel()
 ) {
-    val question = createQuizViewModel.state.questionModel
+    val state = createQuizViewModel.state.collectAsStateWithLifecycle()
+    val question = state.value.questionModel
     
     LaunchedEffect(createQuizViewModel.uiChannel){
         createQuizViewModel.uiChannel.collect { event -> 

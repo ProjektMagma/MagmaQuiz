@@ -4,6 +4,7 @@ import com.github.projektmagma.magmaquiz.app.core.data.ApiDataStore
 import com.github.projektmagma.magmaquiz.app.core.data.ServerConfigDataStore
 import com.github.projektmagma.magmaquiz.app.core.presentation.RootViewModel
 import com.github.projektmagma.magmaquiz.app.core.presentation.ServerConfigViewModel
+import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route
 import com.github.projektmagma.magmaquiz.shared.data.domain.CustomHeaders
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
@@ -27,7 +28,8 @@ import org.koin.dsl.module
 val sharedModule = module {
     viewModelOf(::ServerConfigViewModel)
     viewModelOf(::RootViewModel)
-
+    
+    single { Navigator(Route.Auth.OnBoarding) }
 
     single {
         HttpClient(CIO) {

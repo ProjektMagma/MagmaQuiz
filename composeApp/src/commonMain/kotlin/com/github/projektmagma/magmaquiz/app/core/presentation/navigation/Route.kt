@@ -1,12 +1,11 @@
 package com.github.projektmagma.magmaquiz.app.core.presentation.navigation
 
-import androidx.navigation3.runtime.NavKey
 import com.github.projektmagma.magmaquiz.shared.data.domain.serializers.UUIDSerializer
 import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Serializable
-sealed interface Route : NavKey {
+sealed interface Route {
     @Serializable
     data object Auth : Route {
         @Serializable
@@ -32,44 +31,44 @@ sealed interface Route : NavKey {
     }
 
     @Serializable
-    data object Menus : Route {
+    sealed interface Menus : Route {
         @Serializable
-        data object Home : Route
+        data object Home : Menus
         
         @Serializable
-        data object Settings : Route {
+        data object Settings : Menus {
             @Serializable
-            data object Edit : Route
+            data object Edit : Menus
 
             @Serializable
-            data object Profile : Route
+            data object Profile : Menus
         }
 
         @Serializable
-        data class Quizzes(val route: Route = Find) : Route {
+        sealed interface Quizzes : Menus {
             @Serializable
-            data object Find : Route
+            data object Find : Quizzes
 
             @Serializable
-            data object CreateQuiz : Route
+            data object CreateQuiz : Quizzes
 
             @Serializable
-            data class CreateQuestion(val isMultiple: Boolean) : Route
+            data class CreateQuestion(val isMultiple: Boolean) : Quizzes
 
             @Serializable
-            data class QuizDetails(@Serializable(UUIDSerializer::class) val id: UUID) : Route
+            data class QuizDetails(@Serializable(UUIDSerializer::class) val id: UUID) : Quizzes
         }
 
         @Serializable
-        data class Users(val route: Route = Find) : Route {
+        sealed interface Users : Menus {
             @Serializable
-            data object Find : Route
+            data object Find : Users
 
             @Serializable
-            data class UserDetails(@Serializable(UUIDSerializer::class) val id: UUID): Route
+            data class UserDetails(@Serializable(UUIDSerializer::class) val id: UUID): Users
 
             @Serializable
-            data object Friends : Route
+            data object Friends : Users
         }
     }
 }

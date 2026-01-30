@@ -1,11 +1,23 @@
 package com.github.projektmagma.magmaquiz.app.home.presentation.navigation
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Quiz
-import androidx.compose.material3.*
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -13,20 +25,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.NavBackStack
-import androidx.navigation3.runtime.NavKey
 import com.github.projektmagma.magmaquiz.app.auth.presentation.AuthViewModel
+import com.github.projektmagma.magmaquiz.app.core.di.Navigator
 import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.AnimatedVisibilityFloatingButton
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.ProfilePictureIcon
-import magmaquiz.composeapp.generated.resources.*
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.greeting
+import magmaquiz.composeapp.generated.resources.home_nav
+import magmaquiz.composeapp.generated.resources.quizzes_nav
+import magmaquiz.composeapp.generated.resources.users_nav
 import org.jetbrains.compose.resources.stringResource
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 actual fun MainNavMenu(
-    mainBackStack: NavBackStack<NavKey>,
-    quizzesBackstack: NavBackStack<NavKey>,
+    navigator: Navigator,
     navigateToHome: () -> Unit,
     navigateToQuizzes: () -> Unit,
     navigateToUsers: () -> Unit,
@@ -40,11 +54,10 @@ actual fun MainNavMenu(
         floatingActionButtonPosition = FabPosition.Center,
         floatingActionButton = {
             AnimatedVisibilityFloatingButton(
-                isShown = quizzesBackstack.lastOrNull() == Route.Menus.Quizzes.Find &&
-                        mainBackStack.lastOrNull() is Route.Menus.Quizzes,
+                isShown = navigator.backstack.last() == Route.Menus.Quizzes.Find,
                 animationPositionMultiplier = 4,
                 onClick = {
-                    quizzesBackstack.add(Route.Menus.Quizzes.CreateQuiz)
+                    navigator.goTo(Route.Menus.Quizzes.CreateQuiz)
                 }
             )
         },
@@ -69,7 +82,7 @@ actual fun MainNavMenu(
                             textAlign = TextAlign.Center
                         )
                     },
-                    selected = mainBackStack.last() == Route.Menus.Home,
+                    selected = navigator.backstack.last() == Route.Menus.Home,
                 )
                 NavigationBarItem(
                     onClick = {
@@ -88,7 +101,7 @@ actual fun MainNavMenu(
                             textAlign = TextAlign.Center
                         )
                     },
-                    selected = mainBackStack.last() is Route.Menus.Quizzes,
+                    selected = navigator.backstack.last() is Route.Menus.Quizzes,
                 )
                 NavigationBarItem(
                     onClick = {
@@ -107,7 +120,7 @@ actual fun MainNavMenu(
                             textAlign = TextAlign.Center
                         )
                     },
-                    selected = mainBackStack.last() is Route.Menus.Users,
+                    selected = navigator.backstack.last() is Route.Menus.Users,
                 )
             }
         }

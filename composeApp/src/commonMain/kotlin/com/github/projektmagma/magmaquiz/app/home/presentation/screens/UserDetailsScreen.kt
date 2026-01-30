@@ -35,11 +35,11 @@ import java.util.UUID
 @Composable
 fun UserDetailsScreen(
     id: UUID,
-    userDetailsViewModel: UserDetailsViewModel = koinViewModel(),
-    createQuizViewModel: CreateQuizViewModel,
     navigateToEditScreen: (id: UUID) -> Unit,
     navigateToQuizDetails: (id: UUID) -> Unit,
-    navigateToSettingsScreen: () -> Unit
+    navigateToSettingsScreen: () -> Unit,
+    userDetailsViewModel: UserDetailsViewModel = koinViewModel(),
+    createQuizViewModel: CreateQuizViewModel = koinViewModel(),
 ) {
     val quizzes by userDetailsViewModel.quizzes.collectAsStateWithLifecycle()
     val user by userDetailsViewModel.user.collectAsStateWithLifecycle()
