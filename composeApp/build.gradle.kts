@@ -56,7 +56,7 @@ kotlin {
 
             implementation(libs.androidx.navigation3.runtime)
             implementation(libs.androidx.lifecycle.viewmodel.navigation3)
-            
+
             implementation(libs.kotlinx.serialization.core)
 
             api(libs.koin.core)
@@ -136,15 +136,22 @@ compose.desktop {
             targetFormats(TargetFormat.Msi, TargetFormat.Exe, TargetFormat.Deb)
             packageName = "Magma Quiz"
             packageVersion = appVersion
-            includeAllModules = true
+            includeAllModules = false
             vendor = "Projekt Magma"
+
 
             windows {
                 dirChooser = false
                 shortcut = true
                 menu = true
-                installationPath = "C:\\Program Files\\ProjektMagma\\MagmaQuiz\\"
-                iconFile = project.file(".\\src\\commonMain\\composeResources\\drawable\\app_icon_windows.ico")
+                installationPath = "./ProjektMagma/MagmaQuiz"
+                iconFile = project.file("./src/commonMain/composeResources/drawable/app_icon_windows.ico")
+            }
+
+            linux {
+                shortcut = true
+                installationPath = "./ProjektMagma/MagmaQuiz"
+                iconFile = project.file("./src/commonMain/composeResources/drawable/app_icon.png")
             }
         }
     }

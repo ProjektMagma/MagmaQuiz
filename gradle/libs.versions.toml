@@ -2,39 +2,37 @@
 agp = "8.12.3"
 kotlin = "2.3.0"
 kotlinx-coroutines = "1.10.2"
-serialization = "1.9.0"
+serialization = "1.10.0"
 serialization-plugin = "2.3.0"
 
 android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "36"
 
-androidx-activity = "1.12.2"
+androidx-activity = "1.12.3"
 androidx-lifecycle-viewmodel = "2.10.0"
 androidx-lifecycle = "2.9.6"
 androidx-datastore = "1.2.0"
 
-compose-multiplatform = "1.9.3"
+compose-multiplatform = "1.10.0"
 compose-hot-reload = "1.0.0"
 
 material-icons = "1.7.3"
 
-nav3-core = "1.1.0-alpha01"
-nav3-material = "1.3.0-alpha03"
+nav3-core = "1.1.0-alpha02"
+nav3-material = "1.3.0-alpha04"
 
 coil = "3.3.0"
 
-ktor = "3.3.3"
+ktor = "3.4.0"
 
-exposed = "0.61.0"
-exposed-migration = "1.0.0-rc-4"
+exposed = "1.0.0"
 
-koin = "4.2.0-beta4"
-koin-compiler = "0.2.9"
+koin = "4.2.0-RC1"
 koin-ktor = "4.1.1"
 
-logback = "1.5.23"
-postgresql = "42.7.8"
+logback = "1.5.27"
+postgresql = "42.7.9"
 jbcrypt = "0.4"
 slf4j = "1.7.36"
 
@@ -139,8 +137,6 @@ exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "e
 exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
 exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed" }
 exposed-java-time = { module = "org.jetbrains.exposed:exposed-java-time", version.ref = "exposed" }
-#exposed-migration-jdbc = { module = "org.jetbrains.exposed:exposed-migration-jdbc", version.ref = "exposed-migration" }
-#exposed-migration-core = { module = "org.jetbrains.exposed:exposed-migration-core", version.ref = "exposed-migration" }
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
 
 
