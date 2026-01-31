@@ -8,7 +8,7 @@ import org.koin.dsl.navigation3.navigation
 
 @OptIn(KoinExperimentalAPI::class)
 val homeNavigationModule = module {
-    navigation<Route.Menus.Home> {
+    navigation<Route.Menus.Home>(slideInAndOutHorizontallyAnimation) {
         HomeScreen()
     }
 }

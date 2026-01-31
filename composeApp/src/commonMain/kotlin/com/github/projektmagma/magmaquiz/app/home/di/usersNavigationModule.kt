@@ -10,7 +10,7 @@ import org.koin.dsl.navigation3.navigation
 
 @OptIn(KoinExperimentalAPI::class)
 val usersNavigationModule = module {
-    navigation<Route.Menus.Users.Find> {
+    navigation<Route.Menus.Users.UsersList>(slideInAndOutHorizontallyAnimation) {
         val navigator: Navigator = get()
         UsersScreen(
             navigateToUserDetails = { navigator.goTo(Route.Menus.Users.UserDetails(it)) }

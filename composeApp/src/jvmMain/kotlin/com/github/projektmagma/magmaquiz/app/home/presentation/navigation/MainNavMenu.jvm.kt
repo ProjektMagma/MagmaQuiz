@@ -1,13 +1,6 @@
 package com.github.projektmagma.magmaquiz.app.home.presentation.navigation
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Groups
@@ -29,11 +22,7 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.AnimatedVisibilityFloatingButton
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.NavButton
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.ProfilePictureIcon
-import magmaquiz.composeapp.generated.resources.Res
-import magmaquiz.composeapp.generated.resources.greeting
-import magmaquiz.composeapp.generated.resources.home_nav
-import magmaquiz.composeapp.generated.resources.quizzes_nav
-import magmaquiz.composeapp.generated.resources.users_nav
+import magmaquiz.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -53,7 +42,7 @@ actual fun MainNavMenu(
     Scaffold(
         floatingActionButton = {
             AnimatedVisibilityFloatingButton(
-                isShown = navigator.backstack.last() == Route.Menus.Quizzes.Find,
+                isShown = navigator.backstack.last() == Route.Menus.Quizzes.QuizzesList,
                 onClick = {
                     navigator.goTo(Route.Menus.Quizzes.CreateQuiz)
                 }

@@ -13,7 +13,7 @@ import org.koin.dsl.navigation3.navigation
 
 @OptIn(KoinExperimentalAPI::class)
 val quizzesNavigationModule = module {
-    navigation<Route.Menus.Quizzes.Find> {
+    navigation<Route.Menus.Quizzes.QuizzesList>(slideInAndOutHorizontallyAnimation) {
         val navigator: Navigator = get()
         QuizzesScreen(
             navigateToQuizDetails = { navigator.goTo(Route.Menus.Quizzes.QuizDetails(it)) },

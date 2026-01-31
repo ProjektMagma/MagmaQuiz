@@ -1,8 +1,5 @@
 package com.github.projektmagma.magmaquiz.app.core.presentation.navigation
 
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -60,8 +57,8 @@ private fun AppNavigation(
         MainNavMenu(
             navigator = navigator,
             navigateToHome = { navigator.checkAndNavigate(Route.Menus.Home) },
-            navigateToQuizzes = { navigator.checkAndNavigate(Route.Menus.Quizzes.Find) },
-            navigateToUsers = { navigator.checkAndNavigate(Route.Menus.Users.Find) },
+            navigateToQuizzes = { navigator.checkAndNavigate(Route.Menus.Quizzes.QuizzesList) },
+            navigateToUsers = { navigator.checkAndNavigate(Route.Menus.Users.UsersList) },
             navigateToUserProfile = { navigator.checkAndNavigate(Route.Menus.Users.UserDetails(authRepository.thisUser.value?.userId!!)) },
         ) {
             Navigation(navigator, modifier)
@@ -85,17 +82,5 @@ fun Navigation(
             rememberViewModelStoreNavEntryDecorator()
         ),
         entryProvider = koinEntryProvider(),
-        transitionSpec = {
-            slideInHorizontally(initialOffsetX = { it }) togetherWith
-                    slideOutHorizontally(targetOffsetX = { -it })
-        },
-        popTransitionSpec = {
-            slideInHorizontally(initialOffsetX = { -it }) togetherWith
-                    slideOutHorizontally(targetOffsetX = { it })
-        },
-        predictivePopTransitionSpec = {
-            slideInHorizontally(initialOffsetX = { -it }) togetherWith
-                    slideOutHorizontally(targetOffsetX = { it })
-        },
     )
 }
