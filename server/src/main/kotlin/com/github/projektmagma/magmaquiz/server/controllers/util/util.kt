@@ -7,9 +7,11 @@ import com.github.projektmagma.magmaquiz.server.data.entities.UserEntity
 import com.github.projektmagma.magmaquiz.server.data.tables.FavoriteQuizzesTable
 import com.github.projektmagma.magmaquiz.server.data.tables.FriendshipsTable
 import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesTable
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.or
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.inList
+import org.jetbrains.exposed.v1.core.or
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.*
 
 /**
@@ -120,10 +122,9 @@ fun List<FriendshipEntity>.toUserList(thisUser: UserEntity): List<UserEntity> {
     return transaction {
         friendshipList
             .map { friendship ->
-                if (friendship.userTo == thisUser) friendship.userFrom
+                if (friendship.userTo.id == thisUser.id) friendship.userFrom
                 else friendship.userTo
             }
-            .filterNot { it.id == thisUser.id }
     }
 }
 

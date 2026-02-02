@@ -9,10 +9,11 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.User
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateUserValue
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.LoginUserValue
 import io.ktor.http.*
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.lowerCase
-import org.jetbrains.exposed.sql.or
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.lowerCase
+import org.jetbrains.exposed.v1.core.or
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 class AuthDataController {
     fun authLogin(loginUserValue: LoginUserValue): NetworkResource<User> {

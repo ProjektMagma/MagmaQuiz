@@ -1,6 +1,6 @@
 package com.github.projektmagma.magmaquiz.server.data.tables
 
-import org.jetbrains.exposed.dao.id.IntIdTable
+import org.jetbrains.exposed.v1.core.dao.id.IntIdTable
 
 
 // To jest tabela, gdzie nie robimy soft delete, bo to tylko sesje użytkownika, więc chyba bez sensu to jest

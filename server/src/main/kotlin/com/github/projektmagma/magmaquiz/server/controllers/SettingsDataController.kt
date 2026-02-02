@@ -9,7 +9,8 @@ import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangePasswordV
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangeProfilePictureValue
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangeUserNameValue
 import io.ktor.http.*
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 class SettingsDataController {
 

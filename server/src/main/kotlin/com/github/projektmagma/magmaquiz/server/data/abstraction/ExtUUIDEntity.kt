@@ -1,8 +1,8 @@
 package com.github.projektmagma.magmaquiz.server.data.abstraction
 
-import org.jetbrains.exposed.dao.EntityBatchUpdate
-import org.jetbrains.exposed.dao.UUIDEntity
-import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.v1.core.dao.id.EntityID
+import org.jetbrains.exposed.v1.dao.EntityBatchUpdate
+import org.jetbrains.exposed.v1.dao.java.UUIDEntity
 import java.time.Instant
 import java.util.*
 

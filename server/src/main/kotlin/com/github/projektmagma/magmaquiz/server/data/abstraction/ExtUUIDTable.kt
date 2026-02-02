@@ -1,7 +1,7 @@
 package com.github.projektmagma.magmaquiz.server.data.abstraction
 
-import org.jetbrains.exposed.dao.id.UUIDTable
-import org.jetbrains.exposed.sql.javatime.timestamp
+import org.jetbrains.exposed.v1.core.dao.id.java.UUIDTable
+import org.jetbrains.exposed.v1.javatime.timestamp
 import java.time.Instant
 
 abstract class ExtUUIDTable(name: String, columnName: String = "id") : UUIDTable(name, columnName) {

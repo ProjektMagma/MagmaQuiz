@@ -2,8 +2,8 @@ package com.github.projektmagma.magmaquiz.server.data.entities
 
 import com.github.projektmagma.magmaquiz.server.data.abstraction.ExtUUIDEntity
 import com.github.projektmagma.magmaquiz.server.data.tables.FavoriteQuizzesTable
-import org.jetbrains.exposed.dao.UUIDEntityClass
-import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.v1.core.dao.id.EntityID
+import org.jetbrains.exposed.v1.dao.java.UUIDEntityClass
 import java.util.*
 
 class FavoriteQuizzesEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, FavoriteQuizzesTable) {

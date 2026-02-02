@@ -12,9 +12,11 @@ import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkResource
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.User
 import io.ktor.http.*
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.lowerCase
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.like
+import org.jetbrains.exposed.v1.core.lowerCase
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.*
 
 class UsersDataController {
@@ -96,8 +98,8 @@ class UsersDataController {
 
         transaction {
             FriendshipEntity.new {
-                userFrom = dbUser
-                userTo = UserEntity.findById(session.userId)!!
+                userFrom = UserEntity.findById(session.userId)!!
+                userTo = dbUser
             }
         }
 
@@ -167,7 +169,7 @@ class UsersDataController {
 
         val friendList = transaction {
             dbUser.friendships(false)
-                .filter { it.userTo == dbUser }
+                .filter { it.userTo.id == dbUser.id }
                 .toUserList(dbUser)
                 .map {
                     it.toDomain(UserConversionCommand.ForeignUserWithSmallPicture)
@@ -191,7 +193,7 @@ class UsersDataController {
 
         val friendList = transaction {
             dbUser.friendships(false)
-                .filter { it.userFrom == dbUser }
+                .filter { it.userFrom.id == dbUser.id }
                 .toUserList(dbUser)
                 .map {
                     it.toDomain(UserConversionCommand.ForeignUserWithSmallPicture)

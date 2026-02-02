@@ -3,9 +3,9 @@ package com.github.projektmagma.magmaquiz.server.configuration
 import com.github.projektmagma.magmaquiz.server.data.tables.*
 import com.github.projektmagma.magmaquiz.server.data.util.DatabaseConfig
 import io.ktor.server.application.*
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.Database
+import org.jetbrains.exposed.v1.jdbc.SchemaUtils
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 fun Application.configureDatabase() {
 

@@ -8,7 +8,7 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkR
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.time.Instant
 
 fun Application.configureAuth() {

@@ -6,7 +6,8 @@ import com.github.projektmagma.magmaquiz.server.data.tables.UsersSessionsTable
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import io.ktor.server.sessions.*
 import kotlinx.serialization.json.Json
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.*
 
 class ExposedSessionStorage : SessionStorage {

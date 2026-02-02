@@ -1,7 +1,7 @@
 package com.github.projektmagma.magmaquiz.server.data.tables
 
 import com.github.projektmagma.magmaquiz.server.data.abstraction.ExtUUIDTable
-import org.jetbrains.exposed.sql.javatime.timestamp
+import org.jetbrains.exposed.v1.javatime.timestamp
 import java.time.Instant
 
 
