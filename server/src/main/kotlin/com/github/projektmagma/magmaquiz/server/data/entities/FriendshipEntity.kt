@@ -4,6 +4,7 @@ import com.github.projektmagma.magmaquiz.server.data.abstraction.ExtUUIDEntity
 import com.github.projektmagma.magmaquiz.server.data.tables.FriendshipsTable
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.dao.java.UUIDEntityClass
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.*
 
 class FriendshipEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, FriendshipsTable) {
@@ -12,4 +13,12 @@ class FriendshipEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, FriendshipsTable)
     var userFrom by UserEntity referencedOn FriendshipsTable.userFrom
     var userTo by UserEntity referencedOn FriendshipsTable.userTo
     var wasAccepted by FriendshipsTable.wasAccepted
+
+    fun wasAccepted(): Boolean {
+        return transaction { wasAccepted }
+    }
+
+    fun setAccepted(value: Boolean) {
+        return transaction { wasAccepted = value }
+    }
 }

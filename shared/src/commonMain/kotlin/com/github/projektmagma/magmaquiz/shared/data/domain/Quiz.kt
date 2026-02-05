@@ -14,7 +14,7 @@ data class Quiz(
     val isPublic: Boolean,
     val quizCreator: ForeignUser? = null,
     var likesCount: Int,
-    var likedByYou: Boolean = false,
+    val likedByYou: Boolean,
     val createdAt: Long,
     val modifiedAt: Long,
     val questionList: List<Question>

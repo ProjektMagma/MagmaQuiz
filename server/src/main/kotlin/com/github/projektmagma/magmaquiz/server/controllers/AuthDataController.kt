@@ -2,64 +2,38 @@ package com.github.projektmagma.magmaquiz.server.controllers
 
 import com.github.projektmagma.magmaquiz.server.data.conversion.UserConversionCommand
 import com.github.projektmagma.magmaquiz.server.data.entities.UserEntity
-import com.github.projektmagma.magmaquiz.server.data.tables.UsersTable
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
+import com.github.projektmagma.magmaquiz.server.repository.UserRepository
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkResource
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.User
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateUserValue
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.LoginUserValue
 import io.ktor.http.*
-import org.jetbrains.exposed.v1.core.and
-import org.jetbrains.exposed.v1.core.eq
-import org.jetbrains.exposed.v1.core.lowerCase
-import org.jetbrains.exposed.v1.core.or
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
-class AuthDataController {
+class AuthDataController(private val userRepository: UserRepository) {
     fun authLogin(loginUserValue: LoginUserValue): NetworkResource<User> {
-        val dbUsers = transaction {
-            UserEntity.find {
-                (UsersTable.userEmail.lowerCase() eq loginUserValue.userEmail.lowercase() and
-                        UsersTable.isActive)
-            }
-        }
+        val thisUser = userRepository.getUserByEmail(loginUserValue.userEmail) ?: return NetworkResource.Error(
+            HttpStatusCode.NotFound
+        )
 
-        val count = transaction { dbUsers.count() }
-
-        if (count == 0L) {
-            return NetworkResource.Error(HttpStatusCode.NotFound)
-        }
-
-        if (count > 1L) {
-            return NetworkResource.Error(HttpStatusCode.MultipleChoices)
-        }
-
-        val dbUser = transaction { dbUsers.first() }
-        val isPasswordEmpty = dbUser.userPassword.isNullOrEmpty()
+        // TODO: TO TRZEBA W KOŃCU ZMIENIĆ 
+        val isPasswordEmpty = thisUser.userPassword.isNullOrEmpty()
 
         if (isPasswordEmpty) {
-            transaction { dbUser.mustChangePassword = true }
-        } else if (!dbUser.checkUserPassword(loginUserValue.userPassword)
+            transaction { thisUser.mustChangePassword = true }
+        } else if (!thisUser.checkUserPassword(loginUserValue.userPassword)
         ) {
             return NetworkResource.Error(HttpStatusCode.Unauthorized)
         }
 
-
-        val domainUser = transaction { dbUser.toDomain(UserConversionCommand.ThisUser) }
-
-        return NetworkResource.Success(domainUser)
+        return NetworkResource.Success(thisUser.toDomain(UserConversionCommand.ThisUser))
     }
 
     fun authRegister(createUserValue: CreateUserValue): NetworkResource<User> {
-        val userDoesntExists = transaction {
-            UserEntity.find {
-                (UsersTable.userEmail.lowerCase() eq createUserValue.userEmail.lowercase() or
-                        (UsersTable.userName eq createUserValue.userName)) and
-                        (UsersTable.isActive)
-            }.empty()
-        }
+        val isUserTaken = userRepository.getUserByEmail(createUserValue.userEmail) != null
 
-        if (!userDoesntExists) {
+        if (isUserTaken) {
             return NetworkResource.Error(HttpStatusCode.Conflict)
         }
 
@@ -77,12 +51,7 @@ class AuthDataController {
 
 
     fun authWhoami(session: UserSession): NetworkResource<User> {
-        val dbUser = transaction {
-            UserEntity.findById(session.userId)
-        }
-
-        if (dbUser == null) return NetworkResource.Error(HttpStatusCode.NotFound)
-
+        val dbUser = userRepository.getUserData(session)
         return NetworkResource.Success(dbUser.toDomain(UserConversionCommand.ThisUser))
     }
 }

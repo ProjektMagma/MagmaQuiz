@@ -3,19 +3,32 @@ package com.github.projektmagma.magmaquiz.server.data.entities
 import com.github.projektmagma.magmaquiz.server.data.abstraction.DomainCapable
 import com.github.projektmagma.magmaquiz.server.data.abstraction.ExtUUIDEntity
 import com.github.projektmagma.magmaquiz.server.data.conversion.UserConversionCommand
+import com.github.projektmagma.magmaquiz.server.data.tables.FriendshipsTable
 import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesTable
 import com.github.projektmagma.magmaquiz.server.data.tables.UsersTable
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import com.github.projektmagma.magmaquiz.shared.data.domain.ThisUser
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.User
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.or
 import org.jetbrains.exposed.v1.dao.java.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
 import java.util.*
 
 class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapable<User, UserConversionCommand> {
-    companion object : UUIDEntityClass<UserEntity>(UsersTable)
+    companion object : UUIDEntityClass<UserEntity>(UsersTable) {
+
+        fun isNameTaken(name: String): Boolean {
+            return transaction { find { UsersTable.userName eq name }.firstOrNull() != null }
+        }
+
+        fun isEmailTaken(email: String): Boolean {
+            return transaction { find { UsersTable.userEmail eq email }.firstOrNull() != null }
+        }
+    }
 
     var userPassword by UsersTable.userPassword
         private set
@@ -42,23 +55,27 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
                     )
                 }
 
-                UserConversionCommand.ForeignUserWithSmallPicture -> {
+                is UserConversionCommand.ForeignUserWithSmallPicture -> {
                     ForeignUser(
                         userId = super.id.value,
                         userName = userName,
                         userProfilePicture = userSmallProfilePicture,
                         createdAt = createdAt.epochSecond,
                         lastActivity = lastActivity.epochSecond,
+                        isMyFriend = checkFriendship(command.caller, true),
+                        isFriendshipPending = checkFriendship(command.caller, false),
                     )
                 }
 
-                UserConversionCommand.ForeignUserWithBigPicture -> {
+                is UserConversionCommand.ForeignUserWithBigPicture -> {
                     ForeignUser(
                         userId = super.id.value,
                         userName = userName,
                         userProfilePicture = userBigProfilePicture,
                         createdAt = createdAt.epochSecond,
                         lastActivity = lastActivity.epochSecond,
+                        isMyFriend = checkFriendship(command.caller, true),
+                        isFriendshipPending = checkFriendship(command.caller, false),
                     )
                 }
             }
@@ -76,4 +93,16 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
     fun checkUserPassword(password: String): Boolean {
         return transaction { BCrypt.checkpw(password, userPassword) }
     }
+
+    private fun checkFriendship(otherUser: UserEntity, wasAccepted: Boolean): Boolean {
+        return transaction {
+            FriendshipEntity.find {
+                (FriendshipsTable.userFrom eq otherUser.id and (FriendshipsTable.userTo eq this@UserEntity.id)) or
+                        (FriendshipsTable.userTo eq otherUser.id and (FriendshipsTable.userFrom eq this@UserEntity.id)) and FriendshipsTable.isActive and (FriendshipsTable.wasAccepted.eq(
+                    wasAccepted
+                ))
+            }.firstOrNull() != null
+        }
+    }
+
 }

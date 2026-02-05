@@ -59,24 +59,27 @@ fun Application.usersRoutes(usersDataController: UsersDataController) {
                 }
 
                 get("/find/") {
+                    val session = call.sessions.get<UserSession>()!!
                     call.respondToResource(
-                        usersDataController.usersFindByUserName()
+                        usersDataController.usersFindByUserName(session)
                     )
                 }
 
                 get("/find/{userName}") {
+                    val session = call.sessions.get<UserSession>()!!
                     val userName = call.parameters["userName"]!!
 
                     call.respondToResource(
-                        usersDataController.usersFindByUserName(userName)
+                        usersDataController.usersFindByUserName(session, userName)
                     )
                 }
 
                 get("/userData/{userId}") {
+                    val session = call.sessions.get<UserSession>()!!
                     val userId = UUID.fromString(call.parameters["userId"]!!)
 
                     call.respondToResource(
-                        usersDataController.usersUserData(userId)
+                        usersDataController.usersUserData(session, userId)
                     )
                 }
             }

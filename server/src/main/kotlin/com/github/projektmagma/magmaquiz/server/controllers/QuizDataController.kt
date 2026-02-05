@@ -20,6 +20,8 @@ import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.*
 
+
+// TODO: TO JEST DO PRZEPISANIA, NIE DODAWAĆ NIC NOWEGO
 class QuizDataController {
 
     fun quizCreate(
@@ -191,12 +193,7 @@ class QuizDataController {
 
         val quizzesMapped = transaction {
             quizzesList.map { dbQuiz ->
-                dbQuiz.toDomain(QuizConversionCommand.WithUserNoQuestions).apply {
-                    val favoriteStatus =
-                        transaction { FavoriteQuizzesEntity.find { FavoriteQuizzesTable.user eq dbUser.id and (FavoriteQuizzesTable.quiz eq dbQuiz.id) } }.firstOrNull()
-                    this.likedByYou =
-                        favoriteStatus != null && favoriteStatus.isActive
-                }
+                dbQuiz.toDomain(QuizConversionCommand.WithUserNoQuestions(dbUser))
             }
         }
         return NetworkResource.Success(
@@ -212,14 +209,8 @@ class QuizDataController {
         val dbQuiz = quizEntityOrNull(quizId, session.userId) ?: return NetworkResource.Error(HttpStatusCode.NotFound)
 
         return NetworkResource.Success(transaction {
-            dbQuiz.toDomain(QuizConversionCommand.WithUserAndQuestions)
-                .apply {
-                    val favoriteStatus = transaction {
-                        FavoriteQuizzesEntity.find { FavoriteQuizzesTable.user eq dbUser.id and (FavoriteQuizzesTable.quiz eq dbQuiz.id) }
-                    }.firstOrNull()
+            dbQuiz.toDomain(QuizConversionCommand.WithUserAndQuestions(dbUser))
 
-                    this.likedByYou = favoriteStatus != null && favoriteStatus.isActive
-                }
         })
     }
 
@@ -256,9 +247,7 @@ class QuizDataController {
 
         val quizzesList = transaction {
             dbUser.favoritesQuizzes()
-                .map { dbQuiz ->
-                    dbQuiz.toDomain(QuizConversionCommand.WithUserNoQuestions).apply { this.likedByYou = true }
-                }
+                .map { dbQuiz -> dbQuiz.toDomain(QuizConversionCommand.WithUserNoQuestions(dbUser)) }
         }
 
         return NetworkResource.Success(quizzesList)
@@ -281,16 +270,13 @@ class QuizDataController {
             .filter { isOwner || it.isPublic }
             .toList()
 
-        val likedQuizIds =
-            FavoriteQuizzesEntity.find {
-                (FavoriteQuizzesTable.user eq viewerUser.id) and
-                        (FavoriteQuizzesTable.isActive eq true)
-            }.map { it.quiz.id }
+        FavoriteQuizzesEntity.find {
+            (FavoriteQuizzesTable.user eq viewerUser.id) and
+                    (FavoriteQuizzesTable.isActive eq true)
+        }.map { it.quiz.id }
 
         val mapped = quizzes.map { dbQuiz ->
-            dbQuiz.toDomain(QuizConversionCommand.WithUserNoQuestions).apply {
-                likedByYou = dbQuiz.id in likedQuizIds
-            }
+            dbQuiz.toDomain(QuizConversionCommand.WithUserNoQuestions(viewerUser))
         }
 
         NetworkResource.Success(mapped)
@@ -320,17 +306,14 @@ class QuizDataController {
 
     fun quizNewest(session: UserSession, count: Int): NetworkResource<List<Quiz>> {
         val quizList = transaction {
-            val userFavorites = transaction { UserEntity.findById(session.userId)!!.favoritesQuizzes() }
+            transaction { UserEntity.findById(session.userId)!!.favoritesQuizzes() }
             QuizEntity.all()
                 .filter { it.isActive && it.isPublic }
                 .sortedBy { it.createdAt }
                 .asReversed()
                 .take(count)
                 .map { dbQuiz ->
-                    dbQuiz.toDomain(QuizConversionCommand.WithUserNoQuestions)
-                        .apply {
-                            this.likedByYou = dbQuiz in userFavorites
-                        }
+                    dbQuiz.toDomain(QuizConversionCommand.WithUserNoQuestions(UserEntity.findById(session.userId)!!))
                 }
         }
 
@@ -339,17 +322,14 @@ class QuizDataController {
 
     fun quizMostLiked(session: UserSession, count: Int): NetworkResource<List<Quiz>> {
         val quizList = transaction {
-            val userFavorites = transaction { UserEntity.findById(session.userId)!!.favoritesQuizzes() }
+            transaction { UserEntity.findById(session.userId)!!.favoritesQuizzes() }
             QuizEntity.all()
                 .filter { it.isActive && it.isPublic }
                 .sortedBy { it.likesCount }
                 .asReversed()
                 .take(count)
                 .map { quiz ->
-                    quiz.toDomain(QuizConversionCommand.WithUserNoQuestions)
-                        .apply {
-                            this.likedByYou = quiz in userFavorites
-                        }
+                    quiz.toDomain(QuizConversionCommand.WithUserNoQuestions(UserEntity.findById(session.userId)!!))
                 }
         }
 
@@ -362,15 +342,14 @@ class QuizDataController {
         val quizzesList = mutableListOf<Quiz>()
         val dbUser = transaction { UserEntity.findById(session.userId)!! }
         val friendList = transaction { dbUser.friendships(true).toUserList(dbUser) }
-        val userFavorites = transaction { dbUser.favoritesQuizzes() }
+        transaction { dbUser.favoritesQuizzes() }
 
         transaction {
             friendList.forEach {
                 it.quizList.forEach { quiz ->
                     quizzesList.add(
-                        quiz.toDomain(QuizConversionCommand.WithUserNoQuestions).apply {
-                            likedByYou = quiz in userFavorites
-                        })
+                        quiz.toDomain(QuizConversionCommand.WithUserNoQuestions(dbUser))
+                    )
                 }
             }
 

@@ -1,8 +1,8 @@
 package com.github.projektmagma.magmaquiz.server.controllers
 
 import com.github.projektmagma.magmaquiz.server.data.entities.UserEntity
-import com.github.projektmagma.magmaquiz.server.data.tables.UsersTable
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
+import com.github.projektmagma.magmaquiz.server.repository.UserRepository
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkResource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangeEmailValue
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangePasswordValue
@@ -12,30 +12,25 @@ import io.ktor.http.*
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
-class SettingsDataController {
+class SettingsDataController(private val userRepository: UserRepository) {
 
     fun settingsChangePassword(
         session: UserSession,
         changePasswordValue: ChangePasswordValue
     ): NetworkResource<Unit> {
 
-        val dbUser = transaction {
-            UserEntity.findById(session.userId)
-        }!!
+        val thisUser = userRepository.getUserData(session)
 
-        dbUser.setHashedPassword(changePasswordValue.newPassword)
+        thisUser.setHashedPassword(changePasswordValue.newPassword)
 
         return NetworkResource.Success(Unit)
     }
 
 
     fun settingsDelete(session: UserSession, isActive: Boolean): NetworkResource<Unit> {
-        val dbUser = transaction {
-            UserEntity.findById(session.userId)
-        }!!
+        val thisUser = userRepository.getUserData(session)
 
-
-        transaction { dbUser.isActive = isActive }
+        transaction { thisUser.isActive = isActive }
 
         return NetworkResource.Success(Unit)
     }
@@ -44,13 +39,11 @@ class SettingsDataController {
         session: UserSession,
         postContent: ChangeProfilePictureValue
     ): NetworkResource<Unit> {
-        val dbUser = transaction {
-            UserEntity.findById(session.userId)
-        }!!
+        val thisUser = userRepository.getUserData(session)
 
         transaction {
-            dbUser.userBigProfilePicture = postContent.profilePictureBig
-            dbUser.userSmallProfilePicture = postContent.profilePictureSmall
+            thisUser.userBigProfilePicture = postContent.profilePictureBig
+            thisUser.userSmallProfilePicture = postContent.profilePictureSmall
         }
 
         return NetworkResource.Success(Unit)
@@ -60,19 +53,13 @@ class SettingsDataController {
         session: UserSession,
         postContent: ChangeUserNameValue
     ): NetworkResource<Unit> {
-        val dbUser = transaction {
-            UserEntity.findById(session.userId)
-        }!!
+        val thisUser = userRepository.getUserData(session)
 
-        val otherDbUser = transaction {
-            UserEntity.find { UsersTable.userName eq postContent.newUserName }.firstOrNull()
-        }
-
-        if (otherDbUser != null)
+        if (UserEntity.isNameTaken(postContent.newUserName))
             return NetworkResource.Error(HttpStatusCode.Conflict)
 
         transaction {
-            dbUser.userName = postContent.newUserName
+            thisUser.userName = postContent.newUserName
         }
 
         return NetworkResource.Success(Unit)
@@ -82,19 +69,14 @@ class SettingsDataController {
         session: UserSession,
         postContent: ChangeEmailValue
     ): NetworkResource<Unit> {
-        val dbUser = transaction {
-            UserEntity.findById(session.userId)
-        }!!
+        val thisUser = userRepository.getUserData(session)
 
-        val otherDbUser = transaction {
-            UserEntity.find { UsersTable.userEmail eq postContent.newEmail }.firstOrNull()
-        }
-
-        if (otherDbUser != null)
+        if (UserEntity.isEmailTaken(postContent.newEmail))
             return NetworkResource.Error(HttpStatusCode.Conflict)
 
+
         transaction {
-            dbUser.userEmail = postContent.newEmail
+            thisUser.userEmail = postContent.newEmail
         }
 
         return NetworkResource.Success(Unit)

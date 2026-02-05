@@ -32,7 +32,14 @@ class ExposedSessionStorage : SessionStorage {
         return transaction {
             val session = UserSessionEntity.find { UsersSessionsTable.sessionId eq id }.firstOrNull()
 
+
             if (session == null) throw NoSuchElementException()
+
+            if (!session.sessionOwner.isActive) {
+                clearAllUserSessions(session.sessionOwner.id.value) // na wszelki wypadek, raczej powinny się wyczyścić same
+                throw NoSuchElementException()
+            }
+
             session.sessionValue
         }
     }
@@ -40,7 +47,6 @@ class ExposedSessionStorage : SessionStorage {
     fun clearAllUserSessions(userId: UUID) {
         transaction {
             UserSessionEntity.find { UsersSessionsTable.sessionOwner eq userId }.forEach { it.delete() }
-
         }
     }
 }
