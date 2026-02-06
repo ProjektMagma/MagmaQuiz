@@ -7,7 +7,6 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
 import com.github.projektmagma.magmaquiz.app.home.data.repository.QuizRepository
 import com.github.projektmagma.magmaquiz.app.home.data.repository.UsersRepository
-import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.User
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenError
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
@@ -25,7 +24,7 @@ class UserDetailsViewModel(
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState = _uiState.asStateFlow()
 
-    private val _quizzes = MutableStateFlow<List<Quiz>>(emptyList())
+    private val _quizzes = quizRepository.userDetailsQuizList
     val quizzes = _quizzes.asStateFlow()
     
     private val _user = MutableStateFlow<User?>(null)
@@ -62,9 +61,8 @@ class UserDetailsViewModel(
 
     fun changeFavoriteStatus(id: UUID) {
         viewModelScope.launch {
-            quizRepository.changeFavoriteStatus(id, _quizzes.value)
-                .whenSuccess { 
-                    _quizzes.value = it.data
+            quizRepository.changeFavoriteStatus(id)
+                .whenSuccess {
                     _uiState.value = UiState.Success
                 }
                 .whenError { 

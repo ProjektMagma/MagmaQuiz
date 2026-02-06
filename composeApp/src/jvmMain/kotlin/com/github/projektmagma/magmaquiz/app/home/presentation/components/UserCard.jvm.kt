@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -14,13 +15,16 @@ import com.github.projektmagma.magmaquiz.app.core.util.convertLongSecondsToStrin
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.last_activity
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import java.util.UUID
 
 @Composable
 actual fun UserCard(
     user: ForeignUser,
-    navigateToUserDetails: (id: UUID) -> Unit
+    navigateToUserDetails: (id: UUID) -> Unit,
+    inviteButtonText: StringResource,
+    onInviteButtonClick: (id: UUID) -> Unit,
 ) {
     UniversalCardContainer(onClick = { navigateToUserDetails(user.userId!!) }) {
         Row(
@@ -41,9 +45,16 @@ actual fun UserCard(
                         fontWeight = FontWeight.Bold
                     )
                 }
+                Button(
+                    shape = MaterialTheme.shapes.small,
+                    onClick = {
+                        onInviteButtonClick(user.userId!!)
+                    }
+                ) {
+                    Text(stringResource(inviteButtonText))
+                }
             }
-            ProfilePictureIcon(user.userProfilePicture)
-
         }
+        ProfilePictureIcon(user.userProfilePicture)
     }
 }

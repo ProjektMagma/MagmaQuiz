@@ -1,8 +1,5 @@
 package com.github.projektmagma.magmaquiz.app.home.presentation
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
@@ -11,29 +8,30 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiStat
 import com.github.projektmagma.magmaquiz.app.core.util.withSearchDelay
 import com.github.projektmagma.magmaquiz.app.home.data.repository.UsersRepository
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.users.UsersCommand
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.users.UsersFilters
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.users.UsersState
+import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenError
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class UsersViewModel(
     private val usersRepository: UsersRepository
 ) : ViewModel() {
-
     private val _authChannel = Channel<NetworkEvent>()
     val authChannel = _authChannel.receiveAsFlow()
 
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState = _uiState.asStateFlow()
-
-    var userName by mutableStateOf("")
-
-    val userList = usersRepository.userList
-
-    val friendList = usersRepository.friendList
+    
+    private val _state = MutableStateFlow(UsersState())
+    val state = _state.asStateFlow()
 
     var searchLock = false
 
@@ -45,10 +43,52 @@ class UsersViewModel(
     fun onCommand(command: UsersCommand) {
         when (command) {
             is UsersCommand.UserList -> userList(command.withDelay)
-            is UsersCommand.UserDetails -> TODO()
-            is UsersCommand.SendFriendInvite -> TODO()
-            is UsersCommand.AcceptFriendInvite -> TODO()
+            is UsersCommand.SendFriendInvite -> sendInvite(command.uuid)
+            is UsersCommand.AcceptFriendInvite -> acceptInvite(command.uuid)
+            is UsersCommand.FilterChanged -> {
+                _uiState.value = UiState.Loading
+                _state.update {
+                    it.copy(
+                        usersFilter = if (command.newFilter != _state.value.usersFilter) 
+                            command.newFilter 
+                        else UsersFilters.None
+                    )
+                }
+                getFilteredData()
+            }
+            is UsersCommand.UsernameChanged -> _state.update { it.copy(username = command.newUsername) }
         }
+    }
+    
+    private fun getFilteredData(){
+        viewModelScope.launch {
+            when (_state.value.usersFilter) {
+                UsersFilters.Friends -> {
+                    usersRepository.getFriendList().whenSuccess { result ->
+                        updateUserList(result.data)
+                    }
+                }
+                UsersFilters.SentInvitations -> {
+                    usersRepository.getOutgoingInvitations().whenSuccess { result ->
+                        updateUserList(result.data)
+                    }
+                }
+                UsersFilters.IncomingInvitations -> {
+                    usersRepository.getIncomingInvitations().whenSuccess { result ->
+                        updateUserList(result.data)
+                    }
+                }
+
+                UsersFilters.None -> {
+                    userList(false)
+                }
+            }   
+        }
+    }
+    
+    private fun updateUserList(data: List<ForeignUser>){
+        _state.update { it.copy(usersList = data) }
+        _uiState.value = UiState.Success
     }
 
     private fun userList(withDelay: Boolean = false) {
@@ -57,7 +97,8 @@ class UsersViewModel(
             _uiState.value = UiState.Loading
             searchLock = true
             withSearchDelay(withDelay) {
-                usersRepository.getFindUsersByName(userName).whenSuccess {
+                usersRepository.getFindUsersByName(_state.value.username).whenSuccess { result ->
+                    _state.update { it.copy(usersList = result.data) }
                     _authChannel.trySend(NetworkEvent.Success)
                     _uiState.value = UiState.Success
                 }.whenError {
@@ -66,6 +107,18 @@ class UsersViewModel(
                 }
                 searchLock = false
             }
+        }
+    }
+    
+    private fun sendInvite(uuid: UUID){
+        viewModelScope.launch {
+            usersRepository.getSendFriendInvite(uuid)
+        }
+    }
+    
+    private fun acceptInvite(uuid: UUID){
+        viewModelScope.launch { 
+            usersRepository.getAcceptFriendInvite(uuid)
         }
     }
 }

@@ -6,7 +6,6 @@ import com.github.projektmagma.magmaquiz.app.home.presentation.screens.quizzes.C
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.quizzes.CreateQuizScreen
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.quizzes.QuizDetailsScreen
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.quizzes.QuizzesScreen
-import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.dsl.module
 import org.koin.dsl.navigation3.navigation
@@ -18,7 +17,6 @@ val quizzesNavigationModule = module {
         QuizzesScreen(
             navigateToQuizDetails = { navigator.goTo(Route.Menus.Quizzes.QuizDetails(it)) },
             navigateToUserDetails = { navigator.goTo(Route.Menus.Users.UserDetails(it)) },
-            quizzesListViewModel = koinViewModel()
         )
     }
     navigation<Route.Menus.Quizzes.QuizDetails> {

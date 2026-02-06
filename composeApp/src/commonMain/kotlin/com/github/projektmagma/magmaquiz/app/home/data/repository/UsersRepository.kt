@@ -5,40 +5,35 @@ import com.github.projektmagma.magmaquiz.app.home.data.service.UsersService
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Resource
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import java.util.*
+import java.util.UUID
 
 class UsersRepository(
     private val usersService: UsersService
-) {
-
-    private val _userList = MutableStateFlow<List<ForeignUser>>(emptyList())
-    val userList = _userList.asStateFlow()
-
-    private val _selectedUserData = MutableStateFlow<ForeignUser?>(null)
-    private val _friendList = MutableStateFlow<List<ForeignUser>>(emptyList())
-    val friendList = _friendList.asStateFlow()
-
+) { 
     suspend fun getFindUsersByName(name: String): Resource<List<ForeignUser>, NetworkError> {
-        return usersService.getFindUsersByName(name).whenSuccess { _userList.value = it.data }
+        return usersService.getFindUsersByName(name)
     }
 
     suspend fun getUserDataById(uuid: UUID): Resource<ForeignUser, NetworkError> {
-        return usersService.getUserDataById(uuid).whenSuccess { _selectedUserData.value = it.data }
+        return usersService.getUserDataById(uuid)
     }
 
     suspend fun getFriendList(): Resource<List<ForeignUser>, NetworkError> {
-        return usersService.getFriendList().whenSuccess { _friendList.value = it.data }
+        return usersService.getFriendList()
     }
-
-    suspend fun getSendFriendInvite(uuid: UUID): Boolean {
-        var wasSend = false
-        usersService.getSendFriendInvite(uuid)
-            .whenSuccess { wasSend = true }
-        return wasSend
+    
+    suspend fun getIncomingInvitations(): Resource<List<ForeignUser>, NetworkError> {
+        return usersService.getIncomingInvitations()
     }
-
+    
+    suspend fun getOutgoingInvitations(): Resource<List<ForeignUser>, NetworkError> {
+        return usersService.getOutgoingInvitations()
+    }
+    
+    suspend fun getSendFriendInvite(uuid: UUID): Resource<Unit, NetworkError> {
+        return usersService.getSendFriendInvite(uuid)
+    }
+    
     suspend fun getAcceptFriendInvite(uuid: UUID): Boolean {
         var wasAccepted = false
         usersService.getAcceptFriendInvite(uuid)

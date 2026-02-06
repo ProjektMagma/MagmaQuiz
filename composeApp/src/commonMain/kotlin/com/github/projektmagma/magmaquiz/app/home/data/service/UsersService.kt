@@ -29,6 +29,18 @@ class UsersService(
         }
     }
 
+    suspend fun getIncomingInvitations(): Resource<List<ForeignUser>, NetworkError> {
+        return safeCall<List<ForeignUser>> { 
+            httpClient.get("users/friendship/incoming")
+        }
+    }
+
+    suspend fun getOutgoingInvitations(): Resource<List<ForeignUser>, NetworkError> {
+        return safeCall<List<ForeignUser>> { 
+            httpClient.get("users/friendship/outgoing")
+        }
+    }
+
     suspend fun getSendFriendInvite(uuid: UUID): Resource<Unit, NetworkError> {
         return safeCall<Unit> {
             httpClient.get("users/friendship/sendInvitation/$uuid")

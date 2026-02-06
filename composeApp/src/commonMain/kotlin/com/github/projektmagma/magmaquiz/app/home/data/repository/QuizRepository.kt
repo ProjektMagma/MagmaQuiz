@@ -7,7 +7,6 @@ import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.Qui
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.create.CreateQuizState
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Resource
-import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.map
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -22,6 +21,8 @@ class QuizRepository(
     val quizListState = MutableStateFlow(QuizListState())
 
     val createQuizState = MutableStateFlow(CreateQuizState())
+    
+    val userDetailsQuizList = MutableStateFlow<List<Quiz>>(emptyList())
 
     suspend fun getQuizByName(name: String): Resource<List<Quiz>, NetworkError> {
         return quizService.getQuizByName(name)
@@ -32,37 +33,30 @@ class QuizRepository(
     }
 
     suspend fun changeFavoriteStatus(
-        id: UUID,
-        list: List<Quiz>? = null
-    ): Resource<List<Quiz>, NetworkError> {
+        id: UUID
+    ): Resource<Unit, NetworkError> {
         quizListState.update {
             it.copy(
-                quizzes = it.quizzes.map { quiz ->
-                    if (quiz.id == id) {
-                        quiz.copy(
-                            likedByYou = !quiz.likedByYou,
-                            likesCount = if (quiz.likedByYou) quiz.likesCount - 1 else quiz.likesCount + 1
-                        )
-                    } else {
-                        quiz
-                    }
-                }
+                quizzes = it.quizzes.changeLikeStatusInList(id)
             )
         }
+        userDetailsQuizList.value.changeLikeStatusInList(id)
 
-        val newList = list?.map { quiz -> 
-                if (quiz.id == id) {
-                    quiz.copy(
-                        likedByYou = !quiz.likedByYou,
-                        likesCount = if (quiz.likedByYou) quiz.likesCount - 1 else quiz.likesCount + 1
-                    )
-                } else {
-                    quiz
-                }
+        return quizService.changeFavoriteStatus(id)
+    }   
+    
+    fun List<Quiz>.changeLikeStatusInList(id: UUID): List<Quiz>{
+        return this.map { quiz ->
+            if (quiz.id == id) {
+                quiz.copy(
+                    likedByYou = !quiz.likedByYou,
+                    likesCount = if (quiz.likedByYou) quiz.likesCount - 1 else quiz.likesCount + 1
+                )
+            } else {
+                quiz
+            }
         }
-
-    return quizService.changeFavoriteStatus(id).map { if (newList.isNullOrEmpty()) emptyList() else newList }
-}
+    }
 
 suspend fun getMyFavorites(): Resource<List<Quiz>, NetworkError> {
     return quizService.getMyFavorites()

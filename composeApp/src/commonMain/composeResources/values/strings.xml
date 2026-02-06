@@ -81,4 +81,5 @@
     <string name="most_liked">Most liked</string>
     <string name="friends_quizzes">Friends quizzes</string>
     <string name="recently_added">Recently added</string>
+    <string name="send_invite">Send invite</string>
 </resources>
