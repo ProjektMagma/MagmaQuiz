@@ -8,12 +8,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Button
@@ -41,7 +39,6 @@ import java.util.UUID
 fun QuizDetailsScreen(
     id: UUID,
     navigateToPlayScreen: () -> Unit,
-    navigateBack: () -> Unit
 ) {
     val quizDetailsViewModel: QuizDetailsViewModel = koinViewModel { parametersOf(id) }
     
@@ -59,18 +56,6 @@ fun QuizDetailsScreen(
                 .padding(horizontal = 12.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            IconButton(
-                modifier = Modifier.size(24.dp),
-                onClick = {
-                    navigateBack()
-                }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    tint = MaterialTheme.colorScheme.onSurface,
-                    contentDescription = "BackButton",
-                )
-            }
-
             LazyColumn(
                 modifier = Modifier
                     .weight(1f)
@@ -123,11 +108,10 @@ fun QuizDetailsScreen(
                     }
 
                     Text(
+                        modifier = Modifier.padding(vertical = 16.dp),
                         text = quiz!!.quizDescription,
                         style = MaterialTheme.typography.labelMedium
                     )
-
-                    Spacer(modifier = Modifier.height(8.dp))
                 }
 
                 items(quiz!!.questionList) { question ->
@@ -137,7 +121,7 @@ fun QuizDetailsScreen(
                     ) {
                         ContentImage(
                             imageData = question.questionImage,
-                            imageSize = 128.dp
+                            imageSize = 96.dp
                         )
                         Column {
                             QuestionNumber(question.questionNumber)

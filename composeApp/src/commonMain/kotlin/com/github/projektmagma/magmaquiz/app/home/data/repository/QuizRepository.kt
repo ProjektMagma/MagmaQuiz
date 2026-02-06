@@ -40,11 +40,12 @@ class QuizRepository(
                 quizzes = it.quizzes.changeLikeStatusInList(id)
             )
         }
-        userDetailsQuizList.value.changeLikeStatusInList(id)
+        
+        userDetailsQuizList.value = userDetailsQuizList.value.changeLikeStatusInList(id)
 
         return quizService.changeFavoriteStatus(id)
-    }   
-    
+    }
+
     fun List<Quiz>.changeLikeStatusInList(id: UUID): List<Quiz>{
         return this.map { quiz ->
             if (quiz.id == id) {

@@ -24,7 +24,6 @@ val quizzesNavigationModule = module {
         QuizDetailsScreen(
             id = it.id,
             navigateToPlayScreen = { navigator.goTo(Route.Game) },
-            navigateBack = { navigator.goBack() }
         )
     }
     navigation<Route.Menus.Quizzes.CreateQuiz> {

@@ -33,9 +33,15 @@ class UserDetailsViewModel(
     fun checkOwnership(id: UUID): Boolean{
         return id == authRepository.thisUser.value?.userId
     }
+    
+    fun loadData(id: UUID){
+        getQuizzesByUserId(id)
+        getUserData(id)
+    }
 
-    fun getQuizzesByUserId(id: UUID) {
+    private fun getQuizzesByUserId(id: UUID) {
         viewModelScope.launch { 
+            _uiState.value = UiState.Loading
             quizRepository.getQuizzesByUserId(id)
                 .whenSuccess { 
                     _uiState.value = UiState.Success
@@ -45,8 +51,9 @@ class UserDetailsViewModel(
         }
     }
     
-    fun getUserData(id: UUID) {
-        viewModelScope.launch { 
+    private fun getUserData(id: UUID) {
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
             if (checkOwnership(id)) {
                 _user.value = authRepository.thisUser.value
             } else {
