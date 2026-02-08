@@ -27,7 +27,8 @@ class UsersDataController(
         val thisUser = userRepository.getUserData(session)
         val userList = userRepository.getUsersByName(userName)
         val usersMapped =
-            userList.map { it.toDomain(UserConversionCommand.ForeignUserWithSmallPicture(thisUser)) }
+            userList.filter { it.id != thisUser.id }
+                .map { it.toDomain(UserConversionCommand.ForeignUserWithSmallPicture(thisUser)) }
 
         return NetworkResource.Success(usersMapped, HttpStatusCode.PartialContent)
     }
