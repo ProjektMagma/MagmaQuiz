@@ -13,7 +13,6 @@ data class ForeignUser(
     override val userProfilePicture: ByteArray? = null,
     override val createdAt: Long,
     override val lastActivity: Long,
-    val isMyFriend: Boolean,
-    val isFriendshipPending: Boolean
+    val friendshipStatus: FriendshipStatus
 ) : User
 
