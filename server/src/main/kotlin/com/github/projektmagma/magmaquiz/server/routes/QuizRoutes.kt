@@ -74,12 +74,13 @@ fun Application.quizRoutes(quizDataController: QuizDataController) {
                 get("/findByUser/{userId}") {
                     val session = call.sessions.get<UserSession>()!!
                     val userId = UUID.fromString(call.parameters["userId"]!!)
-                    call.respondToResource(quizDataController.quizFindByUserId(userId, session))
+                    call.respondToResource(quizDataController.quizFindByUserId(session, userId))
                 }
 
                 delete("/{quizId}") {
+                    val session = call.sessions.get<UserSession>()!!
                     val quizId = UUID.fromString(call.parameters["quizId"]!!)
-                    call.respondToResource(quizDataController.quizDelete(quizId))
+                    call.respondToResource(quizDataController.quizDelete(session, quizId))
                 }
 
                 get("/newest/{count}") {
