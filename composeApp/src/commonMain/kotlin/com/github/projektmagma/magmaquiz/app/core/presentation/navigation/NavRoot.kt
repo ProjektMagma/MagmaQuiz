@@ -1,34 +1,57 @@
 package com.github.projektmagma.magmaquiz.app.core.presentation.navigation
 
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import androidx.savedstate.serialization.SavedStateConfiguration
 import com.github.projektmagma.magmaquiz.app.auth.data.AuthRepository
-import com.github.projektmagma.magmaquiz.app.core.di.Navigator
+import com.github.projektmagma.magmaquiz.app.auth.presentation.navigation.AuthNavigation
 import com.github.projektmagma.magmaquiz.app.core.presentation.RootViewModel
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.AuthState
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.FullSizeCircularProgressIndicator
 import com.github.projektmagma.magmaquiz.app.home.presentation.navigation.CustomWindowDraggableArea
+import com.github.projektmagma.magmaquiz.app.home.presentation.navigation.GameNavigation
+import com.github.projektmagma.magmaquiz.app.home.presentation.navigation.HomeNavigation
 import com.github.projektmagma.magmaquiz.app.home.presentation.navigation.MainNavMenu
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
 import org.koin.compose.koinInject
-import org.koin.compose.navigation3.koinEntryProvider
 import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.annotation.KoinExperimentalAPI
 
 @Composable
 fun NavRoot(
     modifier: Modifier = Modifier,
     rootViewModel: RootViewModel = koinViewModel()
 ) {
-    val navigator: Navigator = koinInject()
+    val mainBackstack = rememberNavBackStack(
+        configuration = SavedStateConfiguration {
+            serializersModule = SerializersModule {
+                polymorphic(NavKey::class) {
+                    subclass(Route.Game::class, Route.Game.serializer())
+                    subclass(Route.Auth::class, Route.Auth.serializer())
+                    subclass(Route.Menus::class, Route.Menus.serializer())
+                }
+            }
+        },
+        Route.Auth
+    )
+
     val authState by rootViewModel.state.collectAsStateWithLifecycle()
-    
+
     when (authState) {
         AuthState.Loading -> {
             Column(modifier = Modifier.fillMaxSize()) {
@@ -37,50 +60,74 @@ fun NavRoot(
             }
         }
 
-        AuthState.Unauthenticated -> AppNavigation(navigator, modifier)
-        
+        AuthState.Unauthenticated -> Navigation(mainBackstack, modifier)
+
         AuthState.Authenticated -> {
-            navigator.clearAndGoTo(Route.Menus.Home)
-            AppNavigation(navigator, modifier)
+            mainBackstack.add(Route.Menus)
+            Navigation(mainBackstack, modifier)
         }
     }
 }
 
-@OptIn(KoinExperimentalAPI::class)
 @Composable
-private fun AppNavigation(
-    navigator: Navigator,
+fun Navigation(
+    mainBackStack: NavBackStack<NavKey>,
     modifier: Modifier = Modifier,
     authRepository: AuthRepository = koinInject()
 ) {
-    if (navigator.backstack.last() is Route.Menus) {
-        MainNavMenu(
-            navigator = navigator,
-            navigateToHome = { navigator.checkAndNavigate(Route.Menus.Home) },
-            navigateToQuizzes = { navigator.checkAndNavigate(Route.Menus.Quizzes.QuizzesList) },
-            navigateToUsers = { navigator.checkAndNavigate(Route.Menus.Users.UsersList) },
-            navigateToUserProfile = { navigator.checkAndNavigate(Route.Menus.Users.UserDetails(authRepository.thisUser.value?.userId!!)) },
-        ) {
-            Navigation(navigator, modifier)
-        }
-    } else {
-        Navigation(navigator, modifier)
-    }
-}
+    val navigationState = rememberNavigationState(
+        startRoute = Route.Menus.Home,
+        topLevelRoutes = TOP_LEVEL_DESTINATIONS.keys
+    )
 
-@OptIn(KoinExperimentalAPI::class)
-@Composable
-fun Navigation(
-    navigator: Navigator,
-    modifier: Modifier = Modifier
-) {
+    val navigator = remember {
+        Navigator(navigationState)
+    }
+    
     NavDisplay(
         modifier = modifier,
-        backStack = navigator.backstack,
+        backStack = mainBackStack,
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator(),
             rememberViewModelStoreNavEntryDecorator()
         ),
-        entryProvider = koinEntryProvider(),
+        entryProvider = entryProvider {
+            entry<Route.Auth> {
+                AuthNavigation(
+                    navigateToMain = { mainBackStack.add(Route.Menus) }
+                )
+            }
+            entry<Route.Menus> {
+                MainNavMenu(
+                    navigator = navigator,
+                    navigationState = navigationState,
+                    navigateToUserProfile = { navigator.navigate(Route.Menus.Users.UserDetails(authRepository.thisUser.value?.userId!!)) },
+                ) {
+                    HomeNavigation(
+                        navigator = navigator,
+                        navigationState = navigationState,
+                        navigateToAuth = { mainBackStack.add(Route.Auth) },
+                        navigateToGameScreen = { mainBackStack.add(Route.Game) }
+                    )
+                }
+            }
+            entry<Route.Game> {
+                GameNavigation(
+                    navigateToHome = { mainBackStack.add(Route.Menus) }
+                )
+            }
+        },
+        transitionSpec = {
+            slideInHorizontally(initialOffsetX = { it }) togetherWith
+                    slideOutHorizontally(targetOffsetX = { -it })
+        },
+        popTransitionSpec = {
+            slideInHorizontally(initialOffsetX = { -it }) togetherWith
+                    slideOutHorizontally(targetOffsetX = { it })
+        },
+        predictivePopTransitionSpec = {
+            slideInHorizontally(initialOffsetX = { -it }) togetherWith
+                    slideOutHorizontally(targetOffsetX = { it })
+        },
     )
 }

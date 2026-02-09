@@ -12,9 +12,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
-import androidx.compose.material.icons.filled.Groups
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Quiz
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -27,25 +24,21 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.projektmagma.magmaquiz.app.auth.presentation.AuthViewModel
 import com.github.projektmagma.magmaquiz.app.core.MainWindow
-import com.github.projektmagma.magmaquiz.app.core.di.Navigator
+import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.NavigationState
+import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Navigator
+import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.QuizNavigationBar
 import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.AnimatedVisibilityFloatingButton
-import com.github.projektmagma.magmaquiz.app.home.presentation.components.NavButton
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.ProfilePictureIcon
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.greeting
-import magmaquiz.composeapp.generated.resources.home_nav
-import magmaquiz.composeapp.generated.resources.quizzes_nav
-import magmaquiz.composeapp.generated.resources.users_nav
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 actual fun MainNavMenu(
     navigator: Navigator,
-    navigateToHome: () -> Unit,
-    navigateToQuizzes: () -> Unit,
-    navigateToUsers: () -> Unit,
+    navigationState: NavigationState,
     navigateToUserProfile: () -> Unit,
     content: @Composable (() -> Unit)
 ) {
@@ -56,9 +49,9 @@ actual fun MainNavMenu(
     Scaffold(
         floatingActionButton = {
             AnimatedVisibilityFloatingButton(
-                isShown = navigator.backstack.last() == Route.Menus.Quizzes.QuizzesList,
+                isShown = navigationState.topLevelRoute == Route.Menus.Quizzes.QuizList,
                 onClick = {
-                    navigator.goTo(Route.Menus.Quizzes.CreateQuiz)
+                    navigator.navigate(Route.Menus.Quizzes.CreateQuiz)
                 }
             )
         },
@@ -81,40 +74,20 @@ actual fun MainNavMenu(
                         ) {
                             IconButton(
                                 modifier = Modifier.size(24.dp),
-                                onClick = {
-                                    navigator.goBack()
-                                },
-                                enabled = navigator.backstack.size > 1,
+                                onClick = navigator::goBack,
+                                enabled = navigator.currentBackStackSize() > 1
                             ) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
-                                    tint = if (navigator.backstack.size > 1) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outline,
+                                    tint = if (navigator.currentBackStackSize() > 1) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outline,
                                     contentDescription = "BackButton",
                                 )
                             }
-                            NavButton(
-                                isCurrentRoute = navigator.backstack.last() == Route.Menus.Home,
-                                onClick = {
-                                    navigateToHome()
-                                },
-                                contentLabel = stringResource(Res.string.home_nav),
-                                contentIcon = Icons.Default.Home
-                            )
-                            NavButton(
-                                isCurrentRoute = navigator.backstack.last() is Route.Menus.Quizzes,
-                                onClick = {
-                                    navigateToQuizzes()
-                                },
-                                contentLabel = stringResource(Res.string.quizzes_nav),
-                                contentIcon = Icons.Default.Quiz
-                            )
-                            NavButton(
-                                isCurrentRoute = navigator.backstack.last() is Route.Menus.Users,
-                                onClick = {
-                                    navigateToUsers()
-                                },
-                                contentLabel = stringResource(Res.string.users_nav),
-                                contentIcon = Icons.Default.Groups
+                            QuizNavigationBar(
+                                selectedKey = navigationState.topLevelRoute,
+                                onSelectKey = {
+                                    navigator.navigate(it)
+                                }
                             )
                         }
                         Text(

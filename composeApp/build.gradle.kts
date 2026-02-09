@@ -62,7 +62,6 @@ kotlin {
             api(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewModel)
-            implementation(libs.koin.compose.navigation3)
 
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.cio)

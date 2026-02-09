@@ -7,9 +7,9 @@ import com.github.projektmagma.magmaquiz.server.repository.FriendshipRepository
 import com.github.projektmagma.magmaquiz.server.repository.UserRepository
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkResource
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.User
-import io.ktor.http.*
+import io.ktor.http.HttpStatusCode
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import java.util.*
+import java.util.UUID
 
 class UsersDataController(
     private val userRepository: UserRepository,
@@ -27,7 +27,8 @@ class UsersDataController(
         val thisUser = userRepository.getUserData(session)
         val userList = userRepository.getUsersByName(userName)
         val usersMapped =
-            userList.map { it.toDomain(UserConversionCommand.ForeignUserWithSmallPicture(thisUser)) }
+            userList.filter { it.id != thisUser.id }
+                .map { it.toDomain(UserConversionCommand.ForeignUserWithSmallPicture(thisUser)) }
 
         return NetworkResource.Success(usersMapped, HttpStatusCode.PartialContent)
     }

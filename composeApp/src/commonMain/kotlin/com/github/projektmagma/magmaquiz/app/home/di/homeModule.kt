@@ -13,14 +13,11 @@ import com.github.projektmagma.magmaquiz.app.home.presentation.QuizzesListViewMo
 import com.github.projektmagma.magmaquiz.app.home.presentation.SettingsViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.UserDetailsViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.UsersViewModel
-import org.koin.core.annotation.KoinExperimentalAPI
-import org.koin.core.annotation.KoinViewModelScopeApi
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
-@OptIn(KoinExperimentalAPI::class, KoinViewModelScopeApi::class)
 val homeModule = module {
     // Quiz
     singleOf(::QuizService)
@@ -42,13 +39,4 @@ val homeModule = module {
     singleOf(::SettingsService)
     singleOf(::SettingsRepository)
     viewModelOf(::SettingsViewModel)
-    
-    // Navigation
-    includes(
-        homeNavigationModule, 
-        quizzesNavigationModule, 
-        settingsNavigationModule, 
-        usersNavigationModule,
-        gameNavigationModule
-    )
 }

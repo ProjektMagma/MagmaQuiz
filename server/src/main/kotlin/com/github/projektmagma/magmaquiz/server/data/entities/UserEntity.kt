@@ -7,6 +7,7 @@ import com.github.projektmagma.magmaquiz.server.data.tables.FriendshipsTable
 import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesTable
 import com.github.projektmagma.magmaquiz.server.data.tables.UsersTable
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
+import com.github.projektmagma.magmaquiz.shared.data.domain.FriendshipStatus
 import com.github.projektmagma.magmaquiz.shared.data.domain.ThisUser
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.User
 import org.jetbrains.exposed.v1.core.and
@@ -16,7 +17,7 @@ import org.jetbrains.exposed.v1.core.or
 import org.jetbrains.exposed.v1.dao.java.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
-import java.util.*
+import java.util.UUID
 
 class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapable<User, UserConversionCommand> {
     companion object : UUIDEntityClass<UserEntity>(UsersTable) {
@@ -62,8 +63,7 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
                         userProfilePicture = userSmallProfilePicture,
                         createdAt = createdAt.epochSecond,
                         lastActivity = lastActivity.epochSecond,
-                        isMyFriend = checkFriendship(command.caller, true),
-                        isFriendshipPending = checkFriendship(command.caller, false),
+                        friendshipStatus = checkFriendship(command.caller),
                     )
                 }
 
@@ -74,8 +74,7 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
                         userProfilePicture = userBigProfilePicture,
                         createdAt = createdAt.epochSecond,
                         lastActivity = lastActivity.epochSecond,
-                        isMyFriend = checkFriendship(command.caller, true),
-                        isFriendshipPending = checkFriendship(command.caller, false),
+                        friendshipStatus = checkFriendship(command.caller),
                     )
                 }
             }
@@ -94,14 +93,17 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
         return transaction { BCrypt.checkpw(password, userPassword) }
     }
 
-    private fun checkFriendship(otherUser: UserEntity, wasAccepted: Boolean): Boolean {
+    private fun checkFriendship(otherUser: UserEntity): FriendshipStatus {
         return transaction {
-            FriendshipEntity.find {
+            val friendship = FriendshipEntity.find {
                 (FriendshipsTable.userFrom eq otherUser.id and (FriendshipsTable.userTo eq this@UserEntity.id)) or
-                        (FriendshipsTable.userTo eq otherUser.id and (FriendshipsTable.userFrom eq this@UserEntity.id)) and FriendshipsTable.isActive and (FriendshipsTable.wasAccepted.eq(
-                    wasAccepted
-                ))
-            }.firstOrNull() != null
+                        (FriendshipsTable.userTo eq otherUser.id and (FriendshipsTable.userFrom eq this@UserEntity.id)) and FriendshipsTable.isActive
+            }.firstOrNull()
+
+            if (friendship == null) return@transaction FriendshipStatus.None
+            else if (friendship.wasAccepted) return@transaction FriendshipStatus.Friends
+            else if (friendship.userTo.id == otherUser.id) return@transaction FriendshipStatus.Incoming
+            else return@transaction FriendshipStatus.Outgoing
         }
     }
 
