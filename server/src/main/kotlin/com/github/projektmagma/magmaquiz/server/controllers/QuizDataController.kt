@@ -10,7 +10,6 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkResource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
 import io.ktor.http.*
-import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.*
 
 
@@ -115,7 +114,7 @@ class QuizDataController(
             ?: return NetworkResource.Error(HttpStatusCode.NotFound)
 
 
-        val quizList = profileUser.quizList.map {
+        val quizList = profileUser.getUserQuizzes().map {
             it.toDomain(QuizConversionCommand.WithUserNoQuestions(thisUser))
         }
 
@@ -165,7 +164,7 @@ class QuizDataController(
     fun quizFriendsQuizzes(session: UserSession): NetworkResource<List<Quiz>> {
         val thisUser = userRepository.getUserData(session)
         val quizzesList = mutableListOf<QuizEntity>()
-        friendshipRepository.userFriendList(thisUser).forEach { transaction { quizzesList.addAll(it.quizList) } }
+        friendshipRepository.userFriendList(thisUser).forEach { quizzesList.addAll(it.getUserQuizzes()) }
 
 
         return NetworkResource.Success(quizzesList.map {

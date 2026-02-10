@@ -41,7 +41,7 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
     var userBigProfilePicture by UsersTable.userBigProfilePicture
     var userSmallProfilePicture by UsersTable.userSmallProfilePicture
     var lastActivity by UsersTable.lastActivity
-    val quizList by QuizEntity referrersOn QuizzesTable.quizCreator
+    private val quizList by QuizEntity referrersOn QuizzesTable.quizCreator
 
     override fun toDomain(command: UserConversionCommand): User {
         return transaction {
@@ -124,5 +124,9 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
                         (QuizzesTable.id inList (favorites))
             }.toList()
         }
+    }
+
+    fun getUserQuizzes(): List<QuizEntity> {
+        return transaction { quizList.toList() }
     }
 }
