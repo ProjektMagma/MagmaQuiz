@@ -1,10 +1,22 @@
 package com.github.projektmagma.magmaquiz.app.core.presentation.navigation
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,11 +71,11 @@ actual fun MainNavMenu(
                             IconButton(
                                 modifier = Modifier.size(50.dp),
                                 onClick = navigator::goBack,
-                                enabled = navigator.currentBackStackSize() > 1
+                                enabled = navigator.currentBackStack().size > 1
                             ) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
-                                    tint = if (navigator.currentBackStackSize() > 1) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outline,
+                                    tint = if (navigator.currentBackStack().size > 1) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outline,
                                     contentDescription = "BackButton",
                                 )
                             }

@@ -1,7 +1,7 @@
 package com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create
 
 import com.github.projektmagma.magmaquiz.shared.data.domain.Answer
-import java.util.*
+import java.util.UUID
 
 data class AnswerModel(
     val id: UUID? = null,

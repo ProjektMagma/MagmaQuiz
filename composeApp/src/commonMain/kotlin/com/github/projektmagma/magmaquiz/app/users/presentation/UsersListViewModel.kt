@@ -7,9 +7,8 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.Netw
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
 import com.github.projektmagma.magmaquiz.app.core.util.withSearchDelay
 import com.github.projektmagma.magmaquiz.app.users.data.repository.UsersRepository
-import com.github.projektmagma.magmaquiz.app.users.presentation.model.UsersCommand
-import com.github.projektmagma.magmaquiz.app.users.presentation.model.UsersFilters
-import com.github.projektmagma.magmaquiz.app.users.presentation.model.UsersState
+import com.github.projektmagma.magmaquiz.app.users.presentation.model.list.UsersCommand
+import com.github.projektmagma.magmaquiz.app.users.presentation.model.list.UsersFilters
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenError
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
@@ -19,9 +18,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.*
 
-class UsersViewModel(
+class UsersListViewModel(
     private val usersRepository: UsersRepository
 ) : ViewModel() {
     private val _authChannel = Channel<NetworkEvent>()
@@ -30,7 +28,7 @@ class UsersViewModel(
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState = _uiState.asStateFlow()
     
-    private val _state = MutableStateFlow(UsersState())
+    private val _state = usersRepository.usersState
     val state = _state.asStateFlow()
 
     var searchLock = false
@@ -43,8 +41,6 @@ class UsersViewModel(
     fun onCommand(command: UsersCommand) {
         when (command) {
             is UsersCommand.UserList -> userList(command.withDelay)
-            is UsersCommand.SendFriendInvite -> sendInvite(command.uuid)
-            is UsersCommand.AcceptFriendInvite -> acceptInvite(command.uuid)
             is UsersCommand.FilterChanged -> {
                 _uiState.value = UiState.Loading
                 _state.update {
@@ -107,18 +103,6 @@ class UsersViewModel(
                 }
                 searchLock = false
             }
-        }
-    }
-    
-    private fun sendInvite(uuid: UUID){
-        viewModelScope.launch {
-            usersRepository.getSendFriendInvite(uuid)
-        }
-    }
-    
-    private fun acceptInvite(uuid: UUID){
-        viewModelScope.launch { 
-            usersRepository.getAcceptFriendInvite(uuid)
         }
     }
 }

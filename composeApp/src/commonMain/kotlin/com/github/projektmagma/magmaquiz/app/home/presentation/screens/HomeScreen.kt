@@ -20,8 +20,6 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiStat
 import com.github.projektmagma.magmaquiz.app.home.presentation.HomeViewModel
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuizCard
 import com.github.projektmagma.magmaquiz.app.users.presentation.components.UserCard
-import magmaquiz.composeapp.generated.resources.Res
-import magmaquiz.composeapp.generated.resources.send_invite
 import org.koin.compose.viewmodel.koinViewModel
 import java.util.*
 
@@ -110,8 +108,7 @@ fun HomeScreen(
                             UserCard(
                                 it,
                                 navigateToUserDetails = navigateToUserDetails,
-                                inviteButtonText = Res.string.send_invite,
-                                onInviteButtonClick = {},
+                                usersSharedViewModel = koinViewModel()
                             )
                         }
 

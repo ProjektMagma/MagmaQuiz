@@ -1,5 +1,6 @@
 package com.github.projektmagma.magmaquiz.app.core.presentation.navigation
 
+import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 
 class Navigator(val state: NavigationState) {
@@ -7,17 +8,16 @@ class Navigator(val state: NavigationState) {
         if (route in state.backStacks.keys) {
             state.topLevelRoute = route
         } else {
-            state.backStacks[state.topLevelRoute]?.add(route)
+            currentBackStack().add(route)
         }
     }
-
-    fun currentBackStackSize(): Int{
-        return state.backStacks[state.topLevelRoute]?.size ?: 0
+    
+    fun currentBackStack(): NavBackStack<NavKey>{
+        return state.backStacks[state.topLevelRoute] ?: error("NI MA")
     }
 
     fun goBack(){
-        val currentStack = state.backStacks[state.topLevelRoute]
-            ?: error("NI MA")
+        val currentStack = currentBackStack()
 
         val currentRoute = currentStack.last()
 

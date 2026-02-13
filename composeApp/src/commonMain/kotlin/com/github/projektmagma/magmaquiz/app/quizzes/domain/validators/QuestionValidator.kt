@@ -1,6 +1,8 @@
 package com.github.projektmagma.magmaquiz.app.quizzes.domain.validators
 
-import com.github.projektmagma.magmaquiz.app.quizzes.domain.validators.QuestionError.*
+import com.github.projektmagma.magmaquiz.app.quizzes.domain.validators.QuestionError.ANSWER_CONTENT_EMPTY
+import com.github.projektmagma.magmaquiz.app.quizzes.domain.validators.QuestionError.CONTENT_EMPTY
+import com.github.projektmagma.magmaquiz.app.quizzes.domain.validators.QuestionError.NO_CORRECT
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.QuestionModel
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Error
 import magmaquiz.composeapp.generated.resources.Res

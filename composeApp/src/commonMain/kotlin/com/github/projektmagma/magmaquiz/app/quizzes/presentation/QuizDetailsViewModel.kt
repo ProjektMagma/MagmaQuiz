@@ -10,7 +10,7 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSucc
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.UUID
 
 class QuizDetailsViewModel(
     private val id: UUID,

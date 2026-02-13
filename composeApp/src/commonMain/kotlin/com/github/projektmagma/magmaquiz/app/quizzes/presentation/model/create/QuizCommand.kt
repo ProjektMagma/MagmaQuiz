@@ -1,6 +1,6 @@
 package com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create
 
-import java.util.*
+import java.util.UUID
 
 sealed interface QuizCommand {
     sealed interface QuizProperties : QuizCommand {

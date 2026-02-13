@@ -3,7 +3,7 @@ package com.github.projektmagma.magmaquiz.app.quizzes.presentation.components
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
-import java.util.*
+import java.util.UUID
 
 @Composable
 expect fun QuizCard(

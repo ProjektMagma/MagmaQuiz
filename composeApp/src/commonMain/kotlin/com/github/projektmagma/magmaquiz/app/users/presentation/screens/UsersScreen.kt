@@ -11,26 +11,31 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.projektmagma.magmaquiz.app.core.presentation.components.*
+import com.github.projektmagma.magmaquiz.app.core.presentation.components.AutoScalableLazyColumn
+import com.github.projektmagma.magmaquiz.app.core.presentation.components.FilterButton
+import com.github.projektmagma.magmaquiz.app.core.presentation.components.FullSizeCircularProgressIndicator
+import com.github.projektmagma.magmaquiz.app.core.presentation.components.FullSizeErrorIndicator
+import com.github.projektmagma.magmaquiz.app.core.presentation.components.SearchTextField
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
-import com.github.projektmagma.magmaquiz.app.users.presentation.UsersViewModel
+import com.github.projektmagma.magmaquiz.app.users.presentation.UsersListViewModel
+import com.github.projektmagma.magmaquiz.app.users.presentation.UsersSharedViewModel
 import com.github.projektmagma.magmaquiz.app.users.presentation.components.UserCard
-import com.github.projektmagma.magmaquiz.app.users.presentation.model.UsersCommand
-import com.github.projektmagma.magmaquiz.app.users.presentation.model.UsersFilters
+import com.github.projektmagma.magmaquiz.app.users.presentation.model.list.UsersCommand
+import com.github.projektmagma.magmaquiz.app.users.presentation.model.list.UsersFilters
 import magmaquiz.composeapp.generated.resources.Res
-import magmaquiz.composeapp.generated.resources.send_invite
 import magmaquiz.composeapp.generated.resources.username
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-import java.util.*
+import java.util.UUID
 
 @Composable
 fun UsersScreen(
     navigateToUserDetails: (id: UUID) -> Unit
 ) {
-    val usersViewModel: UsersViewModel = koinViewModel()
-    val state by usersViewModel.state.collectAsStateWithLifecycle()
-    val uiState by usersViewModel.uiState.collectAsStateWithLifecycle()
+    val usersListViewModel: UsersListViewModel = koinViewModel()
+    val usersSharedViewModel: UsersSharedViewModel = koinViewModel()
+    val state by usersListViewModel.state.collectAsStateWithLifecycle()
+    val uiState by usersListViewModel.uiState.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -41,11 +46,11 @@ fun UsersScreen(
             searchedText = state.username,
             labelText = stringResource(Res.string.username),
             onSearch = {
-                usersViewModel.onCommand(UsersCommand.UserList(false))
+                usersListViewModel.onCommand(UsersCommand.UserList(false))
             },
             onValueChange = {
-                usersViewModel.onCommand(UsersCommand.UsernameChanged(it))
-                usersViewModel.onCommand(UsersCommand.UserList(true))
+                usersListViewModel.onCommand(UsersCommand.UsernameChanged(it))
+                usersListViewModel.onCommand(UsersCommand.UserList(true))
             }
         )
 
@@ -57,7 +62,7 @@ fun UsersScreen(
                 FilterButton(
                     selected = state.usersFilter == UsersFilters.Friends,
                     onClick = {
-                        usersViewModel.onCommand(UsersCommand.FilterChanged(UsersFilters.Friends))
+                        usersListViewModel.onCommand(UsersCommand.FilterChanged(UsersFilters.Friends))
                     },
                     contentLabel = "Friends",
                     contentIcon = Icons.Default.Group
@@ -68,7 +73,7 @@ fun UsersScreen(
                 FilterButton(
                     selected = state.usersFilter == UsersFilters.SentInvitations,
                     onClick = {
-                        usersViewModel.onCommand(UsersCommand.FilterChanged(UsersFilters.SentInvitations))
+                        usersListViewModel.onCommand(UsersCommand.FilterChanged(UsersFilters.SentInvitations))
                     },
                     contentLabel = "Sent invitations",
                     contentIcon = Icons.Filled.Mail
@@ -79,7 +84,7 @@ fun UsersScreen(
                 FilterButton(
                     selected = state.usersFilter == UsersFilters.IncomingInvitations,
                     onClick = {
-                        usersViewModel.onCommand(UsersCommand.FilterChanged(UsersFilters.IncomingInvitations))
+                        usersListViewModel.onCommand(UsersCommand.FilterChanged(UsersFilters.IncomingInvitations))
                     },
                     contentLabel = "Incoming invitations",
                     contentIcon = Icons.Filled.PersonAdd
@@ -91,18 +96,17 @@ fun UsersScreen(
             is UiState.Error -> FullSizeErrorIndicator(
                 message = (uiState as UiState.Error).errorMessage,
                 onRetry = {
-                    usersViewModel.onCommand(UsersCommand.UserList(false))
+                    usersListViewModel.onCommand(UsersCommand.UserList(false))
                 })
 
             UiState.Loading -> FullSizeCircularProgressIndicator()
             UiState.Success ->
                 AutoScalableLazyColumn(state.usersList, key = { it.userId!! }) { user ->
                     UserCard(
-                        user,
-                        navigateToUserDetails = { navigateToUserDetails(it) },
-                        inviteButtonText = Res.string.send_invite,
-                        onInviteButtonClick = { usersViewModel.onCommand(UsersCommand.SendFriendInvite(it)) }
-                    )
+                        user, 
+                        usersSharedViewModel,
+                        navigateToUserDetails = { navigateToUserDetails(it) }
+                    )  
                 }
         }
 

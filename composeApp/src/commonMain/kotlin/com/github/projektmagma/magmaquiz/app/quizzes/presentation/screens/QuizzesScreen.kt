@@ -1,6 +1,10 @@
 package com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -13,16 +17,25 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.projektmagma.magmaquiz.app.core.presentation.components.*
+import com.github.projektmagma.magmaquiz.app.core.presentation.components.AutoScalableLazyColumn
+import com.github.projektmagma.magmaquiz.app.core.presentation.components.FilterButton
+import com.github.projektmagma.magmaquiz.app.core.presentation.components.FullSizeCircularProgressIndicator
+import com.github.projektmagma.magmaquiz.app.core.presentation.components.FullSizeErrorIndicator
+import com.github.projektmagma.magmaquiz.app.core.presentation.components.SearchTextField
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.QuizzesListViewModel
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuizCard
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.QuizFilters
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.QuizListCommand
-import magmaquiz.composeapp.generated.resources.*
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.favorites
+import magmaquiz.composeapp.generated.resources.friends_quizzes
+import magmaquiz.composeapp.generated.resources.most_liked
+import magmaquiz.composeapp.generated.resources.quiz_title
+import magmaquiz.composeapp.generated.resources.recently_added
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-import java.util.*
+import java.util.UUID
 
 @Composable
 fun QuizzesScreen(

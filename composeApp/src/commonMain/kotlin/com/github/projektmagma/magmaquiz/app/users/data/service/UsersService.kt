@@ -4,9 +4,9 @@ import com.github.projektmagma.magmaquiz.app.core.data.networking.safeCall
 import com.github.projektmagma.magmaquiz.app.core.domain.NetworkError
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Resource
-import io.ktor.client.*
-import io.ktor.client.request.*
-import java.util.*
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import java.util.UUID
 
 class UsersService(
     private val httpClient: HttpClient,

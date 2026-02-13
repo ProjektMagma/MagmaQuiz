@@ -11,7 +11,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
-import androidx.navigation3.runtime.*
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.github.projektmagma.magmaquiz.app.auth.data.AuthRepository
@@ -87,7 +91,10 @@ fun Navigation(
         entryProvider = entryProvider {
             entry<Route.Auth> {
                 AuthNavigation(
-                    navigateToMain = { mainBackStack.add(Route.Menus) }
+                    navigateToMain = {
+                        mainBackStack.clear()
+                        mainBackStack.add(Route.Menus)
+                    }
                 )
             }
             entry<Route.Menus> {
@@ -99,7 +106,11 @@ fun Navigation(
                     MainNavigation(
                         navigator = navigator,
                         navigationState = navigationState,
-                        navigateToAuth = { mainBackStack.add(Route.Auth) },
+                        navigateToAuth = {
+                            mainBackStack.clear()
+                            navigationState.resetAllBackStacks()
+                            mainBackStack.add(Route.Auth)
+                        },
                         navigateToGameScreen = { mainBackStack.add(Route.Game) }
                     )
                 }

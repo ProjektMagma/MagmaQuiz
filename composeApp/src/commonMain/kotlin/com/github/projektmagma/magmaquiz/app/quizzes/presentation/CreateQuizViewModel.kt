@@ -10,7 +10,11 @@ import com.github.projektmagma.magmaquiz.app.quizzes.data.repository.QuizReposit
 import com.github.projektmagma.magmaquiz.app.quizzes.domain.validators.toResId
 import com.github.projektmagma.magmaquiz.app.quizzes.domain.validators.validateQuestion
 import com.github.projektmagma.magmaquiz.app.quizzes.domain.validators.validateQuiz
-import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.*
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.AnswerModel
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.CreateQuizState
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.QuestionModel
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.QuizCommand
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.toQuestionModel
 import com.github.projektmagma.magmaquiz.shared.data.domain.Answer
 import com.github.projektmagma.magmaquiz.shared.data.domain.Question
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Resource
@@ -21,7 +25,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.UUID
 
 class CreateQuizViewModel(
     private val quizRepository: QuizRepository

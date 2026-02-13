@@ -7,14 +7,13 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
 import com.github.projektmagma.magmaquiz.app.quizzes.data.repository.QuizRepository
 import com.github.projektmagma.magmaquiz.app.users.data.repository.UsersRepository
-import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.User
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenError
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.UUID
 
 class UserDetailsViewModel(
     private val quizRepository: QuizRepository,
@@ -27,7 +26,7 @@ class UserDetailsViewModel(
     private val _quizzes = quizRepository.userDetailsQuizList
     val quizzes = _quizzes.asStateFlow()
     
-    private val _user = MutableStateFlow<User?>(null)
+    private val _user = usersRepository.user
     val user = _user.asStateFlow()
     
     fun checkOwnership(id: UUID): Boolean{
