@@ -3,6 +3,7 @@ package com.github.projektmagma.magmaquiz.server.data.entities
 import com.github.projektmagma.magmaquiz.server.data.abstraction.DomainCapable
 import com.github.projektmagma.magmaquiz.server.data.abstraction.ExtUUIDEntity
 import com.github.projektmagma.magmaquiz.server.data.conversion.UserConversionCommand
+import com.github.projektmagma.magmaquiz.server.data.tables.FavoriteQuizzesTable
 import com.github.projektmagma.magmaquiz.server.data.tables.FriendshipsTable
 import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesTable
 import com.github.projektmagma.magmaquiz.server.data.tables.UsersTable
@@ -13,6 +14,7 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.User
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.inList
 import org.jetbrains.exposed.v1.core.or
 import org.jetbrains.exposed.v1.dao.java.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -39,7 +41,7 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
     var userBigProfilePicture by UsersTable.userBigProfilePicture
     var userSmallProfilePicture by UsersTable.userSmallProfilePicture
     var lastActivity by UsersTable.lastActivity
-    val quizList by QuizEntity referrersOn QuizzesTable.quizCreator
+    private val quizList by QuizEntity referrersOn QuizzesTable.quizCreator
 
     override fun toDomain(command: UserConversionCommand): User {
         return transaction {
@@ -107,4 +109,24 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
         }
     }
 
+
+    fun favoriteQuizzes(): List<QuizEntity> {
+        return transaction {
+            val favorites =
+                FavoriteQuizzesEntity.find {
+                    FavoriteQuizzesTable.user eq this@UserEntity.id and
+                            (FavoriteQuizzesTable.isActive)
+                }
+                    .map { it.quiz.id }
+            QuizEntity.find {
+                QuizzesTable.isActive eq true and
+                        (QuizzesTable.isPublic eq true or (QuizzesTable.quizCreator eq this@UserEntity.id)) and
+                        (QuizzesTable.id inList (favorites))
+            }.toList()
+        }
+    }
+
+    fun getUserQuizzes(): List<QuizEntity> {
+        return transaction { quizList.toList() }
+    }
 }

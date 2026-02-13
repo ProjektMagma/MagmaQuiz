@@ -5,6 +5,7 @@ import com.github.projektmagma.magmaquiz.server.controllers.QuizDataController
 import com.github.projektmagma.magmaquiz.server.controllers.SettingsDataController
 import com.github.projektmagma.magmaquiz.server.controllers.UsersDataController
 import com.github.projektmagma.magmaquiz.server.repository.FriendshipRepository
+import com.github.projektmagma.magmaquiz.server.repository.QuizRepository
 import com.github.projektmagma.magmaquiz.server.repository.UserRepository
 import com.github.projektmagma.magmaquiz.server.storage.ExposedSessionStorage
 import io.ktor.server.application.*
@@ -25,6 +26,7 @@ val serverMainModule = module {
 
     singleOf(::UserRepository)
     singleOf(::FriendshipRepository)
+    singleOf(::QuizRepository)
 
     singleOf(::AuthDataController)
     singleOf(::SettingsDataController)

@@ -35,15 +35,22 @@ class FriendshipRepository {
 
     fun userInvitations(user: UserEntity, incoming: Boolean): List<UserEntity> {
         return transaction {
-            FriendshipEntity.find {
-                if (incoming) FriendshipsTable.userTo eq user.id else FriendshipsTable.userFrom eq user.id and
-                        FriendshipsTable.isActive and FriendshipsTable.wasAccepted.eq(false)
-            }.filter { !it.wasAccepted }
-                .map {
-                    if (incoming)
+            if (incoming)
+                FriendshipEntity.find {
+                    FriendshipsTable.userTo eq user.id and
+                            FriendshipsTable.isActive.eq(true)
+                }.filter { !it.wasAccepted }
+                    .map {
                         it.userFrom
-                    else it.userTo
-                }
+                    }
+            else
+                FriendshipEntity.find {
+                    FriendshipsTable.userFrom eq user.id and
+                            FriendshipsTable.isActive.eq(true)
+                }.filter { !it.wasAccepted }
+                    .map {
+                        it.userTo
+                    }
         }
     }
 }

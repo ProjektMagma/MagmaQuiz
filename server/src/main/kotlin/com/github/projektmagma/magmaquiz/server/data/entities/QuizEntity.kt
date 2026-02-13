@@ -19,7 +19,14 @@ import java.util.*
 
 class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable),
     DomainCapable<Quiz, QuizConversionCommand> {
-    companion object : UUIDEntityClass<QuizEntity>(QuizzesTable)
+    companion object : UUIDEntityClass<QuizEntity>(QuizzesTable) {
+
+        fun isQuizNameTaken(newQuizName: String): Boolean {
+            return transaction {
+                find { QuizzesTable.quizName eq newQuizName and QuizzesTable.isActive }.firstOrNull() != null
+            }
+        }
+    }
 
     var quizCreator by UserEntity referencedOn QuizzesTable.quizCreator
     var quizName by QuizzesTable.quizName
@@ -92,5 +99,9 @@ class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable),
             FavoriteQuizzesEntity.find { FavoriteQuizzesTable.quiz eq this@QuizEntity.id and (FavoriteQuizzesTable.user eq user.id) and (FavoriteQuizzesTable.isActive) }
                 .firstOrNull() != null
         }
+    }
+
+    fun isUserCreator(userEntity: UserEntity): Boolean {
+        return transaction { userEntity.id == quizCreator }
     }
 }
