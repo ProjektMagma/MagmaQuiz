@@ -44,6 +44,7 @@ fun FriendshipButtons(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 WideTonalButton(
+                    modifier = Modifier.weight(1f),
                     text = Res.string.accept,
                     action = {
                         usersSharedViewModel.onCommand(
@@ -52,6 +53,7 @@ fun FriendshipButtons(
                     }
                 )
                 WideTonalButton(
+                    modifier = Modifier.weight(1f),
                     text = Res.string.reject,
                     action = {
                         usersSharedViewModel.onCommand(
@@ -88,9 +90,10 @@ fun FriendshipButtons(
 fun WideTonalButton(
     text: StringResource,
     action: () -> Unit,
+    modifier: Modifier = Modifier
 ){
     FilledTonalButton(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
         onClick = { action() }
     ) {
