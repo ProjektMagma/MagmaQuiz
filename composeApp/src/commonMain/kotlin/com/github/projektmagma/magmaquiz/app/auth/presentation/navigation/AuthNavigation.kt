@@ -17,9 +17,9 @@ import androidx.savedstate.serialization.SavedStateConfiguration
 import com.github.projektmagma.magmaquiz.app.auth.presentation.screens.LoginScreen
 import com.github.projektmagma.magmaquiz.app.auth.presentation.screens.OnBoardingScreen
 import com.github.projektmagma.magmaquiz.app.auth.presentation.screens.RegisterScreen
+import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.CustomWindowDraggableArea
 import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.Route
 import com.github.projektmagma.magmaquiz.app.core.presentation.screens.ServerConfigScreen
-import com.github.projektmagma.magmaquiz.app.home.presentation.navigation.CustomWindowDraggableArea
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 

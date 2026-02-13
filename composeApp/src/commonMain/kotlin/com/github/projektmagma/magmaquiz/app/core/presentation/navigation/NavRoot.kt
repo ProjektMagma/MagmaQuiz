@@ -21,12 +21,9 @@ import androidx.savedstate.serialization.SavedStateConfiguration
 import com.github.projektmagma.magmaquiz.app.auth.data.AuthRepository
 import com.github.projektmagma.magmaquiz.app.auth.presentation.navigation.AuthNavigation
 import com.github.projektmagma.magmaquiz.app.core.presentation.RootViewModel
+import com.github.projektmagma.magmaquiz.app.core.presentation.components.FullSizeCircularProgressIndicator
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.AuthState
-import com.github.projektmagma.magmaquiz.app.home.presentation.components.FullSizeCircularProgressIndicator
-import com.github.projektmagma.magmaquiz.app.home.presentation.navigation.CustomWindowDraggableArea
-import com.github.projektmagma.magmaquiz.app.home.presentation.navigation.GameNavigation
-import com.github.projektmagma.magmaquiz.app.home.presentation.navigation.HomeNavigation
-import com.github.projektmagma.magmaquiz.app.home.presentation.navigation.MainNavMenu
+import com.github.projektmagma.magmaquiz.app.game.presentation.navigation.GameNavigation
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import org.koin.compose.koinInject
@@ -106,7 +103,7 @@ fun Navigation(
                     navigationState = navigationState,
                     navigateToUserProfile = { navigator.navigate(Route.Menus.Users.UserDetails(authRepository.thisUser.value?.userId!!)) },
                 ) {
-                    HomeNavigation(
+                    MainNavigation(
                         navigator = navigator,
                         navigationState = navigationState,
                         navigateToAuth = {

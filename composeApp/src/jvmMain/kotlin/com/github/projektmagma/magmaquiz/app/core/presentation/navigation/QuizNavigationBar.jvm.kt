@@ -3,7 +3,7 @@ package com.github.projektmagma.magmaquiz.app.core.presentation.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavKey
-import com.github.projektmagma.magmaquiz.app.home.presentation.components.NavButton
+import com.github.projektmagma.magmaquiz.app.core.presentation.components.NavButton
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
