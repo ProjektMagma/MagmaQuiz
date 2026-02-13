@@ -94,7 +94,10 @@ fun Navigation(
         entryProvider = entryProvider {
             entry<Route.Auth> {
                 AuthNavigation(
-                    navigateToMain = { mainBackStack.add(Route.Menus) }
+                    navigateToMain = {
+                        mainBackStack.clear()
+                        mainBackStack.add(Route.Menus)
+                    }
                 )
             }
             entry<Route.Menus> {
@@ -106,7 +109,11 @@ fun Navigation(
                     HomeNavigation(
                         navigator = navigator,
                         navigationState = navigationState,
-                        navigateToAuth = { mainBackStack.add(Route.Auth) },
+                        navigateToAuth = {
+                            mainBackStack.clear()
+                            navigationState.resetAllBackStacks()
+                            mainBackStack.add(Route.Auth)
+                        },
                         navigateToGameScreen = { mainBackStack.add(Route.Game) }
                     )
                 }

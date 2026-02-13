@@ -12,7 +12,8 @@ import com.github.projektmagma.magmaquiz.app.home.presentation.QuizDetailsViewMo
 import com.github.projektmagma.magmaquiz.app.home.presentation.QuizzesListViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.SettingsViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.UserDetailsViewModel
-import com.github.projektmagma.magmaquiz.app.home.presentation.UsersViewModel
+import com.github.projektmagma.magmaquiz.app.home.presentation.UsersListViewModel
+import com.github.projektmagma.magmaquiz.app.home.presentation.UsersSharedViewModel
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
@@ -25,6 +26,7 @@ val homeModule = module {
     viewModelOf(::QuizzesListViewModel)
     viewModelOf(::GameQuizViewModel)
     viewModelOf(::CreateQuizViewModel)
+    viewModelOf(::UsersSharedViewModel)
     viewModel { parameters ->
         QuizDetailsViewModel(id = parameters.get(), quizRepository = get())
     }
@@ -32,7 +34,7 @@ val homeModule = module {
     // Users
     singleOf(::UsersService)
     singleOf(::UsersRepository)
-    viewModelOf(::UsersViewModel)
+    viewModelOf(::UsersListViewModel)
     viewModelOf(::UserDetailsViewModel)
 
     // Settings

@@ -66,7 +66,7 @@ fun HomeNavigation(
                 entry<Route.Menus.Quizzes.CreateQuiz> {
                     CreateQuizScreen(
                         navigateToQuestionCreate = {
-                            navigator.navigate(Route.Menus.Quizzes.CreateQuiz)
+                            navigator.navigate(Route.Menus.Quizzes.CreateQuestion(it))
                         },
                         navigateBack = {
                             navigator.goBack()

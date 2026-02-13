@@ -59,35 +59,35 @@ class QuizRepository(
         }
     }
 
-suspend fun getMyFavorites(): Resource<List<Quiz>, NetworkError> {
-    return quizService.getMyFavorites()
-}
-
-suspend fun createQuiz(quiz: CreateOrModifyQuizValue): Resource<Unit, NetworkError> {
-    return quizService.createQuiz(quiz)
-}
-
-suspend fun modifyQuiz(quiz: CreateOrModifyQuizValue): Resource<Unit, NetworkError> {
-    return quizService.modifyQuiz(quiz)
-}
-
-suspend fun getQuizzesByUserId(id: UUID): Resource<List<Quiz>, NetworkError> {
-    return quizService.getQuizzesByUserId(id)
-}
-
-suspend fun deleteQuiz(id: UUID): Resource<Unit, NetworkError> {
-    return quizService.deleteQuiz(id)
-}
-
-suspend fun getFriendsQuizzes(): Resource<List<Quiz>, NetworkError> {
-    return quizService.getFriendsQuizzes()
-}
-
-suspend fun getRecentlyAddedQuizzes(): Resource<List<Quiz>, NetworkError> {
-    return quizService.getRecentlyAddedQuizzes()
-}
-
-suspend fun getMostLikedQuizzes(): Resource<List<Quiz>, NetworkError> {
-    return quizService.getMostLikedQuizzes()
-}
+    suspend fun getMyFavorites(): Resource<List<Quiz>, NetworkError> {
+        return quizService.getMyFavorites()
+    }
+    
+    suspend fun createQuiz(quiz: CreateOrModifyQuizValue): Resource<Unit, NetworkError> {
+        return quizService.createQuiz(quiz)
+    }
+    
+    suspend fun modifyQuiz(quiz: CreateOrModifyQuizValue): Resource<Unit, NetworkError> {
+        return quizService.modifyQuiz(quiz)
+    }
+    
+    suspend fun getQuizzesByUserId(id: UUID): Resource<List<Quiz>, NetworkError> {
+        return quizService.getQuizzesByUserId(id)
+    }
+    
+    suspend fun deleteQuiz(id: UUID): Resource<Unit, NetworkError> {
+        return quizService.deleteQuiz(id)
+    }
+    
+    suspend fun getFriendsQuizzes(): Resource<List<Quiz>, NetworkError> {
+        return quizService.getFriendsQuizzes()
+    }
+    
+    suspend fun getRecentlyAddedQuizzes(): Resource<List<Quiz>, NetworkError> {
+        return quizService.getRecentlyAddedQuizzes()
+    }
+    
+    suspend fun getMostLikedQuizzes(): Resource<List<Quiz>, NetworkError> {
+        return quizService.getMostLikedQuizzes()
+    }
 }

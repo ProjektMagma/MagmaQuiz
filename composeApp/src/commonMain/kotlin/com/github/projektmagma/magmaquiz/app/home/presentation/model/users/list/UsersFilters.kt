@@ -1,4 +1,4 @@
-package com.github.projektmagma.magmaquiz.app.home.presentation.model.users
+package com.github.projektmagma.magmaquiz.app.home.presentation.model.users.list
 
 interface UsersFilters {
     data object None: UsersFilters

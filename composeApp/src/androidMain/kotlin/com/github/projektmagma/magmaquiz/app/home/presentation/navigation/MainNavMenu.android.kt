@@ -43,7 +43,7 @@ actual fun MainNavMenu(
         floatingActionButtonPosition = FabPosition.Center,
         floatingActionButton = {
             AnimatedVisibilityFloatingButton(
-                isShown = navigationState.topLevelRoute == Route.Menus.Quizzes.QuizList,
+                isShown = navigator.currentBackStack().last() == Route.Menus.Quizzes.QuizList,
                 animationPositionMultiplier = 4,
                 onClick = {
                     navigator.navigate(Route.Menus.Quizzes.CreateQuiz)

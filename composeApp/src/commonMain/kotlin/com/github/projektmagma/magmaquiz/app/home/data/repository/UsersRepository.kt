@@ -2,14 +2,19 @@ package com.github.projektmagma.magmaquiz.app.home.data.repository
 
 import com.github.projektmagma.magmaquiz.app.core.domain.NetworkError
 import com.github.projektmagma.magmaquiz.app.home.data.service.UsersService
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.users.UsersState
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Resource
-import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
+import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.User
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.UUID
 
 class UsersRepository(
     private val usersService: UsersService
 ) { 
+    val usersState = MutableStateFlow(UsersState())
+    val user = MutableStateFlow<User?>(null)
+    
     suspend fun getFindUsersByName(name: String): Resource<List<ForeignUser>, NetworkError> {
         return usersService.getFindUsersByName(name)
     }
@@ -34,10 +39,7 @@ class UsersRepository(
         return usersService.getSendFriendInvite(uuid)
     }
     
-    suspend fun getAcceptFriendInvite(uuid: UUID): Boolean {
-        var wasAccepted = false
-        usersService.getAcceptFriendInvite(uuid)
-            .whenSuccess { wasAccepted = true }
-        return wasAccepted
+    suspend fun getAcceptFriendInvite(uuid: UUID): Resource<Unit, NetworkError> {
+        return usersService.getAcceptFriendInvite(uuid)
     }
 }

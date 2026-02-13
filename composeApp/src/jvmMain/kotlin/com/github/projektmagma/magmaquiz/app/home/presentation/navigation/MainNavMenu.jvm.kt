@@ -75,11 +75,11 @@ actual fun MainNavMenu(
                             IconButton(
                                 modifier = Modifier.size(24.dp),
                                 onClick = navigator::goBack,
-                                enabled = navigator.currentBackStackSize() > 1
+                                enabled = navigator.currentBackStack().size > 1
                             ) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
-                                    tint = if (navigator.currentBackStackSize() > 1) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outline,
+                                    tint = if (navigator.currentBackStack().size > 1) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outline,
                                     contentDescription = "BackButton",
                                 )
                             }

@@ -35,6 +35,14 @@ class NavigationState(
         } else {
             listOf(startRoute, topLevelRoute)
         }
+
+    fun resetAllBackStacks() {
+        backStacks.forEach { (key, stack) -> 
+            stack.clear()
+            stack.add(key)
+        }
+        topLevelRoute = startRoute
+    }
 }
 
 @Composable

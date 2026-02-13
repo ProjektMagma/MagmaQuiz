@@ -39,11 +39,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
 import com.github.projektmagma.magmaquiz.app.home.presentation.CreateQuizViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.UserDetailsViewModel
+import com.github.projektmagma.magmaquiz.app.home.presentation.UsersSharedViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.ContentImage
+import com.github.projektmagma.magmaquiz.app.home.presentation.components.FriendshipButtons
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.FullSizeCircularProgressIndicator
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.FullSizeErrorIndicator
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.ProfilePictureIcon
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.quizzes.create.QuizCommand
+import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.delete
 import magmaquiz.composeapp.generated.resources.edit
@@ -58,10 +61,11 @@ fun UserDetailsScreen(
     navigateToQuizDetails: (id: UUID) -> Unit,
     navigateToSettingsScreen: () -> Unit,
     userDetailsViewModel: UserDetailsViewModel = koinViewModel(),
-    createQuizViewModel: CreateQuizViewModel = koinViewModel(),
+    createQuizViewModel: CreateQuizViewModel = koinViewModel(), 
+    usersSharedViewModel: UsersSharedViewModel = koinViewModel()
 ) {
     val quizzes by userDetailsViewModel.quizzes.collectAsStateWithLifecycle()
-    val user by userDetailsViewModel.user.collectAsStateWithLifecycle()
+    val user by usersSharedViewModel.user.collectAsStateWithLifecycle()
     val uiState by userDetailsViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit){
@@ -121,6 +125,15 @@ fun UserDetailsScreen(
                                     )
                                 }
                             }
+                        }
+
+                        val foreignUser = user as? ForeignUser
+
+                        if (foreignUser != null) {
+                            FriendshipButtons(
+                                user = foreignUser,
+                                usersSharedViewModel
+                            )
                         }
                     }
                 }

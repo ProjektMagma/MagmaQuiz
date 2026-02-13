@@ -82,6 +82,11 @@
     <string name="friends_quizzes">Friends quizzes</string>
     <string name="recently_added">Recently added</string>
     <string name="send_invite">Send invite</string>
+    <string name="accept">Accept</string>
+    <string name="cancel">Cancel</string>
+    <string name="reject">Reject</string>
+    <string name="delete_friend">Delete friend</string>
+    <string name="friends">Friends</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
 </resources>

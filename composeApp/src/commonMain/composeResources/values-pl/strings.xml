@@ -80,6 +80,11 @@
     <string name="friends_quizzes">Quizy znajomych</string>
     <string name="recently_added">Ostatnio dodane</string>
     <string name="send_invite">Wyślij zaproszenie</string>
+    <string name="accept">Zaakceptuj</string>
+    <string name="reject">Odrzuć</string>
+    <string name="delete_friend">Usuń znajomego</string>
+    <string name="cancel">Anuluj zaproszenie</string>
+    <string name="friends">Znajomi</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
 </resources>
