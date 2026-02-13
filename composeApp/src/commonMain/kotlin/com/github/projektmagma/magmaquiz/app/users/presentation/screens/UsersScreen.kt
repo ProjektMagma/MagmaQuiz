@@ -37,8 +37,7 @@ fun UsersScreen(
     ) {
         SearchTextField(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp),
+                .fillMaxWidth(),
             searchedText = state.username,
             labelText = stringResource(Res.string.username),
             onSearch = {
@@ -51,7 +50,7 @@ fun UsersScreen(
         )
 
         LazyRow(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             item {
@@ -99,11 +98,11 @@ fun UsersScreen(
             UiState.Success ->
                 AutoScalableLazyColumn(state.usersList, key = { it.userId!! }) { user ->
                     UserCard(
-                        user, 
+                        user,
                         navigateToUserDetails = { navigateToUserDetails(it) },
                         inviteButtonText = Res.string.send_invite,
                         onInviteButtonClick = { usersViewModel.onCommand(UsersCommand.SendFriendInvite(it)) }
-                    )  
+                    )
                 }
         }
 

@@ -72,6 +72,7 @@ actual fun MainNavMenu(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding(horizontal = 4.dp)
                     .weight(1f),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally

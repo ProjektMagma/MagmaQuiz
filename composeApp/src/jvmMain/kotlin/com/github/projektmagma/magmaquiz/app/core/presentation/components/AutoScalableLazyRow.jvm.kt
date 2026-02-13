@@ -1,12 +1,14 @@
 package com.github.projektmagma.magmaquiz.app.core.presentation.components
 
+import androidx.compose.foundation.HorizontalScrollbar
 import androidx.compose.foundation.ScrollbarStyle
-import androidx.compose.foundation.VerticalScrollbar
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -16,13 +18,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-actual fun <T> AutoScalableLazyColumn(
+actual fun <T> AutoScalableLazyRow(
     itemList: List<T>,
     key: ((T) -> Any)?,
     contentEmptyMessage: String,
     content: @Composable ((T) -> Unit)
 ) {
-    val state = rememberLazyGridState()
+
+    val state = rememberLazyListState()
 
     if (itemList.isEmpty())
         Column(
@@ -37,28 +40,15 @@ actual fun <T> AutoScalableLazyColumn(
         }
     else
 
-        Row(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            LazyVerticalGrid(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .weight(1f)
-                    .widthIn(max = 512.dp),
-                columns = GridCells.Adaptive(450.dp),
-                contentPadding = PaddingValues(8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                state = state
-            ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            LazyRow(modifier = Modifier.fillMaxWidth(), state = state) {
                 items(itemList, key = key) {
                     content(it)
                 }
             }
 
-            VerticalScrollbar(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(start = 4.dp, bottom = 16.dp),
+            HorizontalScrollbar(
+                modifier = Modifier.fillMaxWidth(),
                 adapter = rememberScrollbarAdapter(scrollState = state),
                 style = ScrollbarStyle(
                     minimalHeight = 10.dp,
@@ -69,6 +59,5 @@ actual fun <T> AutoScalableLazyColumn(
                     hoverColor = MaterialTheme.colorScheme.secondaryContainer
                 )
             )
-
         }
 }

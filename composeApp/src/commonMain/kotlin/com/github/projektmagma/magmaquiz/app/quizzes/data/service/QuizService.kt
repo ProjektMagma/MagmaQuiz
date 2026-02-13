@@ -45,7 +45,7 @@ class QuizService(
             }
         }
     }
-    
+
     suspend fun modifyQuiz(quiz: CreateOrModifyQuizValue): Resource<Unit, NetworkError> {
         return safeCall<Unit> {
             httpClient.post("quiz/modify") {
@@ -60,26 +60,28 @@ class QuizService(
             httpClient.get("quiz/findByUser/$id")
         }
     }
-    
+
     suspend fun deleteQuiz(id: UUID): Resource<Unit, NetworkError> {
         return safeCall<Unit> {
             httpClient.delete("quiz/$id")
         }
     }
 
-    suspend fun getMostLikedQuizzes(count: Long = 100): Resource<List<Quiz>, NetworkError> {
+    suspend fun getMostLikedQuizzes(count: Long): Resource<List<Quiz>, NetworkError> {
         return safeCall<List<Quiz>> {
             httpClient.get("quiz/mostLiked/${count}")
         }
     }
 
-    suspend fun getFriendsQuizzes(): Resource<List<Quiz>, NetworkError> {
+    suspend fun getFriendsQuizzes(count: Long): Resource<List<Quiz>, NetworkError> {
         return safeCall<List<Quiz>> {
             httpClient.get("quiz/friendsQuizzes/")
+//            TODO: Tutaj trzeba by zrobić też count, ale to najpierw serwer musi to mieć
+//            httpClient.get("quiz/friendsQuizzes/${count}")
         }
     }
 
-    suspend fun getRecentlyAddedQuizzes(count: Long = 100): Resource<List<Quiz>, NetworkError> {
+    suspend fun getRecentlyAddedQuizzes(count: Long): Resource<List<Quiz>, NetworkError> {
         return safeCall<List<Quiz>> {
             httpClient.get("quiz/newest/${count}")
         }

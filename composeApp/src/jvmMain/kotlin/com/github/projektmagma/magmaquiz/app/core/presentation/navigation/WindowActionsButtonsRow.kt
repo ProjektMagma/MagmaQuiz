@@ -1,4 +1,4 @@
-package com.github.projektmagma.magmaquiz.app.home.presentation.navigation
+package com.github.projektmagma.magmaquiz.app.core.presentation.navigation
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState

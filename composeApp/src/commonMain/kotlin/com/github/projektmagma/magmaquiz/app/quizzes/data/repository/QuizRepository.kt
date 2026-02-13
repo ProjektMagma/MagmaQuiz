@@ -79,15 +79,15 @@ suspend fun deleteQuiz(id: UUID): Resource<Unit, NetworkError> {
     return quizService.deleteQuiz(id)
 }
 
-suspend fun getFriendsQuizzes(): Resource<List<Quiz>, NetworkError> {
-    return quizService.getFriendsQuizzes()
+    suspend fun getFriendsQuizzes(count: Long = 100): Resource<List<Quiz>, NetworkError> {
+        return quizService.getFriendsQuizzes(count)
 }
 
-suspend fun getRecentlyAddedQuizzes(): Resource<List<Quiz>, NetworkError> {
-    return quizService.getRecentlyAddedQuizzes()
+    suspend fun getRecentlyAddedQuizzes(count: Long = 100): Resource<List<Quiz>, NetworkError> {
+        return quizService.getRecentlyAddedQuizzes(count)
 }
 
-suspend fun getMostLikedQuizzes(): Resource<List<Quiz>, NetworkError> {
-    return quizService.getMostLikedQuizzes()
+    suspend fun getMostLikedQuizzes(count: Long = 100): Resource<List<Quiz>, NetworkError> {
+        return quizService.getMostLikedQuizzes(count)
 }
 }

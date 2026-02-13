@@ -50,8 +50,7 @@ fun CreateQuestionScreen(
     
     LazyColumn(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 8.dp),
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {

@@ -40,8 +40,7 @@ fun QuizDetailsScreen(
         Column(
             modifier = Modifier
                 .widthIn(max = 1000.dp)
-                .fillMaxSize()
-                .padding(horizontal = 12.dp),
+                .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             LazyColumn(

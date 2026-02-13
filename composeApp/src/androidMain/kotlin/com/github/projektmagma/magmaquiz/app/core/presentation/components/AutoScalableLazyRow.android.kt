@@ -3,23 +3,23 @@ package com.github.projektmagma.magmaquiz.app.core.presentation.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 
 @Composable
-actual fun <T> AutoScalableLazyColumn(
+actual fun <T> AutoScalableLazyRow(
     itemList: List<T>,
     key: ((T) -> Any)?,
     contentEmptyMessage: String,
     content: @Composable ((T) -> Unit)
 ) {
+
     if (itemList.isEmpty())
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -32,13 +32,8 @@ actual fun <T> AutoScalableLazyColumn(
             )
         }
     else
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .widthIn(max = 512.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
-        ) {
+
+        LazyRow(modifier = Modifier.fillMaxWidth()) {
             items(itemList, key = key) {
                 content(it)
             }

@@ -33,7 +33,14 @@ fun MainNavigation(
         entries = navigationState.toEntries(
             entryProvider {
                 entry<Route.Menus.Home> {
-                    HomeScreen()
+                    HomeScreen(
+                        navigateToQuizDetails = { id ->
+                            navigator.navigate(Route.Menus.Quizzes.QuizDetails(id))
+                        },
+                        navigateToUserDetails = {
+                            navigator.navigate(Route.Menus.Users.UserDetails(it))
+                        }
+                    )
                 }
                 entry<Route.Menus.Settings> {
                     SettingsScreen(

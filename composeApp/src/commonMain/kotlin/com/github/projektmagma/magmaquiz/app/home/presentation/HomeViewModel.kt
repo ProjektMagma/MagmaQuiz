@@ -1,0 +1,57 @@
+package com.github.projektmagma.magmaquiz.app.home.presentation
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
+import com.github.projektmagma.magmaquiz.app.quizzes.data.repository.QuizRepository
+import com.github.projektmagma.magmaquiz.app.users.data.repository.UsersRepository
+import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
+import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
+import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+
+class HomeViewModel(
+    private val quizRepository: QuizRepository,
+    private val usersRepository: UsersRepository
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
+    val uiState = _uiState.asStateFlow()
+
+    private val _recentQuizzes = MutableStateFlow<List<Quiz>>(emptyList())
+    val recentQuizzes = _recentQuizzes.asStateFlow()
+
+    private val _mostLikedQuizzes = MutableStateFlow<List<Quiz>>(emptyList())
+    val mostLikedQuizzes = _recentQuizzes.asStateFlow()
+
+    private val _friendsQuizzes = MutableStateFlow<List<Quiz>>(emptyList())
+    val friendsQuizzes = _recentQuizzes.asStateFlow()
+
+    private val _incomingFriends = MutableStateFlow<List<ForeignUser>>(emptyList())
+    val incomingFriends = _incomingFriends.asStateFlow()
+
+    init {
+        downloadAllData()
+    }
+
+    fun downloadAllData() {
+        _uiState.value = UiState.Loading
+        viewModelScope.launch {
+            quizRepository.getRecentlyAddedQuizzes(10).whenSuccess {
+                _recentQuizzes.value = it.data
+            }
+            quizRepository.getMostLikedQuizzes(10).whenSuccess {
+                _mostLikedQuizzes.value = it.data
+            }
+            quizRepository.getFriendsQuizzes(10).whenSuccess {
+                _friendsQuizzes.value = it.data
+            }
+            usersRepository.getIncomingInvitations().whenSuccess {
+                _incomingFriends.value = it.data
+            }
+            _uiState.value = UiState.Success
+        }
+    }
+}

@@ -14,7 +14,6 @@ import com.github.projektmagma.magmaquiz.app.auth.presentation.AuthViewModel
 import com.github.projektmagma.magmaquiz.app.core.MainWindow
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.AnimatedVisibilityFloatingButton
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.ProfilePictureIcon
-import com.github.projektmagma.magmaquiz.app.home.presentation.navigation.WindowActionsButtonsRow
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.greeting
 import org.jetbrains.compose.resources.stringResource
@@ -49,7 +48,7 @@ actual fun MainNavMenu(
                     Row(
                         modifier = Modifier.fillMaxWidth()
                             .weight(1f)
-                            .padding(12.dp),
+                            .padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Row(
@@ -58,7 +57,7 @@ actual fun MainNavMenu(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             IconButton(
-                                modifier = Modifier.size(24.dp),
+                                modifier = Modifier.size(50.dp),
                                 onClick = navigator::goBack,
                                 enabled = navigator.currentBackStackSize() > 1
                             ) {
@@ -98,6 +97,7 @@ actual fun MainNavMenu(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding(horizontal = 16.dp)
                     .weight(1f),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally

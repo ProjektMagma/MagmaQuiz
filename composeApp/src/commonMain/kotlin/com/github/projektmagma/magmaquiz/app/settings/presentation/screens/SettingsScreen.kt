@@ -86,13 +86,14 @@ fun SettingsScreen(
                 AsyncImage(
                     modifier = Modifier
                         .padding(16.dp)
-                        .height(256.dp)
+                        .heightIn(256.dp)
+                        .widthIn(256.dp)
                         .clip(CircleShape),
                     model = ImageRequest.Builder(LocalPlatformContext.current)
                         .crossfade(true)
                         .data(state.profilePicture)
                         .build(),
-                    contentScale = ContentScale.Fit,
+                    contentScale = ContentScale.Crop,
                     contentDescription = "ProfilePicture"
                 )
 

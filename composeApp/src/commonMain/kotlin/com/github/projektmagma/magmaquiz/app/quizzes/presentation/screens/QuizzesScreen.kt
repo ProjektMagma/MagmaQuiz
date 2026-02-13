@@ -42,8 +42,7 @@ fun QuizzesScreen(
     ) {
         SearchTextField(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp),
+                .fillMaxWidth(),
             searchedText = state.quizName,
             labelText = stringResource(Res.string.quiz_title),
             onSearch = {
@@ -56,17 +55,19 @@ fun QuizzesScreen(
         )
 
         LazyRow(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             item {
                 FilterButton(
                     selected = state.quizFilter == QuizFilters.Favorites,
                     onClick = {
-                        quizzesListViewModel.onCommand(QuizListCommand.FilterChanged(
-                            if (state.quizFilter == QuizFilters.Favorites)
-                                QuizFilters.None
-                            else QuizFilters.Favorites)
+                        quizzesListViewModel.onCommand(
+                            QuizListCommand.FilterChanged(
+                                if (state.quizFilter == QuizFilters.Favorites)
+                                    QuizFilters.None
+                                else QuizFilters.Favorites
+                            )
                         )
                     },
                     contentLabel = stringResource(Res.string.favorites),
@@ -78,10 +79,12 @@ fun QuizzesScreen(
                 FilterButton(
                     selected = state.quizFilter == QuizFilters.MostLiked,
                     onClick = {
-                        quizzesListViewModel.onCommand(QuizListCommand.FilterChanged(
-                            if (state.quizFilter == QuizFilters.MostLiked)
-                                QuizFilters.None
-                            else QuizFilters.MostLiked)
+                        quizzesListViewModel.onCommand(
+                            QuizListCommand.FilterChanged(
+                                if (state.quizFilter == QuizFilters.MostLiked)
+                                    QuizFilters.None
+                                else QuizFilters.MostLiked
+                            )
                         )
                     },
                     contentLabel = stringResource(Res.string.most_liked),
@@ -93,10 +96,12 @@ fun QuizzesScreen(
                 FilterButton(
                     selected = state.quizFilter == QuizFilters.Friends,
                     onClick = {
-                        quizzesListViewModel.onCommand(QuizListCommand.FilterChanged(
-                            if (state.quizFilter == QuizFilters.Friends)
-                                QuizFilters.None
-                            else QuizFilters.Friends)
+                        quizzesListViewModel.onCommand(
+                            QuizListCommand.FilterChanged(
+                                if (state.quizFilter == QuizFilters.Friends)
+                                    QuizFilters.None
+                                else QuizFilters.Friends
+                            )
                         )
                     },
                     contentLabel = stringResource(Res.string.friends_quizzes),
@@ -108,10 +113,12 @@ fun QuizzesScreen(
                 FilterButton(
                     selected = state.quizFilter == QuizFilters.RecentlyAdded,
                     onClick = {
-                        quizzesListViewModel.onCommand(QuizListCommand.FilterChanged(
-                            if (state.quizFilter == QuizFilters.RecentlyAdded)
-                                QuizFilters.None
-                            else QuizFilters.RecentlyAdded)
+                        quizzesListViewModel.onCommand(
+                            QuizListCommand.FilterChanged(
+                                if (state.quizFilter == QuizFilters.RecentlyAdded)
+                                    QuizFilters.None
+                                else QuizFilters.RecentlyAdded
+                            )
                         )
                     },
                     contentLabel = stringResource(Res.string.recently_added),
