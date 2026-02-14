@@ -2,15 +2,18 @@ package com.github.projektmagma.magmaquiz.app.home.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
 import com.github.projektmagma.magmaquiz.app.quizzes.data.repository.QuizRepository
 import com.github.projektmagma.magmaquiz.app.users.data.repository.UsersRepository
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
+import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenError
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.*
 
 class HomeViewModel(
     private val quizRepository: QuizRepository,
@@ -36,6 +39,7 @@ class HomeViewModel(
         downloadAllData()
     }
 
+    // TODO: to na komendy można przepisać, jeśli nam się chce... zzz...
     fun downloadAllData() {
         _uiState.value = UiState.Loading
         viewModelScope.launch {
@@ -52,6 +56,15 @@ class HomeViewModel(
                 _incomingFriends.value = it.data
             }
             _uiState.value = UiState.Success
+        }
+    }
+
+    fun changeFavoriteStatus(id: UUID) {
+        viewModelScope.launch {
+            quizRepository.changeFavoriteStatus(id)
+                .whenError {
+                    _uiState.value = UiState.Error(it.error.toResId())
+                }
         }
     }
 }

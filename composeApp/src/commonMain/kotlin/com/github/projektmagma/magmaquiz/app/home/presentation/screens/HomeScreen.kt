@@ -18,7 +18,7 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.components.FullSi
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.FullSizeErrorIndicator
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
 import com.github.projektmagma.magmaquiz.app.home.presentation.HomeViewModel
-import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuizCard
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuizCardSmall
 import com.github.projektmagma.magmaquiz.app.users.presentation.components.UserCard
 import org.koin.compose.viewmodel.koinViewModel
 import java.util.*
@@ -69,11 +69,11 @@ fun HomeScreen(
                             itemList = mostLikedQuizzes.value,
                             key = { it.id!! }
                         ) {
-                            QuizCard(
+                            QuizCardSmall(
                                 it,
                                 navigateToQuizDetails = navigateToQuizDetails,
                                 navigateToUserDetails = navigateToUserDetails,
-                                changeFavoriteStatus = {},
+                                changeFavoriteStatus = { viewModel.changeFavoriteStatus(it.id!!) }
                             )
                         }
 
@@ -87,11 +87,11 @@ fun HomeScreen(
                             itemList = recentQuizzes.value,
                             key = { it.id!! }
                         ) {
-                            QuizCard(
+                            QuizCardSmall(
                                 it,
                                 navigateToQuizDetails = navigateToQuizDetails,
                                 navigateToUserDetails = navigateToUserDetails,
-                                changeFavoriteStatus = {},
+                                changeFavoriteStatus = { viewModel.changeFavoriteStatus(it.id!!) }
                             )
                         }
 
@@ -122,11 +122,11 @@ fun HomeScreen(
                             itemList = friendsQuizzes.value,
                             key = { it.id!! }
                         ) {
-                            QuizCard(
+                            QuizCardSmall(
                                 it,
                                 navigateToQuizDetails = navigateToQuizDetails,
                                 navigateToUserDetails = navigateToUserDetails,
-                                changeFavoriteStatus = {},
+                                changeFavoriteStatus = { viewModel.changeFavoriteStatus(it.id!!) }
                             )
                         }
                     }
