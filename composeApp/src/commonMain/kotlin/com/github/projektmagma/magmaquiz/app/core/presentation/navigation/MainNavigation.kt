@@ -14,6 +14,7 @@ import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.Create
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.QuizDetailsScreen
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.QuizzesScreen
 import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.SettingsScreen
+import com.github.projektmagma.magmaquiz.app.users.presentation.UserDetailsViewModel
 import com.github.projektmagma.magmaquiz.app.users.presentation.screens.UserDetailsScreen
 import com.github.projektmagma.magmaquiz.app.users.presentation.screens.UsersScreen
 import org.koin.compose.viewmodel.koinViewModel
@@ -27,6 +28,7 @@ fun MainNavigation(
 ) {
     val quizzesListViewModel: QuizzesListViewModel = koinViewModel()
     val createQuizViewModel: CreateQuizViewModel = koinViewModel()
+    val userDetailsViewModel: UserDetailsViewModel = koinViewModel()
 
     NavDisplay(
         onBack = navigator::goBack,
@@ -90,7 +92,8 @@ fun MainNavigation(
                         createQuizViewModel = createQuizViewModel,
                         navigateToEditScreen = { navigator.navigate(Route.Menus.Quizzes.CreateQuiz) },
                         navigateToQuizDetails = { navigator.navigate(Route.Menus.Quizzes.QuizDetails(it)) },
-                        navigateToSettingsScreen = { navigator.navigate(Route.Menus.Settings) }
+                        navigateToSettingsScreen = { navigator.navigate(Route.Menus.Settings) },
+                        userDetailsViewModel = userDetailsViewModel
                     )
                 }
                 entry<Route.Menus.Users.Find> {

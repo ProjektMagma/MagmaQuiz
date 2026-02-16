@@ -1,7 +1,15 @@
 package com.github.projektmagma.magmaquiz.app.users.presentation.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -10,24 +18,26 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.github.projektmagma.magmaquiz.app.core.presentation.components.FriendshipButtons
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.FullSizeCircularProgressIndicator
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.FullSizeErrorIndicator
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.ProfilePictureIcon
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
-import com.github.projektmagma.magmaquiz.app.home.presentation.components.FriendshipButtons
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.CreateQuizViewModel
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuizCardSmall
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.QuizCommand
 import com.github.projektmagma.magmaquiz.app.users.presentation.UserDetailsViewModel
 import com.github.projektmagma.magmaquiz.app.users.presentation.UsersSharedViewModel
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import org.koin.compose.viewmodel.koinViewModel
-import java.util.*
+import java.util.UUID
 
 @Composable
 fun UserDetailsScreen(
@@ -35,7 +45,7 @@ fun UserDetailsScreen(
     navigateToEditScreen: (id: UUID) -> Unit,
     navigateToQuizDetails: (id: UUID) -> Unit,
     navigateToSettingsScreen: () -> Unit,
-    userDetailsViewModel: UserDetailsViewModel = koinViewModel(),
+    userDetailsViewModel: UserDetailsViewModel,
     createQuizViewModel: CreateQuizViewModel = koinViewModel(),
     usersSharedViewModel: UsersSharedViewModel = koinViewModel()
 ) {
@@ -61,6 +71,7 @@ fun UserDetailsScreen(
         UiState.Success -> {
             LazyColumn(
                 modifier = Modifier
+                    .widthIn(max = 1000.dp)
                     .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -115,93 +126,16 @@ fun UserDetailsScreen(
                 }
 
                 items(quizzes) { quiz ->
-
-                    //TODO: Zmodyfikuj sobie tą composatkę aby były te opcje edycji
                     QuizCardSmall(
                         quiz = quiz,
                         showUserButton = false,
                         navigateToQuizDetails = { navigateToQuizDetails(quiz.id!!) },
-                        changeFavoriteStatus = { userDetailsViewModel.changeFavoriteStatus(quiz.id!!) }
+                        changeFavoriteStatus = { userDetailsViewModel.changeFavoriteStatus(quiz.id!!) },
+                        navigateToEditScreen = { navigateToEditScreen(quiz.id!!) },
+                        canEdit = userDetailsViewModel.checkOwnership(quiz.quizCreator?.userId!!),
+                        onDeleteClick = { userDetailsViewModel.deleteQuiz(quiz.id!!) },
+                        onEditClick = { createQuizViewModel.onCommand(QuizCommand.SetForEdit(quiz.id!!)) }
                     )
-
-//                    Column(modifier = Modifier.fillMaxWidth()) {
-//                        Row(
-//                            modifier = Modifier
-//                                .clickable(
-//                                    onClick = {
-//                                        navigateToQuizDetails(quiz.id!!)
-//                                    }
-//                                )
-//                                .fillMaxWidth()
-//                                .animateItem(
-//                                    fadeOutSpec = tween(200),
-//                                    fadeInSpec = tween(200),
-//                                    placementSpec = tween(200)
-//                                )
-//                            ,
-//                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-//                        ) {
-//                            ContentImage(
-//                                imageData = quiz.quizImage,
-//                                imageSize = 96.dp
-//                            )
-//                            Column(
-//                                modifier = Modifier.weight(1f)
-//                            ) {
-//                                Text(
-//                                    text = quiz.quizName,
-//                                    style = MaterialTheme.typography.labelMedium
-//                                )
-//                                Text(text = quiz.quizDescription)
-//                            }
-//                            if (userDetailsViewModel.checkOwnership(id)) {
-//                                Box{
-//                                    IconButton(
-//                                        onClick = {
-//                                            expanded = !expanded
-//                                        }
-//                                    ) {
-//                                        Icon(
-//                                            imageVector = Icons.Default.MoreVert,
-//                                            contentDescription = "more"
-//                                        )
-//                                    }
-//                                    DropdownMenu(
-//                                        expanded = expanded,
-//                                        onDismissRequest = { expanded = false },
-//                                    ) {
-//                                        DropdownMenuItem(
-//                                            text = { Text(stringResource(Res.string.edit)) },
-//                                            onClick = {
-//                                                createQuizViewModel.onCommand(QuizCommand.SetForEdit(quiz.id!!))
-//                                                navigateToEditScreen(quiz.id!!)
-//                                            }
-//                                        )
-//                                        DropdownMenuItem(
-//                                            text = { Text(stringResource(Res.string.delete)) },
-//                                            onClick = { userDetailsViewModel.deleteQuiz(quiz.id!!) }
-//                                        )
-//                                    }
-//                                }
-//                            }
-//                        }
-//                        Row(
-//                            verticalAlignment = Alignment.CenterVertically
-//                        ) {
-//                            IconButton(
-//                                onClick = {
-//                                    userDetailsViewModel.changeFavoriteStatus(quiz.id!!)
-//                                }
-//                            ) {
-//                                Icon(
-//                                    imageVector = if (quizzes.first { it.id == quiz.id!! }.likedByYou) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
-//                                    tint = Color(0xfff498ae),
-//                                    contentDescription = "FavoriteButton"
-//                                )
-//                            }
-//                            Text(text = "${quizzes.first { it.id == quiz.id!! }.likesCount}")
-//                        }
-//                    }
 
                     Spacer(modifier = Modifier.height(8.dp))
                 }

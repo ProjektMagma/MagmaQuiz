@@ -1,4 +1,4 @@
-package com.github.projektmagma.magmaquiz.app.home.presentation.components
+package com.github.projektmagma.magmaquiz.app.core.presentation.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

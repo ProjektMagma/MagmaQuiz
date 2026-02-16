@@ -60,6 +60,7 @@ fun NavRoot(
         AuthState.Unauthenticated -> Navigation(mainBackstack, modifier)
 
         AuthState.Authenticated -> {
+            mainBackstack.clear()
             mainBackstack.add(Route.Menus)
             Navigation(mainBackstack, modifier)
         }

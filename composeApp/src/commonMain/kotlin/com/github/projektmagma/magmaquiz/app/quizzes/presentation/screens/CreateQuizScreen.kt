@@ -29,11 +29,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigationevent.NavigationEventInfo
+import androidx.navigationevent.compose.NavigationEventHandler
+import androidx.navigationevent.compose.rememberNavigationEventState
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.FullSizeCircularProgressIndicator
 import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.UiEvent
@@ -65,7 +66,7 @@ import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateQuizScreen(
     navigateToQuestionCreate: (Boolean) -> Unit,
@@ -77,11 +78,15 @@ fun CreateQuizScreen(
     var showBottomSheet by remember { mutableStateOf(false) }
     var showAlertDialog by remember { mutableStateOf(false) }
     val state = createQuizViewModel.state.collectAsStateWithLifecycle()
+    val backState = rememberNavigationEventState(
+        currentInfo = NavigationEventInfo.None
+    )
     val quiz = state.value.quizModel
 
-    BackHandler {
-        showAlertDialog = true
-    }
+    NavigationEventHandler(
+        state = backState,
+        onBackCompleted = { showAlertDialog = true }
+    )
 
     LaunchedEffect(createQuizViewModel.quizChannel) {
         createQuizViewModel.quizChannel.collect { event -> 
