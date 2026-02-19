@@ -20,13 +20,13 @@ fun convertLongSecondsToString(time: Long, pattern: String = "dd.MM.yyyy HH:mm")
     return format.format(date)
 }
 
-suspend fun ByteArray?.compressImage(quality: Int): ByteArray? {
+suspend fun ByteArray?.compressImage(quality: Int, size: Int = 1024): ByteArray? {
     return if (this != null) {
         FileKit.compressImage(
             bytes = this,
             quality = quality,
-            maxWidth = 1024,
-            maxHeight = 1024,
+            maxWidth = size,
+            maxHeight = size,
             imageFormat = ImageFormat.JPEG
         )
     } else null

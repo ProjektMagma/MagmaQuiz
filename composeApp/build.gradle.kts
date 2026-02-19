@@ -47,6 +47,9 @@ kotlin {
             implementation(libs.filekit.dialogs)
             implementation(libs.filekit.dialogs.compose)
             implementation(libs.filekit.coil)
+            
+            implementation(libs.krop)
+            implementation(libs.krop.filekit)
 
             implementation(libs.androidx.datastore)
             implementation(libs.androidx.datastore.preferences)

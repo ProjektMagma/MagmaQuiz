@@ -37,6 +37,7 @@ jbcrypt = "0.4"
 slf4j = "1.7.36"
 
 filekit = "0.12.0"
+krop = "0.3.0-alpha01"
 
 napier = "2.7.1"
 
@@ -86,6 +87,8 @@ filekit-dialogs = { module = "io.github.vinceglb:filekit-dialogs", version.ref =
 filekit-dialogs-compose = { module = "io.github.vinceglb:filekit-dialogs-compose", version.ref = "filekit"}
 filekit-coil = { module = "io.github.vinceglb:filekit-coil", version.ref = "filekit" }
 
+krop = { module = "com.attafitamim.krop:ui", version.ref = "krop" }
+krop-filekit = { module = "com.attafitamim.krop:extensions-filekit", version.ref = "krop" }
 
 # ANDROID
 slf4j-android = { module = "org.slf4j:slf4j-android", version.ref = "slf4j" }

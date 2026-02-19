@@ -7,14 +7,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.UiEvent
+import com.github.projektmagma.magmaquiz.app.core.util.compressImage
 import com.github.projektmagma.magmaquiz.app.settings.data.repository.SettingsRepository
 import com.github.projektmagma.magmaquiz.app.settings.presentation.model.SettingsCommand
 import com.github.projektmagma.magmaquiz.app.settings.presentation.model.SettingsState
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenError
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
-import io.github.vinceglb.filekit.FileKit
-import io.github.vinceglb.filekit.ImageFormat
-import io.github.vinceglb.filekit.compressImage
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -45,17 +43,9 @@ class SettingsViewModel(
         }
 
         viewModelScope.launch {
-            val smallImage = FileKit.compressImage(
-                bytes = profilePicture,
-                quality = 75,
-                maxWidth = 128,
-                maxHeight = 128,
-                imageFormat = ImageFormat.JPEG
-            )
-
             settingsRepository.changeProfilePicture(
-                profilePictureBig = profilePicture,
-                profilePictureSmall = smallImage
+                profilePictureBig = profilePicture.compressImage(75, 512)!!,
+                profilePictureSmall = profilePicture.compressImage(75, 128)!!
             )
                 .whenSuccess {
                     _uiChannel.trySend(UiEvent.ShowSnackbar(Res.string.profile_picture_changed_success))

@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.ContentImage
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.FavoriteButton
@@ -58,8 +59,7 @@ fun QuizCardSmall(
         if (canEdit) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp),
+                    .fillMaxWidth(),
                 contentAlignment = Alignment.TopEnd
             ) {
                 IconButton(
@@ -73,6 +73,7 @@ fun QuizCardSmall(
                 DropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
+                    offset = DpOffset(250.dp, 0.dp)
                 ) {
                     DropdownMenuItem(
                         text = { Text(stringResource(Res.string.edit)) },
