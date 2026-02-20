@@ -102,6 +102,6 @@ class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable),
     }
 
     fun isUserCreator(userEntity: UserEntity): Boolean {
-        return transaction { userEntity.id == quizCreator }
+        return transaction { userEntity.id == quizCreator.id }
     }
 }

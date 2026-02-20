@@ -114,9 +114,10 @@ class QuizDataController(
             ?: return NetworkResource.Error(HttpStatusCode.NotFound)
 
 
-        val quizList = profileUser.getUserQuizzes().map {
-            it.toDomain(QuizConversionCommand.WithUserNoQuestions(thisUser))
-        }
+        val quizList =
+            profileUser.getUserQuizzes().filter { it.isUserCreator(thisUser) || it.isPublic }.map {
+                it.toDomain(QuizConversionCommand.WithUserNoQuestions(thisUser))
+            }
 
         return NetworkResource.Success(quizList)
     }
