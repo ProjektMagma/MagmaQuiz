@@ -87,4 +87,7 @@
     <string name="friends">Znajomi</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
+    <string name="no_description">Nie podano opisu</string>
+    <string name="incoming">Przychodzące</string>
+    <string name="outgoing">Wychodzące</string>
 </resources>

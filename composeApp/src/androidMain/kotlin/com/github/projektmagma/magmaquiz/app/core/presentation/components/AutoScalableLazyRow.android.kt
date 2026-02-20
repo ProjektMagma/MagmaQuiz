@@ -28,7 +28,7 @@ actual fun <T> AutoScalableLazyRow(
         ) {
             Text(
                 text = contentEmptyMessage,
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.bodyLarge
             )
         }
     else

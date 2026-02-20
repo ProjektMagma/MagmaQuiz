@@ -14,6 +14,11 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.components.Favori
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.UniversalCardContainer
 import com.github.projektmagma.magmaquiz.app.core.util.convertLongSecondsToString
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.created_at
+import magmaquiz.composeapp.generated.resources.modified_at
+import magmaquiz.composeapp.generated.resources.no_description
+import org.jetbrains.compose.resources.stringResource
 import java.util.*
 
 @Composable
@@ -24,21 +29,20 @@ actual fun QuizCard(
     changeFavoriteStatus: () -> Unit,
 ) {
 
-
     UniversalCardContainer(
-        modifier = Modifier.padding(8.dp),
+        modifier = Modifier.padding(vertical = 4.dp),
         onClick = {
             navigateToQuizDetails(quiz.id!!)
         }
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .padding(vertical = 4.dp, horizontal = 8.dp)
+                .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -67,7 +71,7 @@ actual fun QuizCard(
                 textAlign = TextAlign.Center
             )
             Text(
-                text = quiz.quizDescription.ifBlank { "Nie podano opisu" },
+                text = quiz.quizDescription.ifBlank { stringResource(Res.string.no_description) },
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center
             )
@@ -78,7 +82,7 @@ actual fun QuizCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "Data stworzenia ")
+                Text(text = "${stringResource(Res.string.created_at)} ")
                 Text(
                     text = convertLongSecondsToString(quiz.createdAt),
                     fontWeight = FontWeight.Bold
@@ -90,7 +94,7 @@ actual fun QuizCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "Data modyfikacji ")
+                Text(text = "${stringResource(Res.string.modified_at)} ")
                 Text(
                     text = convertLongSecondsToString(quiz.modifiedAt),
                     fontWeight = FontWeight.Bold

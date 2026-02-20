@@ -89,4 +89,7 @@
     <string name="friends">Friends</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
+    <string name="no_description">No description provided</string>
+    <string name="incoming">Incoming</string>
+    <string name="outgoing">Outgoing</string>
 </resources>

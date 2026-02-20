@@ -14,61 +14,86 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.github.projektmagma.magmaquiz.app.core.MainWindow
+import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
 
 @Composable
 actual fun <T> AutoScalableLazyColumn(
     itemList: List<T>,
     key: ((T) -> Any)?,
     contentEmptyMessage: String,
+    uiState: UiState,
+    stickyHeader: @Composable (modifier: Modifier) -> Unit,
     content: @Composable ((T) -> Unit)
 ) {
     val state = rememberLazyGridState()
 
-    if (itemList.isEmpty())
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+    Row(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        LazyVerticalGrid(
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(1f)
+                .widthIn(max = 512.dp),
+            columns = when (uiState) {
+                UiState.Success -> GridCells.Adaptive(450.dp)
+                else -> GridCells.FixedSize(MainWindow.windowState.size.width)
+            },
+            contentPadding = PaddingValues(8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            state = state
         ) {
-            Text(
-                text = contentEmptyMessage,
-                style = MaterialTheme.typography.titleSmall
-            )
-        }
-    else
+            stickyHeader {
+                stickyHeader(Modifier)
+            }
+            // TODO: Aby Error i Loading wyświetlał się na środku listy
+            when (uiState) {
+                is UiState.Error -> item {
+                    FullSizeErrorIndicator(message = uiState.errorMessage)
+                }
 
-        Row(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            LazyVerticalGrid(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .weight(1f)
-                    .widthIn(max = 512.dp),
-                columns = GridCells.Adaptive(450.dp),
-                contentPadding = PaddingValues(8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                state = state
-            ) {
-                items(itemList, key = key) {
-                    content(it)
+                UiState.Loading -> item {
+                    FullSizeCircularProgressIndicator()
+                }
+
+                UiState.Success -> {
+                    if (itemList.isEmpty())
+                        item {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    text = contentEmptyMessage,
+                                    style = MaterialTheme.typography.titleSmall
+                                )
+                            }
+                        }
+                    else
+                        items(itemList, key = key) {
+                            content(it)
+                        }
                 }
             }
 
-            VerticalScrollbar(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(start = 4.dp, bottom = 16.dp),
-                adapter = rememberScrollbarAdapter(scrollState = state),
-                style = ScrollbarStyle(
-                    minimalHeight = 10.dp,
-                    thickness = 10.dp,
-                    shape = MaterialTheme.shapes.medium,
-                    hoverDurationMillis = 500,
-                    unhoverColor = MaterialTheme.colorScheme.surfaceContainer,
-                    hoverColor = MaterialTheme.colorScheme.secondaryContainer
-                )
-            )
-
         }
+
+        VerticalScrollbar(
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(start = 4.dp, bottom = 16.dp),
+            adapter = rememberScrollbarAdapter(scrollState = state),
+            style = ScrollbarStyle(
+                minimalHeight = 10.dp,
+                thickness = 10.dp,
+                shape = MaterialTheme.shapes.medium,
+                hoverDurationMillis = 500,
+                unhoverColor = MaterialTheme.colorScheme.surfaceContainer,
+                hoverColor = MaterialTheme.colorScheme.secondaryContainer
+            )
+        )
+
+    }
 }

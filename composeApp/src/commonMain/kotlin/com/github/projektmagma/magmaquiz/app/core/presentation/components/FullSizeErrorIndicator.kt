@@ -17,9 +17,13 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun FullSizeErrorIndicator(message: StringResource = Res.string.unknown_error, onRetry: (() -> Unit)? = null) {
+fun FullSizeErrorIndicator(
+    modifier: Modifier = Modifier,
+    message: StringResource = Res.string.unknown_error,
+    onRetry: (() -> Unit)? = null
+) {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {

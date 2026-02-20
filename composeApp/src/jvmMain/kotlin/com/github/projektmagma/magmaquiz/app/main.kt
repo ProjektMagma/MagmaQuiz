@@ -37,7 +37,7 @@ fun main() {
             transparent = true
         ) {
             MainWindow.frameWindowScope = this
-            window.minimumSize = Dimension(1000, 750)
+            window.minimumSize = Dimension(1200, 750)
             MagmaQuizTheme {
                 App(
                     modifier = Modifier
