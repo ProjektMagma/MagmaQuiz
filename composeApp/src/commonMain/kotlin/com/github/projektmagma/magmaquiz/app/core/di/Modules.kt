@@ -1,7 +1,10 @@
 package com.github.projektmagma.magmaquiz.app.core.di
 
 import com.github.projektmagma.magmaquiz.app.core.data.ApiDataStore
-import com.github.projektmagma.magmaquiz.app.core.data.ServerConfigDataStore
+import com.github.projektmagma.magmaquiz.app.core.data.ServerConfigRepository
+import com.github.projektmagma.magmaquiz.app.core.data.database.ServerConfigDao
+import com.github.projektmagma.magmaquiz.app.core.data.database.getRoomDatabase
+import com.github.projektmagma.magmaquiz.app.core.data.database.getServerConfigDao
 import com.github.projektmagma.magmaquiz.app.core.presentation.RootViewModel
 import com.github.projektmagma.magmaquiz.app.core.presentation.ServerConfigViewModel
 import com.github.projektmagma.magmaquiz.shared.data.domain.CustomHeaders
@@ -21,18 +24,23 @@ import io.ktor.http.path
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.koin.core.module.Module
+import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 val sharedModule = module {
     viewModelOf(::ServerConfigViewModel)
     viewModelOf(::RootViewModel)
+    
+    singleOf(::ServerConfigRepository)
+    single { getRoomDatabase(get()) }
+    single { getServerConfigDao(get()) }
 
     single {
         HttpClient(CIO) {
             val defaultCredentialsPlugin = createClientPlugin("DefaultCredentialsPlugin"){
                 onRequest { request, _ ->
-                    val config = get<ServerConfigDataStore>().getServerConfig()
+                    val config = get<ServerConfigDao>().getSelectedConfig()
                     val sessionHeader = get<ApiDataStore>().getSessionHeader()
                     
                     request.url {

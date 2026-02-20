@@ -92,4 +92,10 @@
     <string name="no_description">No description provided</string>
     <string name="incoming">Incoming</string>
     <string name="outgoing">Outgoing</string>
+    <string name="server_config">Server configuration</string>
+    <string name="server_connection">Configure server connection</string>
+    <string name="last_configs">Last configs</string>
+    <string name="connection_details">Connection details</string>
+    <string name="ip" translatable="false">IP</string>
+    <string name="port" translatable="false">Port</string>
 </resources>

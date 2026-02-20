@@ -90,4 +90,8 @@
     <string name="no_description">Nie podano opisu</string>
     <string name="incoming">Przychodzące</string>
     <string name="outgoing">Wychodzące</string>
+    <string name="server_config">Konfiguracja serwera</string>
+    <string name="server_connection">Skonfiguruj połączenie z serwerem</string>
+    <string name="last_configs">Ostatnie konfiguracje</string>
+    <string name="connection_details">Sszczegóły połączenia</string>
 </resources>
