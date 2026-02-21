@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.github.projektmagma.magmaquiz"
-version = "1.0.0"
+version = "0.1.0"
 application {
     mainClass.set("com.github.projektmagma.magmaquiz.server.ApplicationKt")
 
@@ -32,6 +32,8 @@ dependencies {
     implementation(libs.exposed.dao)
     implementation(libs.exposed.jdbc)
     implementation(libs.exposed.java.time)
+    implementation(libs.exposed.migration.core)
+    implementation(libs.exposed.migration.jdbc)
     implementation(libs.postgresql)
     implementation(libs.jbcrypt)
     testImplementation(libs.ktor.serverTestHost)

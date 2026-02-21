@@ -3,10 +3,8 @@ package com.github.projektmagma.magmaquiz.shared.data.domain
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class FriendshipStatus {
-    Unknown,
-    None,
-    Incoming,
-    Outgoing,
-    Friends
-}
+data class QuizzesReview(
+    val author: ForeignUser,
+    val rating: Int,
+    val comment: String
+)

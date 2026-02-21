@@ -1,15 +1,15 @@
 package com.github.projektmagma.magmaquiz.server.controllers
 
 import com.github.projektmagma.magmaquiz.server.data.conversion.UserConversionCommand
-import com.github.projektmagma.magmaquiz.server.data.entities.FriendshipEntity
+import com.github.projektmagma.magmaquiz.server.data.entities.UserFriendshipEntity
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import com.github.projektmagma.magmaquiz.server.repository.FriendshipRepository
 import com.github.projektmagma.magmaquiz.server.repository.UserRepository
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkResource
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.User
-import io.ktor.http.HttpStatusCode
+import io.ktor.http.*
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import java.util.UUID
+import java.util.*
 
 class UsersDataController(
     private val userRepository: UserRepository,
@@ -28,7 +28,7 @@ class UsersDataController(
         val userList = userRepository.getUsersByName(userName)
         val usersMapped =
             userList.filter { it.id != thisUser.id }
-                .map { it.toDomain(UserConversionCommand.ForeignUserWithSmallPicture(thisUser)) }
+                .map { it.toDomain(UserConversionCommand.ForeignUser(thisUser)) }
 
         return NetworkResource.Success(usersMapped, HttpStatusCode.PartialContent)
     }
@@ -43,7 +43,7 @@ class UsersDataController(
         val thisUser = userRepository.getUserData(session)
         val userToFind = userRepository.getUserData(userId) ?: return NetworkResource.Error(HttpStatusCode.NotFound)
 
-        return NetworkResource.Success(userToFind.toDomain(UserConversionCommand.ForeignUserWithBigPicture(thisUser)))
+        return NetworkResource.Success(userToFind.toDomain(UserConversionCommand.ForeignUserWithData(thisUser)))
     }
 
     /**
@@ -55,9 +55,11 @@ class UsersDataController(
      *
      * @param session Sesja użytkownika wykonującego akcję
      * @param userId Identyfikator użytkownika, do którego wysyłane jest zaproszenie
-     * @return NetworkResource z wynikiem operacji (`201 Created`, `200 OK`, `400 Bad Request`, `404 Not Found`)
+     * @return NetworkResource z wynikiem operacji (`200 OK`, `400 Bad Request`, `404 Not Found`)
+     * `True` - wysłano zaproszenie
+     * `False` - anulowano zaproszenie
      */
-    fun usersFriendshipSendInvitation(session: UserSession, userId: UUID): NetworkResource<Unit> {
+    fun usersFriendshipSendInvitation(session: UserSession, userId: UUID): NetworkResource<Boolean> {
 
         if (session.userId == userId)
             return NetworkResource.Error(HttpStatusCode.BadRequest)
@@ -69,16 +71,16 @@ class UsersDataController(
 
         if (friendship != null) {
             friendship.setIsActive(false)
-            return NetworkResource.Success(Unit)
+            return NetworkResource.Success(false)
         } else
             transaction {
-                FriendshipEntity.new {
+                UserFriendshipEntity.new {
                     this.userFrom = userFrom
                     this.userTo = userTo
                 }
             }
 
-        return NetworkResource.Success(Unit, HttpStatusCode.Created)
+        return NetworkResource.Success(true)
     }
 
 
@@ -90,9 +92,11 @@ class UsersDataController(
      *
      * @param session Sesja użytkownika wykonującego akcję
      * @param userId Identyfikator użytkownika, którego dotyczy zaproszenie
-     * @return NetworkResource z wynikiem operacji (`201 Created`, `200 OK`, `404 Not Found`)
+     * @return NetworkResource z wynikiem operacji (`200 OK`, `404 Not Found`)
+     * `True` - potwierdzono znajomość
+     * `False` - usunięto istniejącą znajomość
      */
-    fun usersFriendshipAcceptInvitation(session: UserSession, userId: UUID): NetworkResource<Unit> {
+    fun usersFriendshipAcceptInvitation(session: UserSession, userId: UUID): NetworkResource<Boolean> {
         val userFrom = userRepository.getUserData(session)
         val userTo = userRepository.getUserData(userId) ?: return NetworkResource.Error(HttpStatusCode.NotFound)
 
@@ -103,12 +107,12 @@ class UsersDataController(
 
         if (friendship.wasAccepted()) {
             friendship.setIsActive(false)
-            return NetworkResource.Success(Unit)
+            return NetworkResource.Success(false)
         }
 
         friendship.setAccepted(true)
 
-        return NetworkResource.Success(Unit, HttpStatusCode.Created)
+        return NetworkResource.Success(true)
     }
 
     /**
@@ -122,7 +126,7 @@ class UsersDataController(
 
         val friendList = friendshipRepository.userFriendList(thisUser)
             .map {
-                it.toDomain(UserConversionCommand.ForeignUserWithSmallPicture(thisUser))
+                it.toDomain(UserConversionCommand.ForeignUser(thisUser))
             }
 
         return NetworkResource.Success(friendList)
@@ -139,7 +143,7 @@ class UsersDataController(
 
         val friendList = friendshipRepository.userInvitations(thisUser, true)
             .map {
-                it.toDomain(UserConversionCommand.ForeignUserWithSmallPicture(thisUser))
+                it.toDomain(UserConversionCommand.ForeignUser(thisUser))
             }
 
         return NetworkResource.Success(friendList)
@@ -157,7 +161,7 @@ class UsersDataController(
 
         val friendList = friendshipRepository.userInvitations(thisUser, false)
             .map {
-                it.toDomain(UserConversionCommand.ForeignUserWithSmallPicture(thisUser))
+                it.toDomain(UserConversionCommand.ForeignUser(thisUser))
             }
 
         return NetworkResource.Success(friendList)

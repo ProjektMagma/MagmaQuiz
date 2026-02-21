@@ -24,13 +24,13 @@ class ExposedSessionStorage : SessionStorage {
 
     override suspend fun invalidate(id: String) {
         transaction {
-            UserSessionEntity.find { UsersSessionsTable.sessionId eq id }.firstOrNull()?.delete()
+            UserSessionEntity.find { UsersSessionsTable.sessionKey eq id }.firstOrNull()?.delete()
         }
     }
 
     override suspend fun read(id: String): String {
         return transaction {
-            val session = UserSessionEntity.find { UsersSessionsTable.sessionId eq id }.firstOrNull()
+            val session = UserSessionEntity.find { UsersSessionsTable.sessionKey eq id }.firstOrNull()
 
 
             if (session == null) throw NoSuchElementException()

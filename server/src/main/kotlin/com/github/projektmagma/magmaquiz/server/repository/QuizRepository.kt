@@ -1,10 +1,10 @@
 package com.github.projektmagma.magmaquiz.server.repository
 
 import com.github.projektmagma.magmaquiz.server.data.entities.*
-import com.github.projektmagma.magmaquiz.server.data.tables.AnswersTable
-import com.github.projektmagma.magmaquiz.server.data.tables.FavoriteQuizzesTable
-import com.github.projektmagma.magmaquiz.server.data.tables.QuestionsTable
+import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesQuestionsAnswersTable
+import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesQuestionsTable
 import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesTable
+import com.github.projektmagma.magmaquiz.server.data.tables.UsersFavoriteQuizzesTable
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
 import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
@@ -23,14 +23,14 @@ class QuizRepository {
                 isPublic = quizValue.isPublic
             }
             quizValue.questionList.forEach { q ->
-                val innerQuestion = QuestionEntity.new {
+                val innerQuestion = QuizQuestionEntity.new {
                     quiz = innerQuiz
                     questionNumber = q.questionNumber
                     questionContent = q.questionContent
                     questionImage = q.questionImage
                 }
                 q.answerList.forEach { a ->
-                    AnswerEntity.new {
+                    QuizQuestionAnswerEntity.new {
                         question = innerQuestion
                         answerContent = a.answerContent
                         isCorrect = a.isCorrect
@@ -64,13 +64,13 @@ class QuizRepository {
     fun changeFavoriteStatus(quizEntity: QuizEntity, userEntity: UserEntity): Boolean {
         return transaction {
             var favoriteStatus =
-                FavoriteQuizzesEntity.find {
-                    FavoriteQuizzesTable.user eq userEntity.id and (FavoriteQuizzesTable.quiz eq quizEntity.id)
+                UserFavoriteQuizzesEntity.find {
+                    UsersFavoriteQuizzesTable.user eq userEntity.id and (UsersFavoriteQuizzesTable.quiz eq quizEntity.id)
                 }
                     .firstOrNull()
 
             if (favoriteStatus == null) {
-                favoriteStatus = FavoriteQuizzesEntity.new {
+                favoriteStatus = UserFavoriteQuizzesEntity.new {
                     user = userEntity
                     quiz = quizEntity
                 }
@@ -86,9 +86,9 @@ class QuizRepository {
     fun deleteQuiz(quizEntity: QuizEntity) {
         transaction {
             quizEntity.isActive = false
-            quizEntity.questionList.forEach { q ->
+            quizEntity.getQuestions().forEach { q ->
                 q.isActive = false
-                q.answerList.forEach { a ->
+                q.getAnswers().forEach { a ->
                     a.isActive = false
                 }
             }
@@ -111,7 +111,7 @@ class QuizRepository {
             newData.questionList.forEach { postQuestion ->
                 if (postQuestion.id != null) { // modyfikacja starych pytania
                     val q = transaction {
-                        QuestionEntity.findByIdAndUpdate(postQuestion.id!!) {
+                        QuizQuestionEntity.findByIdAndUpdate(postQuestion.id!!) {
                             it.questionNumber = postQuestion.questionNumber
                             it.questionContent = postQuestion.questionContent
                             it.questionImage = postQuestion.questionImage
@@ -121,7 +121,7 @@ class QuizRepository {
                     postQuestion.answerList.forEach { postAnswer -> // modyfikacja starych odpowiedzi
                         if (postAnswer.id != null) {
                             val a = transaction {
-                                AnswerEntity.findByIdAndUpdate(postAnswer.id!!) {
+                                QuizQuestionAnswerEntity.findByIdAndUpdate(postAnswer.id!!) {
                                     it.answerContent = postAnswer.answerContent
                                     it.isCorrect = postAnswer.isCorrect
                                 }!!
@@ -129,7 +129,7 @@ class QuizRepository {
                             existingAnswers.add(a.id)
                         } else {
                             val a = transaction {
-                                AnswerEntity.new { // nowe odpowiedzi do starego pytania
+                                QuizQuestionAnswerEntity.new { // nowe odpowiedzi do starego pytania
                                     question = q
                                     answerContent = postAnswer.answerContent
                                     isCorrect = postAnswer.isCorrect
@@ -140,7 +140,7 @@ class QuizRepository {
                     }
                 } else {
                     val q = transaction {
-                        QuestionEntity.new { // nowe pytanie
+                        QuizQuestionEntity.new { // nowe pytanie
                             quiz = quizEntity
                             questionNumber = postQuestion.questionNumber
                             questionContent = postQuestion.questionContent
@@ -151,7 +151,7 @@ class QuizRepository {
 
                     postQuestion.answerList.forEach { answer -> // nowe odpowiedzi
                         val a = transaction {
-                            AnswerEntity.new {
+                            QuizQuestionAnswerEntity.new {
                                 question = q
                                 answerContent = answer.answerContent
                                 isCorrect = answer.isCorrect
@@ -163,16 +163,16 @@ class QuizRepository {
             }
 
             transaction {
-                QuestionEntity.find { // Usuń nieaktywne pytania razem z odpowiedziami
-                    QuestionsTable.id notInList existingQuestions and (QuestionsTable.quiz eq QuestionsTable.id)
+                QuizQuestionEntity.find { // Usuń nieaktywne pytania razem z odpowiedziami
+                    QuizzesQuestionsTable.id notInList existingQuestions and (QuizzesQuestionsTable.quiz eq QuizzesQuestionsTable.id)
                 }
                     .forEach { q ->
                         q.isActive = false
-                        q.answerList.forEach { a -> a.isActive = false }
+                        q.getAnswers().forEach { a -> a.isActive = false }
                     }
 
-                AnswerEntity.find { // Usuń nieaktywne odpowiedzi
-                    AnswersTable.id notInList existingAnswers and (AnswersTable.question inList existingAnswers)
+                QuizQuestionAnswerEntity.find { // Usuń nieaktywne odpowiedzi
+                    QuizzesQuestionsAnswersTable.id notInList existingAnswers and (QuizzesQuestionsAnswersTable.question inList existingAnswers)
                 }
                     .forEach { it.isActive = false }
             }
