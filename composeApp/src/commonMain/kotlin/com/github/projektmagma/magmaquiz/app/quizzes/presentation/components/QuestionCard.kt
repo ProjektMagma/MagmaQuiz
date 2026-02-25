@@ -1,5 +1,6 @@
 package com.github.projektmagma.magmaquiz.app.quizzes.presentation.components
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,21 +18,23 @@ fun QuestionCard(
         modifier = Modifier.padding(8.dp),
         onClick = { navigateToQuestionCreate() }
     ) {
-        if (question.image != null) {
-            QuizCoverImage(
-                height = 312.dp,
-                model = question.image
-            )
-        }
+        Column(modifier = Modifier.padding(8.dp)) {
+            if (question.image != null) {
+                QuizCoverImage(
+                    height = 312.dp,
+                    model = question.image
+                )
+            }
 
-        QuestionNumber(question.number)
+            QuestionNumber(question.number)
 
-        Text(text = question.content)
+            Text(text = question.content)
 
-        question.answerList.forEach { answer ->
-            AnswerCard(
-                answer
-            )
+            question.answerList.forEach { answer ->
+                AnswerCard(
+                    answer
+                )
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ package com.github.projektmagma.magmaquiz.app.core.presentation.ui.theme
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 
 @Composable
 fun defaultButtonColors(): ButtonColors {
@@ -34,4 +35,5 @@ fun notSelectedNavButtonColors(): ButtonColors {
     )
 }
 
-    
+
+val favoritePink = Color(0xfff498ae)

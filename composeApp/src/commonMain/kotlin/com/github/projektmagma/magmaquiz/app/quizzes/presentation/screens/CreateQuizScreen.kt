@@ -1,33 +1,12 @@
 package com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuAnchorType
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -45,23 +24,7 @@ import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.Que
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuizCoverImage
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuizDataTextField
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.QuizCommand
-import magmaquiz.composeapp.generated.resources.Res
-import magmaquiz.composeapp.generated.resources.add_question
-import magmaquiz.composeapp.generated.resources.all_changes_remove
-import magmaquiz.composeapp.generated.resources.are_you_sure
-import magmaquiz.composeapp.generated.resources.choose_type
-import magmaquiz.composeapp.generated.resources.description
-import magmaquiz.composeapp.generated.resources.multi_answer
-import magmaquiz.composeapp.generated.resources.name
-import magmaquiz.composeapp.generated.resources.no
-import magmaquiz.composeapp.generated.resources.private
-import magmaquiz.composeapp.generated.resources.public
-import magmaquiz.composeapp.generated.resources.save_icon
-import magmaquiz.composeapp.generated.resources.save_quiz
-import magmaquiz.composeapp.generated.resources.single_answer
-import magmaquiz.composeapp.generated.resources.success_quiz_add
-import magmaquiz.composeapp.generated.resources.visibility
-import magmaquiz.composeapp.generated.resources.yes
+import magmaquiz.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -89,7 +52,7 @@ fun CreateQuizScreen(
     )
 
     LaunchedEffect(createQuizViewModel.quizChannel) {
-        createQuizViewModel.quizChannel.collect { event -> 
+        createQuizViewModel.quizChannel.collect { event ->
             when (event) {
                 is NetworkEvent.Failure -> SnackbarController.onEvent(getString(event.networkError.toResId()))
                 NetworkEvent.Success -> {
@@ -98,25 +61,25 @@ fun CreateQuizScreen(
             }
         }
     }
-    
+
     LaunchedEffect(createQuizViewModel.uiChannel) {
         createQuizViewModel.uiChannel.collect { event ->
             when (event) {
                 UiEvent.NavigateBack -> navigateBack()
-                is UiEvent.ShowSnackbar ->{
+                is UiEvent.ShowSnackbar -> {
                     val message = if (event.id != null) getString(event.id) else ""
                     SnackbarController.onEvent(message)
                 }
             }
         }
     }
-    
-    if (showAlertDialog){
+
+    if (showAlertDialog) {
         AlertDialog(
             onDismissRequest = { showAlertDialog = false },
             title = { Text(text = stringResource(Res.string.are_you_sure)) },
             text = { Text(text = stringResource(Res.string.all_changes_remove)) },
-            confirmButton = { 
+            confirmButton = {
                 Button(
                     onClick = {
                         showAlertDialog = false
@@ -127,16 +90,16 @@ fun CreateQuizScreen(
                     Text(text = stringResource(Res.string.yes))
                 }
             },
-            dismissButton = { 
+            dismissButton = {
                 Button(
-                    onClick = { showAlertDialog = false } 
+                    onClick = { showAlertDialog = false }
                 ) {
                     Text(text = stringResource(Res.string.no))
                 }
             }
         )
     }
-    
+
     if (state.value.isLoading) {
         FullSizeCircularProgressIndicator()
     } else {
@@ -158,7 +121,10 @@ fun CreateQuizScreen(
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(imageVector = Icons.Default.Save, contentDescription = stringResource(Res.string.save_icon))
+                            Icon(
+                                imageVector = Icons.Default.Save,
+                                contentDescription = stringResource(Res.string.save_icon)
+                            )
                             Text(text = stringResource(Res.string.save_quiz))
                         }
                     }
@@ -174,7 +140,9 @@ fun CreateQuizScreen(
                 )
 
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .imePadding(),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     QuizDataTextField(

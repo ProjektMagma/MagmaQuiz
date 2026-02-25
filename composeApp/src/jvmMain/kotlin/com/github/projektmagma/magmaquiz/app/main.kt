@@ -7,7 +7,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.github.projektmagma.magmaquiz.app.core.MainWindow
@@ -19,14 +18,11 @@ import magmaquiz.composeapp.generated.resources.app_icon
 import magmaquiz.composeapp.generated.resources.app_name
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import java.awt.Dimension
 
 fun main() {
     initKoin()
     application {
         val windowState = rememberWindowState()
-        MainWindow.windowState = windowState
-        MainWindow.applicationScope = this
         Window(
             onCloseRequest = ::exitApplication,
             alwaysOnTop = System.getenv("ALWAYS_ON_TOP").toBoolean(),
@@ -36,20 +32,19 @@ fun main() {
             undecorated = true,
             transparent = true
         ) {
-            MainWindow.frameWindowScope = this
-            window.minimumSize = Dimension(1200, 750)
+            MainWindow.setWindowState(windowState, this, this@application)
             MagmaQuizTheme {
                 App(
                     modifier = Modifier
                         .border(
                             1.dp,
                             MaterialTheme.colorScheme.primaryContainer,
-                            if (MainWindow.windowState.placement == WindowPlacement.Floating)
+                            if (!MainWindow.isMaximized)
                                 MaterialTheme.shapes.large
                             else RectangleShape
                         )
                         .clip(
-                            if (MainWindow.windowState.placement == WindowPlacement.Floating)
+                            if (!MainWindow.isMaximized)
                                 MaterialTheme.shapes.large
                             else RectangleShape
                         )

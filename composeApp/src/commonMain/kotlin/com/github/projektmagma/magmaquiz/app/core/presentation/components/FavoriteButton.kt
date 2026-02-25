@@ -13,9 +13,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.github.projektmagma.magmaquiz.app.core.presentation.ui.theme.favoritePink
 
 @Composable
 fun FavoriteButton(
@@ -47,7 +47,7 @@ fun FavoriteButton(
         ) {
             Icon(
                 imageVector = if (isLiked) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
-                tint = Color(0xfff498ae),
+                tint = favoritePink,
                 contentDescription = "FavoriteButton"
             )
 
