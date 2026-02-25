@@ -8,4 +8,7 @@ interface User {
     val userProfilePicture: ByteArray?
     val createdAt: Long
     val lastActivity: Long
+    val userBio: String
+    val userCountryCode: String
+    val userTown: String
 }

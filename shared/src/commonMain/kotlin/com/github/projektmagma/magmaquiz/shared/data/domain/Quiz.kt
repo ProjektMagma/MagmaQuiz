@@ -16,7 +16,7 @@ data class Quiz(
     var likesCount: Int,
     val likedByYou: Boolean,
     val averageRating: Double,
-    val tagList: List<String>,
+    val tagList: List<Tag>,
     val createdAt: Long,
     val modifiedAt: Long,
     val questionList: List<Question>

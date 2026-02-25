@@ -19,13 +19,13 @@ class UsersDataController(
     /**
      * Wyszukuje użytkowników po nazwie użytkownika.
      *
-     * @param userName Nazwa użytkownika do wyszukania (opcjonalnie)
+     * @param stringToSearch Nazwa użytkownika do wyszukania (opcjonalnie)
      * @return NetworkResource z listą użytkowników spełniających kryteria
      * (`206 Partial Content` jeśli lista jest ograniczona, `200 OK` w pozostałych przypadkach)
      */
-    fun usersFindByUserName(session: UserSession, userName: String? = null): NetworkResource<List<User>> {
+    fun usersFindByUserName(session: UserSession, count: Int, stringToSearch: String?): NetworkResource<List<User>> {
         val thisUser = userRepository.getUserData(session)
-        val userList = userRepository.getUsersByName(userName)
+        val userList = userRepository.getUsersByName(count, stringToSearch)
         val usersMapped =
             userList.filter { it.id != thisUser.id }
                 .map { it.toDomain(UserConversionCommand.ForeignUser(thisUser)) }
@@ -43,7 +43,10 @@ class UsersDataController(
         val thisUser = userRepository.getUserData(session)
         val userToFind = userRepository.getUserData(userId) ?: return NetworkResource.Error(HttpStatusCode.NotFound)
 
-        return NetworkResource.Success(userToFind.toDomain(UserConversionCommand.ForeignUserWithData(thisUser)))
+        return NetworkResource.Success(
+            userToFind.toDomain(UserConversionCommand.ForeignUserWithData(thisUser)),
+            HttpStatusCode.PartialContent
+        )
     }
 
     /**
@@ -121,15 +124,21 @@ class UsersDataController(
      * @param session Sesja użytkownika
      * @return NetworkResource z listą znajomych (`200 OK`)
      */
-    fun usersFriendshipFriendList(session: UserSession): NetworkResource<List<User>> {
+    fun usersFriendshipFriendList(
+        session: UserSession,
+        count: Int,
+        stringToSearch: String?
+    ): NetworkResource<List<User>> {
         val thisUser = userRepository.getUserData(session)
 
         val friendList = friendshipRepository.userFriendList(thisUser)
+            .filter { it.userName == stringToSearch }
+            .take(count)
             .map {
                 it.toDomain(UserConversionCommand.ForeignUser(thisUser))
             }
 
-        return NetworkResource.Success(friendList)
+        return NetworkResource.Success(friendList, HttpStatusCode.PartialContent)
     }
 
     /**
@@ -138,15 +147,21 @@ class UsersDataController(
      * @param session Sesja użytkownika
      * @return NetworkResource z listą użytkowników, którzy wysłali zaproszenia (`200 OK`)
      */
-    fun usersFriendshipIncoming(session: UserSession): NetworkResource<List<User>> {
+    fun usersFriendshipIncoming(
+        session: UserSession,
+        count: Int,
+        stringToSearch: String?
+    ): NetworkResource<List<User>> {
         val thisUser = userRepository.getUserData(session)
 
         val friendList = friendshipRepository.userInvitations(thisUser, true)
+            .filter { it.userName == stringToSearch }
+            .take(count)
             .map {
                 it.toDomain(UserConversionCommand.ForeignUser(thisUser))
             }
 
-        return NetworkResource.Success(friendList)
+        return NetworkResource.Success(friendList, HttpStatusCode.PartialContent)
     }
 
 
@@ -156,14 +171,20 @@ class UsersDataController(
      * @param session Sesja użytkownika
      * @return NetworkResource z listą użytkowników, do których wysłano zaproszenia (`200 OK`)
      */
-    fun usersFriendshipOutgoing(session: UserSession): NetworkResource<List<User>> {
+    fun usersFriendshipOutgoing(
+        session: UserSession,
+        count: Int,
+        stringToSearch: String?
+    ): NetworkResource<List<User>> {
         val thisUser = userRepository.getUserData(session)
 
         val friendList = friendshipRepository.userInvitations(thisUser, false)
+            .filter { it.userName == stringToSearch }
+            .take(count)
             .map {
                 it.toDomain(UserConversionCommand.ForeignUser(thisUser))
             }
 
-        return NetworkResource.Success(friendList)
+        return NetworkResource.Success(friendList, HttpStatusCode.PartialContent)
     }
 }

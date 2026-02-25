@@ -18,11 +18,13 @@ class QuizTagEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTagsTable),
     var tagName by QuizzesTagsTable.tagName
     private val quizzesList by QuizEntity via QuizzesTagsMapTable
 
+    var quizzesCount = quizzesList.count()
+
     override fun toDomain(command: ConversionCommand): Tag {
         return transaction {
             Tag(
                 tagName = tagName,
-                quizzesCount = quizzesList.count()
+                quizzesCount = quizzesCount
             )
         }
     }

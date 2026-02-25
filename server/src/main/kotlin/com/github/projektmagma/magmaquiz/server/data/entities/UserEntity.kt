@@ -37,6 +37,10 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
     var userBigProfilePicture by UsersTable.userBigProfilePicture
     var userSmallProfilePicture by UsersTable.userSmallProfilePicture
     var lastActivity by UsersTable.lastActivity
+    var userBio by UsersTable.userBio
+    var userCountryCode by UsersTable.userCountryCode
+    var userTown by UsersTable.userTown
+
     private val quizList by QuizEntity referrersOn QuizzesTable.quizCreator
     private val lastPlayedQuizzesList by QuizEntity via UsersGameHistoryTable
     private val favoriteQuizzesList by QuizEntity via UsersFavoriteQuizzesTable
@@ -53,6 +57,9 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
                         userProfilePicture = userBigProfilePicture,
                         createdAt = createdAt.epochSecond,
                         lastActivity = lastActivity.epochSecond,
+                        userBio = userBio,
+                        userCountryCode = userCountryCode,
+                        userTown = userTown,
                     )
                 }
 
@@ -63,6 +70,9 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
                         userProfilePicture = userSmallProfilePicture,
                         createdAt = createdAt.epochSecond,
                         lastActivity = lastActivity.epochSecond,
+                        userBio = "",
+                        userCountryCode = "",
+                        userTown = "",
                         friendshipStatus =
                             if (command.caller == null)
                                 FriendshipStatus.Unknown
@@ -78,6 +88,9 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
                         userProfilePicture = userBigProfilePicture,
                         createdAt = createdAt.epochSecond,
                         lastActivity = lastActivity.epochSecond,
+                        userBio = userBio,
+                        userCountryCode = userCountryCode,
+                        userTown = userTown,
                         friendshipStatus = checkFriendship(command.caller),
                     )
                 }

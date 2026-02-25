@@ -1,6 +1,8 @@
 package com.github.projektmagma.magmaquiz.server.repository
 
+import com.github.projektmagma.magmaquiz.server.data.entities.QuizReviewEntity
 import com.github.projektmagma.magmaquiz.server.data.entities.UserEntity
+import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesReviewsTable
 import com.github.projektmagma.magmaquiz.server.data.tables.UsersTable
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import org.jetbrains.exposed.v1.core.and
@@ -23,18 +25,18 @@ class UserRepository {
 
     fun getUserData(session: UserSession) = getUserData(session.userId)!!
 
-    fun getUsersByName(userName: String? = null, maxCount: Int = 100): List<UserEntity> {
+    fun getUsersByName(count: Int, stringToSearch: String?): List<UserEntity> {
         return transaction {
-            if (userName.isNullOrBlank())
+            if (stringToSearch.isNullOrBlank())
                 UserEntity.find {
                     UsersTable.isActive eq true
                 }
                     .sortedBy { it.lastActivity }
                     .reversed()
-                    .take(maxCount)
+                    .take(count)
                     .toList()
             else
-                UserEntity.find { UsersTable.userName.lowerCase() like "%${userName.lowercase()}%" and UsersTable.isActive }
+                UserEntity.find { UsersTable.userName.lowerCase() like "%${stringToSearch.lowercase()}%" and UsersTable.isActive }
                     .toList()
         }
     }
@@ -45,6 +47,14 @@ class UserRepository {
                 UsersTable.userEmail eq email and
                         UsersTable.isActive.eq(true)
             }.firstOrNull()
+        }
+    }
+
+    fun getUserReviews(userEntity: UserEntity): List<QuizReviewEntity> {
+        return transaction {
+            QuizReviewEntity.find {
+                QuizzesReviewsTable.author eq userEntity.id
+            }.toList()
         }
     }
 }

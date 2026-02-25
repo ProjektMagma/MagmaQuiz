@@ -57,7 +57,7 @@ class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable),
                         questionList = questionList.map { it.toDomain(ConversionCommand.Default) },
                         likedByYou = isFavoriteByUser(command.caller),
                         averageRating = getAverageRating(),
-                        tagList = tagList.map { it.tagName }
+                        tagList = tagList.map { it.toDomain(ConversionCommand.Default) }
                     )
                 }
 
@@ -78,7 +78,7 @@ class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable),
                         questionList = emptyList(),
                         likedByYou = isFavoriteByUser(command.caller),
                         averageRating = getAverageRating(),
-                        tagList = tagList.map { it.tagName }
+                        tagList = tagList.map { it.toDomain(ConversionCommand.Default) }
                     )
                 }
 
@@ -95,7 +95,7 @@ class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable),
                         questionList = emptyList(),
                         likedByYou = isFavoriteByUser(command.caller),
                         averageRating = getAverageRating(),
-                        tagList = tagList.map { it.tagName }
+                        tagList = tagList.map { it.toDomain(ConversionCommand.Default) }
                     )
             }
         }
@@ -115,5 +115,34 @@ class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable),
 
     fun isUserCreator(userEntity: UserEntity): Boolean {
         return transaction { userEntity.id == quizCreator.id }
+    }
+
+    fun getTags(): List<QuizTagEntity> {
+        return transaction { tagList.toList() }
+    }
+
+    fun addTags(tagsStr: List<String>) {
+        transaction {
+            tagsStr.forEach { tagStr ->
+                val tagEntity = QuizTagEntity.find {
+                    QuizzesTagsTable.tagName eq tagStr
+                }.firstOrNull()
+
+                if (tagEntity != null) {
+                    QuizTagMapEntity.new {
+                        tag = tagEntity
+                        quiz = this@QuizEntity
+                    }
+                } else {
+                    val tagEntity = QuizTagEntity.new {
+                        tagName = tagStr
+                    }
+                    QuizTagMapEntity.new {
+                        tag = tagEntity
+                        quiz = this@QuizEntity
+                    }
+                }
+            }
+        }
     }
 }

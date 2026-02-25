@@ -3,7 +3,7 @@ package com.github.projektmagma.magmaquiz.shared.data.domain
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.User
 import com.github.projektmagma.magmaquiz.shared.data.domain.serializers.UUIDSerializer
 import kotlinx.serialization.Serializable
-import java.util.UUID
+import java.util.*
 
 @Serializable
 data class ForeignUser(
@@ -13,6 +13,9 @@ data class ForeignUser(
     override val userProfilePicture: ByteArray? = null,
     override val createdAt: Long,
     override val lastActivity: Long,
-    val friendshipStatus: FriendshipStatus
+    override val userBio: String,
+    override val userCountryCode: String,
+    override val userTown: String,
+    val friendshipStatus: FriendshipStatus,
 ) : User
 

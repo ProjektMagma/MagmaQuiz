@@ -1,10 +1,8 @@
 package com.github.projektmagma.magmaquiz.server.repository
 
 import com.github.projektmagma.magmaquiz.server.data.entities.*
-import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesQuestionsAnswersTable
-import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesQuestionsTable
-import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesTable
-import com.github.projektmagma.magmaquiz.server.data.tables.UsersFavoriteQuizzesTable
+import com.github.projektmagma.magmaquiz.server.data.tables.*
+import com.github.projektmagma.magmaquiz.shared.data.domain.QuizReview
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
 import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
@@ -37,6 +35,10 @@ class QuizRepository {
                     }
                 }
             }
+
+            innerQuiz.addTags(quizValue.tagList)
+
+
             innerQuiz
         }
     }
@@ -108,6 +110,16 @@ class QuizRepository {
             val existingQuestions = mutableListOf<EntityID<UUID>>()
             val existingAnswers = mutableListOf<EntityID<UUID>>()
 
+            val tagsToDelete = quizEntity.getTags().filterNot { newData.tagList.contains(it.tagName) }
+
+            tagsToDelete.forEach {
+                QuizTagMapEntity.find { QuizzesTagsMapTable.quiz eq quizEntity.id and (QuizzesTagsMapTable.tag eq it.id) }
+                    .firstOrNull()?.delete()
+            }
+
+            quizEntity.addTags(newData.tagList.filterNot { tagsToDelete.map { t -> t.tagName }.contains(it) })
+
+
             newData.questionList.forEach { postQuestion ->
                 if (postQuestion.id != null) { // modyfikacja starych pytania
                     val q = transaction {
@@ -176,6 +188,48 @@ class QuizRepository {
                 }
                     .forEach { it.isActive = false }
             }
+        }
+    }
+
+    fun markAsPlayed(quizEntity: QuizEntity, userEntity: UserEntity) {
+        transaction {
+            UserGameHistoryEntity.new {
+                quiz = quizEntity
+                user = userEntity
+            }
+        }
+    }
+
+    fun getQuizReviews(quizEntity: QuizEntity): List<QuizReviewEntity> {
+        return transaction {
+            QuizReviewEntity.find {
+                QuizzesReviewsTable.quiz eq quizEntity.id
+            }.toList()
+        }
+    }
+
+    fun createReview(review: QuizReview, quizEntity: QuizEntity, userEntity: UserEntity) {
+        transaction {
+            QuizReviewEntity.new {
+                author = userEntity
+                quiz = quizEntity
+                rating = review.rating
+                comment = review.comment
+            }
+        }
+    }
+
+    fun getExistingTags(count: Int, stringToSearch: String?): List<QuizTagEntity> {
+        return transaction {
+            if (stringToSearch.isNullOrBlank())
+                QuizTagEntity.all()
+                    .sortedBy { it.quizzesCount }
+                    .reversed()
+                    .take(count)
+                    .toList()
+            else
+                QuizTagEntity.find { QuizzesTagsTable.tagName.lowerCase() like "%${stringToSearch.lowercase()}%" }
+                    .toList()
         }
     }
 }
