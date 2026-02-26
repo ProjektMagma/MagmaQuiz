@@ -4,24 +4,20 @@ import com.github.projektmagma.magmaquiz.server.data.entities.UserEntity
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import com.github.projektmagma.magmaquiz.server.repository.UserRepository
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkResource
-import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangeEmailValue
-import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangePasswordValue
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangeProfilePictureValue
-import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangeUserNameValue
 import io.ktor.http.*
-import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 class SettingsDataController(private val userRepository: UserRepository) {
 
     fun settingsChangePassword(
         session: UserSession,
-        changePasswordValue: ChangePasswordValue
+        newPassword: String
     ): NetworkResource<Unit> {
 
         val thisUser = userRepository.getUserData(session)
 
-        thisUser.setHashedPassword(changePasswordValue.newPassword)
+        thisUser.setHashedPassword(newPassword)
 
         return NetworkResource.Success(Unit)
     }
@@ -51,15 +47,15 @@ class SettingsDataController(private val userRepository: UserRepository) {
 
     fun settingsChangeUserName(
         session: UserSession,
-        postContent: ChangeUserNameValue
+        newUserName: String
     ): NetworkResource<Unit> {
         val thisUser = userRepository.getUserData(session)
 
-        if (UserEntity.isNameTaken(postContent.newUserName))
+        if (UserEntity.isNameTaken(newUserName))
             return NetworkResource.Error(HttpStatusCode.Conflict)
 
         transaction {
-            thisUser.userName = postContent.newUserName
+            thisUser.userName = newUserName
         }
 
         return NetworkResource.Success(Unit)
@@ -67,16 +63,46 @@ class SettingsDataController(private val userRepository: UserRepository) {
 
     fun settingsChangeEmail(
         session: UserSession,
-        postContent: ChangeEmailValue
+        newEmail: String
     ): NetworkResource<Unit> {
         val thisUser = userRepository.getUserData(session)
 
-        if (UserEntity.isEmailTaken(postContent.newEmail))
+        if (UserEntity.isEmailTaken(newEmail))
             return NetworkResource.Error(HttpStatusCode.Conflict)
 
 
         transaction {
-            thisUser.userEmail = postContent.newEmail
+            thisUser.userEmail = newEmail
+        }
+
+        return NetworkResource.Success(Unit)
+    }
+
+    fun settingsChangeBio(session: UserSession, newBio: String): NetworkResource<Unit> {
+        val thisUser = userRepository.getUserData(session)
+
+        transaction {
+            thisUser.userBio = newBio
+        }
+
+        return NetworkResource.Success(Unit)
+    }
+
+    fun settingsChangeCountryCode(session: UserSession, newCountryCode: String): NetworkResource<Unit> {
+        val thisUser = userRepository.getUserData(session)
+
+        transaction {
+            thisUser.userCountryCode = newCountryCode
+        }
+
+        return NetworkResource.Success(Unit)
+    }
+
+    fun settingsChangeTown(session: UserSession, newTown: String): NetworkResource<Unit> {
+        val thisUser = userRepository.getUserData(session)
+
+        transaction {
+            thisUser.userTown = newTown
         }
 
         return NetworkResource.Success(Unit)

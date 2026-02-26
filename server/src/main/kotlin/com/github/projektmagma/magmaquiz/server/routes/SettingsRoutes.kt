@@ -4,10 +4,7 @@ import com.github.projektmagma.magmaquiz.server.controllers.SettingsDataControll
 import com.github.projektmagma.magmaquiz.server.data.util.AuthTypes
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import com.github.projektmagma.magmaquiz.server.data.util.respondToResource
-import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangeEmailValue
-import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangePasswordValue
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangeProfilePictureValue
-import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangeUserNameValue
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.request.*
@@ -22,35 +19,68 @@ fun Application.settingsRoutes(settingsDataController: SettingsDataController) {
 
                 route("/change") {
 
-                    post("/userName") {
+                    get("/userName/{newUserName}") {
                         val session = call.sessions.get<UserSession>()!!
-                        val postContent = call.receive<ChangeUserNameValue>()
+                        val newUserName = call.parameters["newUserName"]!!
 
                         call.respondToResource(
                             settingsDataController.settingsChangeUserName(
-                                session, postContent
+                                session, newUserName
                             )
                         )
                     }
 
-                    post("/email") {
+                    get("/email/{newEmail}") {
                         val session = call.sessions.get<UserSession>()!!
-                        val postContent = call.receive<ChangeEmailValue>()
+                        val newEmail = call.parameters["newUserName"]!!
 
                         call.respondToResource(
                             settingsDataController.settingsChangeEmail(
-                                session, postContent
+                                session, newEmail
                             )
                         )
                     }
 
-                    post("/password") {
+                    get("/password/{newPassword}") {
                         val session = call.sessions.get<UserSession>()!!
-                        val postContent = call.receive<ChangePasswordValue>()
+                        val newPassword = call.parameters["newPassword"]!!
 
                         call.respondToResource(
                             settingsDataController.settingsChangePassword(
-                                session, postContent
+                                session, newPassword
+                            )
+                        )
+                    }
+
+                    get("/bio/{newBio}") {
+                        val session = call.sessions.get<UserSession>()!!
+                        val newBio = call.parameters["newBio"]!!
+
+                        call.respondToResource(
+                            settingsDataController.settingsChangeBio(
+                                session, newBio
+                            )
+                        )
+                    }
+
+                    get("/countryCode/{newCountryCode}") {
+                        val session = call.sessions.get<UserSession>()!!
+                        val newCountryCode = call.parameters["newCountryCode"]!!
+
+                        call.respondToResource(
+                            settingsDataController.settingsChangeCountryCode(
+                                session, newCountryCode
+                            )
+                        )
+                    }
+
+                    get("/town/{newTown}") {
+                        val session = call.sessions.get<UserSession>()!!
+                        val newTown = call.parameters["newTown"]!!
+
+                        call.respondToResource(
+                            settingsDataController.settingsChangeTown(
+                                session, newTown
                             )
                         )
                     }
@@ -66,7 +96,7 @@ fun Application.settingsRoutes(settingsDataController: SettingsDataController) {
                         )
                     }
                 }
-                get("/deleteAccount") {
+                delete("/deleteAccount") {
                     val session = call.sessions.get<UserSession>()!!
                     call.sessions.clear<UserSession>()
                     call.respondToResource(settingsDataController.settingsDelete(session, false))

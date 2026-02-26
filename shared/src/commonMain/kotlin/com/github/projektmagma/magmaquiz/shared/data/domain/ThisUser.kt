@@ -14,5 +14,8 @@ data class ThisUser(
     val mustChangePassword: Boolean,
     override val userProfilePicture: ByteArray? = null,
     override val createdAt: Long,
-    override val lastActivity: Long
+    override val lastActivity: Long,
+    override val userBio: String,
+    override val userCountryCode: String,
+    override val userTown: String
 ) : User

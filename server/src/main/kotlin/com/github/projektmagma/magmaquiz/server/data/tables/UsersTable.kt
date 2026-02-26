@@ -13,4 +13,7 @@ object UsersTable : ExtUUIDTable("users", "user_id") {
     val userBigProfilePicture = binary("user_big_profile_picture").nullable()
     val userSmallProfilePicture = binary("user_small_profile_picture").nullable()
     val lastActivity = timestamp("last_activity").clientDefault { Instant.now() }
+    val userBio = text("user_bio").default("")
+    val userCountryCode = varchar("user_country_code", 2).default("")
+    val userTown = varchar("user_town", 256).default("")
 }

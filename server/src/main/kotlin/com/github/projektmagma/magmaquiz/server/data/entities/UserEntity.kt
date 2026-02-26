@@ -3,10 +3,7 @@ package com.github.projektmagma.magmaquiz.server.data.entities
 import com.github.projektmagma.magmaquiz.server.data.abstraction.DomainCapable
 import com.github.projektmagma.magmaquiz.server.data.abstraction.ExtUUIDEntity
 import com.github.projektmagma.magmaquiz.server.data.conversion.UserConversionCommand
-import com.github.projektmagma.magmaquiz.server.data.tables.FavoriteQuizzesTable
-import com.github.projektmagma.magmaquiz.server.data.tables.FriendshipsTable
-import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesTable
-import com.github.projektmagma.magmaquiz.server.data.tables.UsersTable
+import com.github.projektmagma.magmaquiz.server.data.tables.*
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import com.github.projektmagma.magmaquiz.shared.data.domain.FriendshipStatus
 import com.github.projektmagma.magmaquiz.shared.data.domain.ThisUser
@@ -14,12 +11,11 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.User
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.eq
-import org.jetbrains.exposed.v1.core.inList
 import org.jetbrains.exposed.v1.core.or
 import org.jetbrains.exposed.v1.dao.java.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
-import java.util.UUID
+import java.util.*
 
 class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapable<User, UserConversionCommand> {
     companion object : UUIDEntityClass<UserEntity>(UsersTable) {
@@ -41,7 +37,13 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
     var userBigProfilePicture by UsersTable.userBigProfilePicture
     var userSmallProfilePicture by UsersTable.userSmallProfilePicture
     var lastActivity by UsersTable.lastActivity
+    var userBio by UsersTable.userBio
+    var userCountryCode by UsersTable.userCountryCode
+    var userTown by UsersTable.userTown
+
     private val quizList by QuizEntity referrersOn QuizzesTable.quizCreator
+    private val lastPlayedQuizzesList by QuizEntity via UsersGameHistoryTable
+    private val favoriteQuizzesList by QuizEntity via UsersFavoriteQuizzesTable
 
     override fun toDomain(command: UserConversionCommand): User {
         return transaction {
@@ -55,33 +57,60 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
                         userProfilePicture = userBigProfilePicture,
                         createdAt = createdAt.epochSecond,
                         lastActivity = lastActivity.epochSecond,
+                        userBio = userBio,
+                        userCountryCode = userCountryCode,
+                        userTown = userTown,
                     )
                 }
 
-                is UserConversionCommand.ForeignUserWithSmallPicture -> {
+                is UserConversionCommand.ForeignUser -> {
                     ForeignUser(
                         userId = super.id.value,
                         userName = userName,
                         userProfilePicture = userSmallProfilePicture,
                         createdAt = createdAt.epochSecond,
                         lastActivity = lastActivity.epochSecond,
-                        friendshipStatus = checkFriendship(command.caller),
+                        userBio = "",
+                        userCountryCode = "",
+                        userTown = "",
+                        friendshipStatus =
+                            if (command.caller == null)
+                                FriendshipStatus.Unknown
+                            else
+                                checkFriendship(command.caller),
                     )
                 }
 
-                is UserConversionCommand.ForeignUserWithBigPicture -> {
+                is UserConversionCommand.ForeignUserWithData -> {
                     ForeignUser(
                         userId = super.id.value,
                         userName = userName,
                         userProfilePicture = userBigProfilePicture,
                         createdAt = createdAt.epochSecond,
                         lastActivity = lastActivity.epochSecond,
+                        userBio = userBio,
+                        userCountryCode = userCountryCode,
+                        userTown = userTown,
                         friendshipStatus = checkFriendship(command.caller),
                     )
                 }
             }
         }
 
+    }
+
+    private fun checkFriendship(otherUser: UserEntity): FriendshipStatus {
+        return transaction {
+            val friendship = UserFriendshipEntity.find {
+                (UsersFriendshipsTable.userFrom eq otherUser.id and (UsersFriendshipsTable.userTo eq this@UserEntity.id)) or
+                        (UsersFriendshipsTable.userTo eq otherUser.id and (UsersFriendshipsTable.userFrom eq this@UserEntity.id)) and UsersFriendshipsTable.isActive
+            }.firstOrNull()
+
+            if (friendship == null) return@transaction FriendshipStatus.None
+            else if (friendship.wasAccepted) return@transaction FriendshipStatus.Friends
+            else if (friendship.userTo.id == otherUser.id) return@transaction FriendshipStatus.Incoming
+            else return@transaction FriendshipStatus.Outgoing
+        }
     }
 
     fun setHashedPassword(password: String) {
@@ -95,38 +124,16 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
         return transaction { BCrypt.checkpw(password, userPassword) }
     }
 
-    private fun checkFriendship(otherUser: UserEntity): FriendshipStatus {
-        return transaction {
-            val friendship = FriendshipEntity.find {
-                (FriendshipsTable.userFrom eq otherUser.id and (FriendshipsTable.userTo eq this@UserEntity.id)) or
-                        (FriendshipsTable.userTo eq otherUser.id and (FriendshipsTable.userFrom eq this@UserEntity.id)) and FriendshipsTable.isActive
-            }.firstOrNull()
-
-            if (friendship == null) return@transaction FriendshipStatus.None
-            else if (friendship.wasAccepted) return@transaction FriendshipStatus.Friends
-            else if (friendship.userTo.id == otherUser.id) return@transaction FriendshipStatus.Incoming
-            else return@transaction FriendshipStatus.Outgoing
-        }
-    }
-
 
     fun favoriteQuizzes(): List<QuizEntity> {
-        return transaction {
-            val favorites =
-                FavoriteQuizzesEntity.find {
-                    FavoriteQuizzesTable.user eq this@UserEntity.id and
-                            (FavoriteQuizzesTable.isActive)
-                }
-                    .map { it.quiz.id }
-            QuizEntity.find {
-                QuizzesTable.isActive eq true and
-                        (QuizzesTable.isPublic eq true or (QuizzesTable.quizCreator eq this@UserEntity.id)) and
-                        (QuizzesTable.id inList (favorites))
-            }.toList()
-        }
+        return transaction { favoriteQuizzesList.toList() }
     }
 
     fun getUserQuizzes(): List<QuizEntity> {
         return transaction { quizList.toList() }
+    }
+
+    fun getLastPlayedQuizzes(): List<QuizEntity> {
+        return transaction { lastPlayedQuizzesList.toList() }
     }
 }

@@ -15,6 +15,8 @@ data class Quiz(
     val quizCreator: ForeignUser? = null,
     var likesCount: Int,
     val likedByYou: Boolean,
+    val averageRating: Double,
+    val tagList: List<Tag>,
     val createdAt: Long,
     val modifiedAt: Long,
     val questionList: List<Question>

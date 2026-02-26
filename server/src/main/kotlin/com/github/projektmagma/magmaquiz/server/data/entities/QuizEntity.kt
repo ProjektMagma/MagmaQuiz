@@ -5,9 +5,7 @@ import com.github.projektmagma.magmaquiz.server.data.abstraction.ExtUUIDEntity
 import com.github.projektmagma.magmaquiz.server.data.conversion.ConversionCommand
 import com.github.projektmagma.magmaquiz.server.data.conversion.QuizConversionCommand
 import com.github.projektmagma.magmaquiz.server.data.conversion.UserConversionCommand
-import com.github.projektmagma.magmaquiz.server.data.tables.FavoriteQuizzesTable
-import com.github.projektmagma.magmaquiz.server.data.tables.QuestionsTable
-import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesTable
+import com.github.projektmagma.magmaquiz.server.data.tables.*
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 import org.jetbrains.exposed.v1.core.and
@@ -28,20 +26,23 @@ class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable),
         }
     }
 
-    var quizCreator by UserEntity referencedOn QuizzesTable.quizCreator
     var quizName by QuizzesTable.quizName
     var quizDescription by QuizzesTable.quizDescription
     var quizImage by QuizzesTable.quizImage
     var isPublic by QuizzesTable.isPublic
     var likesCount by QuizzesTable.likesCount
-    val questionList by QuestionEntity referrersOn QuestionsTable.quiz
+    var quizCreator by UserEntity referencedOn QuizzesTable.quizCreator
+    private val questionList by QuizQuestionEntity referrersOn QuizzesQuestionsTable.quiz
+    private val reviewList by QuizReviewEntity referrersOn QuizzesReviewsTable.quiz
+    private val favoritesList by UserFavoriteQuizzesEntity referrersOn UsersFavoriteQuizzesTable.quiz
+    private val tagList by QuizTagEntity via QuizzesTagsMapTable
 
     override fun toDomain(command: QuizConversionCommand): Quiz {
         return transaction {
             when (command) {
                 is QuizConversionCommand.WithUserAndQuestions -> {
                     val quizCreator =
-                        quizCreator.toDomain(UserConversionCommand.ForeignUserWithSmallPicture(command.caller))
+                        quizCreator.toDomain(UserConversionCommand.ForeignUser(command.caller))
                                 as ForeignUser
                     Quiz(
                         id = super.id.value,
@@ -54,13 +55,15 @@ class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable),
                         createdAt = createdAt.epochSecond,
                         modifiedAt = modifiedAt.epochSecond,
                         questionList = questionList.map { it.toDomain(ConversionCommand.Default) },
-                        likedByYou = isFavoriteByUser(command.caller)
+                        likedByYou = isFavoriteByUser(command.caller),
+                        averageRating = getAverageRating(),
+                        tagList = tagList.map { it.toDomain(ConversionCommand.Default) }
                     )
                 }
 
                 is QuizConversionCommand.WithUserNoQuestions -> {
                     val quizCreator =
-                        quizCreator.toDomain(UserConversionCommand.ForeignUserWithSmallPicture(command.caller))
+                        quizCreator.toDomain(UserConversionCommand.ForeignUser(command.caller))
                                 as ForeignUser
                     Quiz(
                         id = super.id.value,
@@ -73,7 +76,9 @@ class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable),
                         createdAt = createdAt.epochSecond,
                         modifiedAt = modifiedAt.epochSecond,
                         questionList = emptyList(),
-                        likedByYou = isFavoriteByUser(command.caller)
+                        likedByYou = isFavoriteByUser(command.caller),
+                        averageRating = getAverageRating(),
+                        tagList = tagList.map { it.toDomain(ConversionCommand.Default) }
                     )
                 }
 
@@ -88,20 +93,56 @@ class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable),
                         createdAt = createdAt.epochSecond,
                         modifiedAt = modifiedAt.epochSecond,
                         questionList = emptyList(),
-                        likedByYou = isFavoriteByUser(command.caller)
+                        likedByYou = isFavoriteByUser(command.caller),
+                        averageRating = getAverageRating(),
+                        tagList = tagList.map { it.toDomain(ConversionCommand.Default) }
                     )
             }
         }
     }
 
+    private fun getAverageRating(): Double {
+        return transaction { reviewList.map { it.rating }.average() }
+    }
+
     private fun isFavoriteByUser(user: UserEntity): Boolean {
-        return transaction {
-            FavoriteQuizzesEntity.find { FavoriteQuizzesTable.quiz eq this@QuizEntity.id and (FavoriteQuizzesTable.user eq user.id) and (FavoriteQuizzesTable.isActive) }
-                .firstOrNull() != null
-        }
+        return transaction { favoritesList.any { it.user.id == user.id && it.isActive } }
+    }
+
+    fun getQuestions(): List<QuizQuestionEntity> {
+        return transaction { questionList.toList() }
     }
 
     fun isUserCreator(userEntity: UserEntity): Boolean {
-        return transaction { userEntity.id == quizCreator }
+        return transaction { userEntity.id == quizCreator.id }
+    }
+
+    fun getTags(): List<QuizTagEntity> {
+        return transaction { tagList.toList() }
+    }
+
+    fun addTags(tagsStr: List<String>) {
+        transaction {
+            tagsStr.forEach { tagStr ->
+                val tagEntity = QuizTagEntity.find {
+                    QuizzesTagsTable.tagName eq tagStr
+                }.firstOrNull()
+
+                if (tagEntity != null) {
+                    QuizTagMapEntity.new {
+                        tag = tagEntity
+                        quiz = this@QuizEntity
+                    }
+                } else {
+                    val tagEntity = QuizTagEntity.new {
+                        tagName = tagStr
+                    }
+                    QuizTagMapEntity.new {
+                        tag = tagEntity
+                        quiz = this@QuizEntity
+                    }
+                }
+            }
+        }
     }
 }
