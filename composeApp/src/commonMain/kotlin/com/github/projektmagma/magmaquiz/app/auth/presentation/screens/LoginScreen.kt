@@ -52,6 +52,7 @@ fun LoginScreen(
     Column(
         modifier = Modifier
             .padding(horizontal = 32.dp)
+            .imePadding()
             .fillMaxSize()
             .widthIn(max = 512.dp),
         horizontalAlignment = Alignment.CenterHorizontally,

@@ -19,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.WindowPlacement
 import com.github.projektmagma.magmaquiz.app.core.MainWindow
 
 @Composable
@@ -59,12 +58,10 @@ fun WindowActionsButtonsRow(
             modifier = Modifier.size(50.dp).padding(0.dp),
             shape = RectangleShape,
             onClick = {
-                MainWindow.windowState.placement =
-                    if (MainWindow.windowState.placement == WindowPlacement.Maximized)
-                        WindowPlacement.Floating else WindowPlacement.Maximized
+                MainWindow.toggleMaximized()
             }) {
             Icon(
-                imageVector = if (MainWindow.windowState.placement == WindowPlacement.Maximized) Icons.Default.FullscreenExit else Icons.Default.Fullscreen,
+                imageVector = if (MainWindow.isMaximized) Icons.Default.FullscreenExit else Icons.Default.Fullscreen,
                 contentDescription = null
             )
         }
