@@ -34,7 +34,7 @@ fun getRoomDatabase(
             override fun onCreate(connection: SQLiteConnection) {
                 super.onCreate(connection)
                 CoroutineScope(Dispatchers.IO).launch { 
-                    getServerConfigDao(database).insert(
+                    getServerConfigDao(database).insertOrUpdate(
                         ServerConfigEntity(
                             name = "Default",
                             ip = "api.projektmagma.pl",

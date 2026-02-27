@@ -83,6 +83,8 @@ fun FriendshipButtons(
                 }
             )
         }
+
+        FriendshipStatus.Unknown -> {}// todo nie wiem co tu powinno byc 
     }
 }
 

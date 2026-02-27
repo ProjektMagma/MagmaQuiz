@@ -12,8 +12,8 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.QuizReview
 import com.github.projektmagma.magmaquiz.shared.data.domain.Tag
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkResource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
-import io.ktor.http.*
-import java.util.*
+import io.ktor.http.HttpStatusCode
+import java.util.UUID
 
 
 class QuizDataController(
@@ -106,7 +106,7 @@ class QuizDataController(
 
         val quizzesList =
             thisUser.favoriteQuizzes()
-                .filter { it.quizName == stringToSearch }
+                .filter { stringToSearch.isNullOrBlank() || it.quizName.equals(stringToSearch, true) }
                 .take(count)
                 .map { it.toDomain(QuizConversionCommand.WithUserNoQuestions(thisUser)) }
 
@@ -146,7 +146,7 @@ class QuizDataController(
         val thisUser = userRepository.getUserData(session)
 
         val quizList = quizRepository.getQuizzesByName()
-            .filter { it.quizName == stringToSearch }
+            .filter { stringToSearch.isNullOrBlank() || it.quizName.equals(stringToSearch, true) }
             .sortedBy { it.createdAt }
             .reversed()
             .take(count)
@@ -159,7 +159,7 @@ class QuizDataController(
         val thisUser = userRepository.getUserData(session)
 
         val quizList = quizRepository.getQuizzesByName()
-            .filter { it.quizName == stringToSearch }
+            .filter { stringToSearch.isNullOrBlank() || it.quizName.equals(stringToSearch, true) }
             .sortedBy { it.likesCount }
             .reversed()
             .take(count)
@@ -178,7 +178,7 @@ class QuizDataController(
 
         return NetworkResource.Success(
             quizzesList
-                .filter { it.quizName == stringToSearch }
+                .filter { stringToSearch.isNullOrBlank() || it.quizName.equals(stringToSearch, true) }
                 .sortedBy { it.likesCount }
                 .take(count)
                 .map {

@@ -14,32 +14,32 @@ class UsersRepository(
 ) { 
     val usersState = MutableStateFlow(UsersState())
     val user = MutableStateFlow<User?>(null)
+
+    suspend fun getSendFriendInvite(uuid: UUID): Resource<Unit, NetworkError> {
+        return usersService.getSendFriendInvite(uuid)
+    }
+
+    suspend fun getAcceptFriendInvite(uuid: UUID): Resource<Unit, NetworkError> {
+        return usersService.getAcceptFriendInvite(uuid)
+    }
+
+    suspend fun getFriendList(name: String, count: Int = 10): Resource<List<ForeignUser>, NetworkError> {
+        return usersService.getFriendList(name, count)
+    }
+
+    suspend fun getIncomingInvitations(name: String = "", count: Int = 10): Resource<List<ForeignUser>, NetworkError> {
+        return usersService.getIncomingInvitations(name, count)
+    }
+
+    suspend fun getOutgoingInvitations(name: String, count: Int = 10): Resource<List<ForeignUser>, NetworkError> {
+        return usersService.getOutgoingInvitations(name, count)
+    }
     
-    suspend fun getFindUsersByName(name: String): Resource<List<ForeignUser>, NetworkError> {
-        return usersService.getFindUsersByName(name)
+    suspend fun getFindUsers(name: String = "", count: Int = 10): Resource<List<ForeignUser>, NetworkError> {
+        return usersService.getFindUsers(name, count)
     }
 
     suspend fun getUserDataById(uuid: UUID): Resource<ForeignUser, NetworkError> {
         return usersService.getUserDataById(uuid)
-    }
-
-    suspend fun getFriendList(): Resource<List<ForeignUser>, NetworkError> {
-        return usersService.getFriendList()
-    }
-    
-    suspend fun getIncomingInvitations(): Resource<List<ForeignUser>, NetworkError> {
-        return usersService.getIncomingInvitations()
-    }
-    
-    suspend fun getOutgoingInvitations(): Resource<List<ForeignUser>, NetworkError> {
-        return usersService.getOutgoingInvitations()
-    }
-    
-    suspend fun getSendFriendInvite(uuid: UUID): Resource<Unit, NetworkError> {
-        return usersService.getSendFriendInvite(uuid)
-    }
-    
-    suspend fun getAcceptFriendInvite(uuid: UUID): Resource<Unit, NetworkError> {
-        return usersService.getAcceptFriendInvite(uuid)
     }
 }

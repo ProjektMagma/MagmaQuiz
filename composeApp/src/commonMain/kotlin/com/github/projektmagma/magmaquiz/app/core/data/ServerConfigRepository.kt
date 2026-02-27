@@ -10,12 +10,12 @@ class ServerConfigRepository(
 ) { 
     suspend fun insert(state: ServerConfigState){
         serverConfigDao.deselectAll()
-        serverConfigDao.insert(state.toEntity())
+        serverConfigDao.insertOrUpdate(state.toEntity())
     }
     
     suspend fun update(state: ServerConfigState){
         serverConfigDao.deselectAll()
-        serverConfigDao.update(state.toEntity().copy(id = state.id))
+        serverConfigDao.insertOrUpdate(state.toEntity().copy(id = state.id))
     }
     
     fun getAllConfigs() = serverConfigDao.getAllConfigsDesc()

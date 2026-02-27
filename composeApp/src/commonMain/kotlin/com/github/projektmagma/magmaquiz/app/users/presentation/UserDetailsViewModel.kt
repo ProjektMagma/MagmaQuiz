@@ -38,15 +38,22 @@ class UserDetailsViewModel(
         getUserData(id)
     }
 
-    private fun getQuizzesByUserId(id: UUID) {
-        viewModelScope.launch { 
-            _uiState.value = UiState.Loading
+    fun getQuizzesByUserId(id: UUID) {
+        viewModelScope.launch {
+            _quizzes.value = null
             quizRepository.getQuizzesByUserId(id)
-                .whenSuccess { 
-                    _uiState.value = UiState.Success
+                .whenSuccess {
                     _quizzes.value = it.data
                 }
                 .whenError { _uiState.value = UiState.Error(it.error.toResId()) }
+        }
+    }
+    
+    fun getUserHistory(){
+        viewModelScope.launch { 
+            _quizzes.value = null
+            quizRepository.getMyGameHistory()
+                .whenSuccess { _quizzes.value = it.data }
         }
     }
     
@@ -55,9 +62,11 @@ class UserDetailsViewModel(
             _uiState.value = UiState.Loading
             if (checkOwnership(id)) {
                 _user.value = authRepository.thisUser.value
+                _uiState.value = UiState.Success
             } else {
                 usersRepository.getUserDataById(id)
                     .whenSuccess {
+                        _uiState.value = UiState.Success
                         _user.value = it.data
                     }
                     .whenError { _uiState.value = UiState.Error(it.error.toResId()) }
@@ -82,7 +91,7 @@ class UserDetailsViewModel(
             quizRepository.deleteQuiz(id)
                 .whenSuccess {
                      _quizzes.update { quizzes -> 
-                        quizzes.filter { quiz ->
+                        quizzes?.filter { quiz ->
                             quiz.id != id
                         }
                     }

@@ -14,13 +14,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SecondaryTabRow
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -36,6 +42,10 @@ import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.Q
 import com.github.projektmagma.magmaquiz.app.users.presentation.UserDetailsViewModel
 import com.github.projektmagma.magmaquiz.app.users.presentation.UsersSharedViewModel
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.game_history
+import magmaquiz.composeapp.generated.resources.quizzes
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import java.util.UUID
 
@@ -122,22 +132,56 @@ fun UserDetailsScreen(
                                 usersSharedViewModel
                             )
                         }
+                        
+                        var selectedTabIndex by remember { mutableIntStateOf(0) }
+
+                        if (foreignUser == null){
+                            SecondaryTabRow(
+                                selectedTabIndex = selectedTabIndex,
+                                divider = { HorizontalDivider() },
+                            ) {
+                                Tab(
+                                    selected = selectedTabIndex == 0,
+                                    onClick = {
+                                        selectedTabIndex = 0
+                                        userDetailsViewModel.getQuizzesByUserId(id)
+                                    },
+                                ) {
+                                    Text(stringResource(Res.string.quizzes))
+                                }
+                                Tab(
+                                    selected = selectedTabIndex == 1,
+                                    onClick = {
+                                        selectedTabIndex = 1
+                                        userDetailsViewModel.getUserHistory()
+                                    },
+                                ) {
+                                    Text(stringResource(Res.string.game_history))
+                                }
+                            }
+                        }
                     }
                 }
 
-                items(quizzes) { quiz ->
-                    QuizCardSmall(
-                        quiz = quiz,
-                        showUserButton = false,
-                        navigateToQuizDetails = { navigateToQuizDetails(quiz.id!!) },
-                        changeFavoriteStatus = { userDetailsViewModel.changeFavoriteStatus(quiz.id!!) },
-                        navigateToEditScreen = { navigateToEditScreen(quiz.id!!) },
-                        canEdit = userDetailsViewModel.checkOwnership(quiz.quizCreator?.userId!!),
-                        onDeleteClick = { userDetailsViewModel.deleteQuiz(quiz.id!!) },
-                        onEditClick = { createQuizViewModel.onCommand(QuizCommand.SetForEdit(quiz.id!!)) }
-                    )
+                if (quizzes != null) {
+                    items(quizzes!!) { quiz ->
+                        QuizCardSmall(
+                            quiz = quiz,
+                            showUserButton = false,
+                            navigateToQuizDetails = { navigateToQuizDetails(quiz.id!!) },
+                            changeFavoriteStatus = { userDetailsViewModel.changeFavoriteStatus(quiz.id!!) },
+                            navigateToEditScreen = { navigateToEditScreen(quiz.id!!) },
+                            canEdit = userDetailsViewModel.checkOwnership(quiz.quizCreator?.userId!!),
+                            onDeleteClick = { userDetailsViewModel.deleteQuiz(quiz.id!!) },
+                            onEditClick = { createQuizViewModel.onCommand(QuizCommand.SetForEdit(quiz.id!!)) }
+                        )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                } else {
+                    item {
+                        FullSizeCircularProgressIndicator()
+                    }
                 }
             }
         }

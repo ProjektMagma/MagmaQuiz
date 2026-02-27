@@ -11,36 +11,6 @@ import java.util.UUID
 class UsersService(
     private val httpClient: HttpClient,
 ) {
-    suspend fun getFindUsersByName(name: String): Resource<List<ForeignUser>, NetworkError> {
-        return safeCall<List<ForeignUser>> {
-            httpClient.get("users/find/$name")
-        }
-    }
-
-    suspend fun getUserDataById(uuid: UUID): Resource<ForeignUser, NetworkError> {
-        return safeCall<ForeignUser> {
-            httpClient.get("users/userData/$uuid")
-        }
-    }
-
-    suspend fun getFriendList(): Resource<List<ForeignUser>, NetworkError> {
-        return safeCall<List<ForeignUser>> {
-            httpClient.get("users/friendship/friendList")
-        }
-    }
-
-    suspend fun getIncomingInvitations(): Resource<List<ForeignUser>, NetworkError> {
-        return safeCall<List<ForeignUser>> {
-            httpClient.get("users/friendship/incoming")
-        }
-    }
-
-    suspend fun getOutgoingInvitations(): Resource<List<ForeignUser>, NetworkError> {
-        return safeCall<List<ForeignUser>> {
-            httpClient.get("users/friendship/outgoing")
-        }
-    }
-
     suspend fun getSendFriendInvite(uuid: UUID): Resource<Unit, NetworkError> {
         return safeCall<Unit> {
             httpClient.get("users/friendship/sendInvitation/$uuid")
@@ -50,6 +20,36 @@ class UsersService(
     suspend fun getAcceptFriendInvite(uuid: UUID): Resource<Unit, NetworkError> {
         return safeCall<Unit> {
             httpClient.get("users/friendship/acceptInvitation/$uuid")
+        }
+    }
+
+    suspend fun getFriendList(username: String, count: Int): Resource<List<ForeignUser>, NetworkError> {
+        return safeCall<List<ForeignUser>> {
+            httpClient.get("users/friendship/friendList/$count/$username")
+        }
+    }
+
+    suspend fun getIncomingInvitations(username: String, count: Int): Resource<List<ForeignUser>, NetworkError> {
+        return safeCall<List<ForeignUser>> {
+            httpClient.get("users/friendship/incoming/$count/$username")
+        }
+    }
+
+    suspend fun getOutgoingInvitations(username: String, count: Int): Resource<List<ForeignUser>, NetworkError> {
+        return safeCall<List<ForeignUser>> {
+            httpClient.get("users/friendship/outgoing/$count/$username")
+        }
+    }
+    
+    suspend fun getFindUsers(name: String, count: Int): Resource<List<ForeignUser>, NetworkError> {
+        return safeCall<List<ForeignUser>> {
+            httpClient.get("users/find/$count/$name")
+        }
+    }
+
+    suspend fun getUserDataById(uuid: UUID): Resource<ForeignUser, NetworkError> {
+        return safeCall<ForeignUser> {
+            httpClient.get("users/userData/$uuid")
         }
     }
 }

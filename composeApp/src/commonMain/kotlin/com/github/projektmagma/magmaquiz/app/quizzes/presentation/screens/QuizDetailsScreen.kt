@@ -1,12 +1,24 @@
 package com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -19,9 +31,10 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.components.Profil
 import com.github.projektmagma.magmaquiz.app.core.presentation.ui.theme.favoritePink
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.QuizDetailsViewModel
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuestionNumber
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.TagList
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
-import java.util.*
+import java.util.UUID
 
 @Composable
 fun QuizDetailsScreen(
@@ -31,6 +44,9 @@ fun QuizDetailsScreen(
     val quizDetailsViewModel: QuizDetailsViewModel = koinViewModel { parametersOf(id) }
 
     val quiz by quizDetailsViewModel.quiz.collectAsStateWithLifecycle()
+    
+    val state by quizDetailsViewModel.quizListState.collectAsStateWithLifecycle()
+    val currentQuiz = state.quizzes.firstOrNull { it.id == id }
 
     if (quiz == null) {
         FullSizeCircularProgressIndicator()
@@ -82,13 +98,13 @@ fun QuizDetailsScreen(
                                 }
                             ) {
                                 Icon(
-                                    imageVector = if (quiz!!.likedByYou)
+                                    imageVector = if (currentQuiz?.likedByYou == true)
                                         Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
                                     tint = favoritePink,
                                     contentDescription = "FavoriteButton"
                                 )
                             }
-                            Text(text = "${quiz!!.likesCount}")
+                            Text(text = "${currentQuiz?.likesCount ?: 0}")
                         }
                     }
 
@@ -96,6 +112,10 @@ fun QuizDetailsScreen(
                         modifier = Modifier.padding(vertical = 16.dp),
                         text = quiz!!.quizDescription,
                         style = MaterialTheme.typography.labelMedium
+                    )
+
+                    TagList(
+                        tagList = quiz!!.tagList
                     )
                 }
 
@@ -124,6 +144,7 @@ fun QuizDetailsScreen(
                     modifier = Modifier.weight(0.5f),
                     onClick = {
                         navigateToPlayScreen()
+                        quizDetailsViewModel.addQuizToMyHistory(id)
                     }
                 ) {
                     Text(text = "Graj")

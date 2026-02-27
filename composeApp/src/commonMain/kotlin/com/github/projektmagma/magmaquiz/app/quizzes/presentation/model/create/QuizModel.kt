@@ -8,5 +8,6 @@ data class QuizModel(
     val description: String = "",
     val image: ByteArray? = null,
     val isPublic: Boolean = false,
+    val tagList: List<String> = emptyList(),
     val questionList: List<QuestionModel> = emptyList()
 )

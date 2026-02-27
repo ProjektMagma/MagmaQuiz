@@ -47,4 +47,10 @@ class QuizDetailsViewModel(
                 }
         }
     }
+    
+    fun addQuizToMyHistory(id: UUID){
+        viewModelScope.launch { 
+            quizRepository.markQuizAsPlayed(id)
+        }
+    }
 }

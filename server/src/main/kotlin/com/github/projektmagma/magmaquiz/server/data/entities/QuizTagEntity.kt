@@ -9,7 +9,7 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.Tag
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.dao.java.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import java.util.*
+import java.util.UUID
 
 class QuizTagEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTagsTable),
     DomainCapable<Tag, ConversionCommand> {
@@ -17,14 +17,16 @@ class QuizTagEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTagsTable),
 
     var tagName by QuizzesTagsTable.tagName
     private val quizzesList by QuizEntity via QuizzesTagsMapTable
-
-    var quizzesCount = quizzesList.count()
+    
+    fun getQuizzesListCount(): Long {
+        return quizzesList.count()
+    }
 
     override fun toDomain(command: ConversionCommand): Tag {
         return transaction {
             Tag(
                 tagName = tagName,
-                quizzesCount = quizzesCount
+                quizzesCount = getQuizzesListCount()
             )
         }
     }

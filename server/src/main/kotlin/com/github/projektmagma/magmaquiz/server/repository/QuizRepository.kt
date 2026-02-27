@@ -1,13 +1,32 @@
 package com.github.projektmagma.magmaquiz.server.repository
 
-import com.github.projektmagma.magmaquiz.server.data.entities.*
-import com.github.projektmagma.magmaquiz.server.data.tables.*
+import com.github.projektmagma.magmaquiz.server.data.entities.QuizEntity
+import com.github.projektmagma.magmaquiz.server.data.entities.QuizQuestionAnswerEntity
+import com.github.projektmagma.magmaquiz.server.data.entities.QuizQuestionEntity
+import com.github.projektmagma.magmaquiz.server.data.entities.QuizReviewEntity
+import com.github.projektmagma.magmaquiz.server.data.entities.QuizTagEntity
+import com.github.projektmagma.magmaquiz.server.data.entities.QuizTagMapEntity
+import com.github.projektmagma.magmaquiz.server.data.entities.UserEntity
+import com.github.projektmagma.magmaquiz.server.data.entities.UserFavoriteQuizzesEntity
+import com.github.projektmagma.magmaquiz.server.data.entities.UserGameHistoryEntity
+import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesQuestionsAnswersTable
+import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesQuestionsTable
+import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesReviewsTable
+import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesTable
+import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesTagsMapTable
+import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesTagsTable
+import com.github.projektmagma.magmaquiz.server.data.tables.UsersFavoriteQuizzesTable
 import com.github.projektmagma.magmaquiz.shared.data.domain.QuizReview
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
-import org.jetbrains.exposed.v1.core.*
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.inList
+import org.jetbrains.exposed.v1.core.like
+import org.jetbrains.exposed.v1.core.lowerCase
+import org.jetbrains.exposed.v1.core.notInList
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import java.util.*
+import java.util.UUID
 
 class QuizRepository {
 
@@ -223,7 +242,7 @@ class QuizRepository {
         return transaction {
             if (stringToSearch.isNullOrBlank())
                 QuizTagEntity.all()
-                    .sortedBy { it.quizzesCount }
+                    .sortedBy { it.getQuizzesListCount() }
                     .reversed()
                     .take(count)
                     .toList()

@@ -6,6 +6,7 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.model.UiEvent
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.UiEvent.ShowSnackbar
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
 import com.github.projektmagma.magmaquiz.app.core.util.compressImage
+import com.github.projektmagma.magmaquiz.app.core.util.withSearchDelay
 import com.github.projektmagma.magmaquiz.app.quizzes.data.repository.QuizRepository
 import com.github.projektmagma.magmaquiz.app.quizzes.domain.validators.toResId
 import com.github.projektmagma.magmaquiz.app.quizzes.domain.validators.validateQuestion
@@ -18,6 +19,7 @@ import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.t
 import com.github.projektmagma.magmaquiz.shared.data.domain.Answer
 import com.github.projektmagma.magmaquiz.shared.data.domain.Question
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Resource
+import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -47,7 +49,7 @@ class CreateQuizViewModel(
                 _state.update {
                     it.copy(quizError = validateQuiz(it.quizModel))
                 }
-                if (state.value.quizError != null) {
+                if (_state.value.quizError != null) {
                     viewModelScope.launch { 
                         _uiChannel.send(ShowSnackbar(_state.value.quizError?.toResId()))
                     }
@@ -57,6 +59,33 @@ class CreateQuizViewModel(
             }
             is QuizCommand.SetForEdit -> getQuizForEdit(quizCommand.id)
             QuizCommand.ResetState -> resetState()
+            is QuizCommand.TagNameChanged -> {
+                if (quizCommand.name.isEmpty()) {
+                    _state.update { it.copy(tagList = emptyList()) }
+                }
+                _state.update { it.copy(tagName = quizCommand.name) }
+                getTags()
+            }
+            
+            is QuizCommand.AddNewTag -> if (quizCommand.tagName.isNotEmpty()){
+                _state.update {
+                    it.copy(
+                        quizModel = it.quizModel.copy(
+                            tagList = _state.value.quizModel.tagList.plus(quizCommand.tagName)
+                        ),
+                        tagName = "",
+                        tagList = emptyList()
+                    )
+                }
+            }
+
+            is QuizCommand.RemoveTag -> _state.update { 
+                it.copy(
+                    quizModel = it.quizModel.copy(
+                        tagList = it.quizModel.tagList.filterIndexed { index, _ -> index != quizCommand.index }
+                    )
+                )
+            }
         }
     }
     
@@ -143,6 +172,19 @@ class CreateQuizViewModel(
         }
     }
     
+    private fun getTags(){
+        viewModelScope.launch {
+            withSearchDelay(true, 100) {
+                quizRepository.getTags(_state.value.tagName)
+                    .whenSuccess { result ->
+                        _state.update {
+                            it.copy(tagList = result.data)
+                        }
+                    }
+            }
+        }
+    }
+    
     private inline fun updateAnswer(index: Int, transform: (AnswerModel) -> AnswerModel) {
         _state.update {
             it.copy(
@@ -178,7 +220,8 @@ class CreateQuizViewModel(
                                 )
                             }
                         )
-                    }
+                    },
+                    tagList = _state.value.quizModel.tagList
                 )
             
             val result = if (state.value.isEditing) {
@@ -216,7 +259,8 @@ class CreateQuizViewModel(
                                 isPublic = quiz.isPublic,
                                 questionList = quiz.questionList.map { question ->
                                     question.toQuestionModel()
-                                }
+                                },
+                                tagList = quiz.tagList.map { tag -> tag.tagName }
                             ),
                             isEditing = true,
                             isLoading = false

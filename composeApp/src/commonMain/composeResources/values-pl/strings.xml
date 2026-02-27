@@ -94,4 +94,8 @@
     <string name="server_connection">Skonfiguruj połączenie z serwerem</string>
     <string name="last_configs">Ostatnie konfiguracje</string>
     <string name="connection_details">Sszczegóły połączenia</string>
+    <string name="tags">Tagi</string>
+    <string name="add_tag">Dodaj tag</string>
+    <string name="quizzes">Quizy</string>
+    <string name="game_history">Historia gier</string>
 </resources>

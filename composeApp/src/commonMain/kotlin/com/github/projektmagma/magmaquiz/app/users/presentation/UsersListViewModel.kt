@@ -58,21 +58,25 @@ class UsersListViewModel(
     
     private fun getFilteredData(){
         viewModelScope.launch {
+            val username = _state.value.username
             when (_state.value.usersFilter) {
                 UsersFilters.Friends -> {
-                    usersRepository.getFriendList().whenSuccess { result ->
-                        updateUserList(result.data)
-                    }
+                    usersRepository.getFriendList(username)
+                        .whenSuccess { result ->
+                            updateUserList(result.data)
+                        }
                 }
                 UsersFilters.SentInvitations -> {
-                    usersRepository.getOutgoingInvitations().whenSuccess { result ->
-                        updateUserList(result.data)
-                    }
+                    usersRepository.getOutgoingInvitations(username)
+                        .whenSuccess { result ->
+                            updateUserList(result.data)
+                        }
                 }
                 UsersFilters.IncomingInvitations -> {
-                    usersRepository.getIncomingInvitations().whenSuccess { result ->
-                        updateUserList(result.data)
-                    }
+                    usersRepository.getIncomingInvitations(username)
+                        .whenSuccess { result ->
+                            updateUserList(result.data)
+                        }
                 }
 
                 UsersFilters.None -> {
@@ -93,7 +97,7 @@ class UsersListViewModel(
             _uiState.value = UiState.Loading
             searchLock = true
             withSearchDelay(withDelay) {
-                usersRepository.getFindUsersByName(_state.value.username).whenSuccess { result ->
+                usersRepository.getFindUsers(_state.value.username).whenSuccess { result ->
                     _state.update { it.copy(usersList = result.data) }
                     _authChannel.trySend(NetworkEvent.Success)
                     _uiState.value = UiState.Success

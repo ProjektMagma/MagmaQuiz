@@ -1,6 +1,10 @@
 package com.github.projektmagma.magmaquiz.app.quizzes.presentation.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,7 +23,7 @@ import magmaquiz.composeapp.generated.resources.created_at
 import magmaquiz.composeapp.generated.resources.modified_at
 import magmaquiz.composeapp.generated.resources.no_description
 import org.jetbrains.compose.resources.stringResource
-import java.util.*
+import java.util.UUID
 
 @Composable
 actual fun QuizCard(
@@ -76,6 +80,8 @@ actual fun QuizCard(
                 textAlign = TextAlign.Center
             )
             ContentImage(quiz.quizImage)
+            
+            TagList(quiz.tagList)
 
             Row(
                 modifier = Modifier.fillMaxWidth(),

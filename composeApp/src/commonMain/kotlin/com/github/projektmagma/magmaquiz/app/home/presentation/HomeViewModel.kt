@@ -13,7 +13,7 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSucc
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.UUID
 
 class HomeViewModel(
     private val quizRepository: QuizRepository,
@@ -43,13 +43,13 @@ class HomeViewModel(
     fun downloadAllData() {
         _uiState.value = UiState.Loading
         viewModelScope.launch {
-            quizRepository.getRecentlyAddedQuizzes(10).whenSuccess {
+            quizRepository.getRecentlyAddedQuizzes(count = 10).whenSuccess {
                 _recentQuizzes.value = it.data
             }
-            quizRepository.getMostLikedQuizzes(10).whenSuccess {
+            quizRepository.getMostLikedQuizzes(count = 10).whenSuccess {
                 _mostLikedQuizzes.value = it.data
             }
-            quizRepository.getFriendsQuizzes(10).whenSuccess {
+            quizRepository.getFriendsQuizzes(count = 10).whenSuccess {
                 _friendsQuizzes.value = it.data
             }
             usersRepository.getIncomingInvitations().whenSuccess {

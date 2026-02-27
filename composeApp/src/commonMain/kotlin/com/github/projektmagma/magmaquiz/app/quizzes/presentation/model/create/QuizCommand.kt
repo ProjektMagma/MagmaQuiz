@@ -21,8 +21,10 @@ sealed interface QuizCommand {
         data object AddAnswer: QuestionEditor
         data class SaveQuestion(val questionModel: QuestionModel) : QuestionEditor
     }
-    
-    data object CreateQuiz : QuizCommand
     data class SetForEdit(val id: UUID) : QuizCommand
+    data class TagNameChanged(val name: String) : QuizCommand
+    data class AddNewTag(val tagName: String) : QuizCommand
+    data class RemoveTag(val index: Int) : QuizCommand
+    data object CreateQuiz : QuizCommand
     data object ResetState : QuizCommand
 }

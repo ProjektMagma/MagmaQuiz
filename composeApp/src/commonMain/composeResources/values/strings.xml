@@ -98,4 +98,8 @@
     <string name="connection_details">Connection details</string>
     <string name="ip" translatable="false">IP</string>
     <string name="port" translatable="false">Port</string>
+    <string name="tags">Tags</string>
+    <string name="add_tag">Add tag</string>
+    <string name="quizzes">Quizzes</string>
+    <string name="game_history">Game history</string>
 </resources>
