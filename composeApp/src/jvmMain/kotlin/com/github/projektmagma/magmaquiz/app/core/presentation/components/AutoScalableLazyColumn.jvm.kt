@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.github.projektmagma.magmaquiz.app.core.MainWindow
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
 
@@ -31,53 +32,49 @@ actual fun <T> AutoScalableLazyColumn(
     Row(
         modifier = Modifier.fillMaxWidth()
     ) {
-        LazyVerticalGrid(
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(1f)
-                .widthIn(max = 512.dp),
-            columns = when (uiState) {
-                UiState.Success -> GridCells.Adaptive(450.dp)
-                else -> GridCells.FixedSize(MainWindow.windowState.size.width)
-            },
-            contentPadding = PaddingValues(8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            state = state
-        ) {
-            stickyHeader {
-                stickyHeader(Modifier)
+        Column(modifier = Modifier.weight(1f)) {
+            LazyVerticalGrid(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                columns = when (uiState) {
+                    UiState.Success -> GridCells.Adaptive(450.dp)
+                    else -> GridCells.FixedSize(MainWindow.windowState.size.width)
+                },
+                contentPadding = PaddingValues(8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                state = state
+            ) {
+                stickyHeader {
+                    stickyHeader(Modifier)
+                }
+                if (uiState == UiState.Success)
+                    items(itemList, key = key) {
+                        content(it)
+                    }
+
             }
-            // TODO: Aby Error i Loading wyświetlał się na środku listy
+
             when (uiState) {
-                is UiState.Error -> item {
-                    FullSizeErrorIndicator(message = uiState.errorMessage)
-                }
-
-                UiState.Loading -> item {
-                    FullSizeCircularProgressIndicator()
-                }
-
                 UiState.Success -> {
-                    if (itemList.isEmpty())
-                        item {
-                            Column(
-                                modifier = Modifier.fillMaxSize(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                Text(
-                                    text = contentEmptyMessage,
-                                    style = MaterialTheme.typography.titleSmall
-                                )
-                            }
+                    if (itemList.isEmpty()) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .zIndex(1f),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = contentEmptyMessage,
+                                style = MaterialTheme.typography.titleLarge
+                            )
                         }
-                    else
-                        items(itemList, key = key) {
-                            content(it)
-                        }
+                    }
                 }
-            }
 
+                is UiState.Error -> FullSizeErrorIndicator(message = uiState.errorMessage)
+                UiState.Loading -> FullSizeCircularProgressIndicator()
+            }
         }
 
         VerticalScrollbar(

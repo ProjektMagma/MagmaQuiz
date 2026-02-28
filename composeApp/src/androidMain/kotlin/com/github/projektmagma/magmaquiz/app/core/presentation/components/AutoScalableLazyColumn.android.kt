@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
 
 @Composable
@@ -44,8 +45,7 @@ actual fun <T> AutoScalableLazyColumn(
     LazyColumn(
         modifier = Modifier
             .clip(MaterialTheme.shapes.large)
-            .fillMaxSize()
-            .widthIn(max = 512.dp),
+            .fillMaxWidth(),
         state = state,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
@@ -54,37 +54,32 @@ actual fun <T> AutoScalableLazyColumn(
             stickyHeader(Modifier.offset(y = yHeaderOffset.dp))
         }
 
-        when (uiState) {
-            is UiState.Error -> item {
-                FullSizeErrorIndicator(
-                    modifier = Modifier.fillParentMaxSize(0.75f),
-                    message = uiState.errorMessage
-                )
+        if (uiState == UiState.Success)
+            items(itemList, key = key) {
+                content(it)
             }
 
-            UiState.Loading -> item {
-                FullSizeCircularProgressIndicator(modifier = Modifier.fillParentMaxSize(0.75f))
-            }
+    }
 
-            UiState.Success -> {
-                if (itemList.isEmpty()) {
-                    item {
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                text = contentEmptyMessage,
-                                style = MaterialTheme.typography.titleLarge
-                            )
-                        }
-                    }
-                } else
-                    items(itemList, key = key) {
-                        content(it)
-                    }
+    when (uiState) {
+        UiState.Success -> {
+            if (itemList.isEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .zIndex(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = contentEmptyMessage,
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
             }
         }
+
+        is UiState.Error -> FullSizeErrorIndicator(message = uiState.errorMessage)
+        UiState.Loading -> FullSizeCircularProgressIndicator()
     }
 }
