@@ -254,7 +254,10 @@ fun CreateQuizScreen(
 
                     ExposedDropdownMenuBox(
                         expanded = tagListExpanded,
-                        onExpandedChange = { }
+                        onExpandedChange = {
+                            createQuizViewModel.onCommand(QuizCommand.GetTags)
+                            tagListExpanded = true
+                        }
                     ) {
                         OutlinedCard(
                             modifier = Modifier
@@ -350,7 +353,6 @@ fun CreateQuizScreen(
                                     text = { Text(it.tagName) },
                                     onClick = {
                                         createQuizViewModel.onCommand(QuizCommand.AddNewTag(it.tagName))
-                                        tagListExpanded = false
                                     },
                                     trailingIcon = { Text(it.quizzesCount.toString()) }
                                 )

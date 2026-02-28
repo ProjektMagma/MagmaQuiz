@@ -24,6 +24,7 @@ sealed interface QuizCommand {
     data class SetForEdit(val id: UUID) : QuizCommand
     data class TagNameChanged(val name: String) : QuizCommand
     data class AddNewTag(val tagName: String) : QuizCommand
+    data object GetTags : QuizCommand
     data class RemoveTag(val index: Int) : QuizCommand
     data object CreateQuiz : QuizCommand
     data object ResetState : QuizCommand

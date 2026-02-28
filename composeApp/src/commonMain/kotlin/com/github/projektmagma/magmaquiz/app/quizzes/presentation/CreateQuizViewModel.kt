@@ -63,7 +63,7 @@ class CreateQuizViewModel(
                 if (quizCommand.name.isEmpty()) {
                     _state.update { it.copy(tagList = emptyList()) }
                 }
-                _state.update { it.copy(tagName = quizCommand.name) }
+                _state.update { it.copy(tagName = quizCommand.name.trim()) }
                 getTags()
             }
             
@@ -77,15 +77,18 @@ class CreateQuizViewModel(
                         tagList = emptyList()
                     )
                 }
+                getTags()
             }
 
-            is QuizCommand.RemoveTag -> _state.update { 
+            is QuizCommand.RemoveTag -> _state.update {
                 it.copy(
                     quizModel = it.quizModel.copy(
                         tagList = it.quizModel.tagList.filterIndexed { index, _ -> index != quizCommand.index }
                     )
                 )
             }
+                
+            QuizCommand.GetTags -> getTags()
         }
     }
     

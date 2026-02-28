@@ -7,9 +7,9 @@ import com.github.projektmagma.magmaquiz.server.repository.FriendshipRepository
 import com.github.projektmagma.magmaquiz.server.repository.UserRepository
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkResource
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.User
-import io.ktor.http.*
+import io.ktor.http.HttpStatusCode
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import java.util.*
+import java.util.UUID
 
 class UsersDataController(
     private val userRepository: UserRepository,
@@ -132,7 +132,7 @@ class UsersDataController(
         val thisUser = userRepository.getUserData(session)
 
         val friendList = friendshipRepository.userFriendList(thisUser)
-            .filter { it.userName == stringToSearch }
+            .filter { stringToSearch == null || it.userName == stringToSearch  }
             .take(count)
             .map {
                 it.toDomain(UserConversionCommand.ForeignUser(thisUser))
@@ -155,7 +155,7 @@ class UsersDataController(
         val thisUser = userRepository.getUserData(session)
 
         val friendList = friendshipRepository.userInvitations(thisUser, true)
-            .filter { it.userName == stringToSearch }
+            .filter { stringToSearch == null || it.userName == stringToSearch }
             .take(count)
             .map {
                 it.toDomain(UserConversionCommand.ForeignUser(thisUser))
@@ -179,7 +179,7 @@ class UsersDataController(
         val thisUser = userRepository.getUserData(session)
 
         val friendList = friendshipRepository.userInvitations(thisUser, false)
-            .filter { it.userName == stringToSearch }
+            .filter { stringToSearch == null || it.userName == stringToSearch }
             .take(count)
             .map {
                 it.toDomain(UserConversionCommand.ForeignUser(thisUser))
