@@ -5,10 +5,24 @@ import androidx.navigation3.runtime.NavKey
 
 class Navigator(val state: NavigationState) {
     fun navigate(route: NavKey){
-        if (route in state.backStacks.keys) {
-            state.topLevelRoute = route
-        } else {
-            currentBackStack().add(route)
+        when (route) {
+            in state.backStacks.keys if state.topLevelRoute == route -> {
+                currentBackStack().clear()
+                currentBackStack().add(route)
+            }
+            in state.backStacks.keys -> {
+                state.topLevelRoute = route
+            }
+            else -> {
+                val existingStack = state.backStacks.entries.firstOrNull { (_, value) ->  
+                    value.any { it == route }
+                }
+                if (existingStack != null) {
+                    state.topLevelRoute = existingStack.key
+                } else if (currentBackStack().last() != route) {
+                    currentBackStack().add(route)
+                }
+            }
         }
     }
     

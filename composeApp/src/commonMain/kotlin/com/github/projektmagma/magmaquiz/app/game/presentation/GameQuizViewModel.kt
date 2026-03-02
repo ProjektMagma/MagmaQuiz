@@ -24,11 +24,16 @@ class GameQuizViewModel(
         when (command) {
             is GameCommand.AnswerClicked -> onAnswerSelected(command)
             GameCommand.StartGame -> startGame()
+            GameCommand.FinishGame -> {
+                viewModelScope.launch { 
+                    delay(400)
+                    _gameState.update { it.copy(score = 0, currentQuestionIndex = 0) }
+                }
+            }
         }
     }
 
     private fun startGame() {
-        _gameState.update { it.copy(currentQuestionIndex = 0) }
         updateGameState()
     }
 
@@ -64,7 +69,9 @@ class GameQuizViewModel(
         val questions = _quiz.value?.questionList ?: emptyList()
         if (_gameState.value.currentQuestionIndex >= questions.size) {
             _gameState.update { gameState ->
-                gameState.copy(isQuizFinished = true)
+                gameState.copy(
+                    isQuizFinished = true
+                )
             }
         } else {
             val question = questions[_gameState.value.currentQuestionIndex]

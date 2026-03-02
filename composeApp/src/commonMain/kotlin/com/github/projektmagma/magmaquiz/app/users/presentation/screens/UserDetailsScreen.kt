@@ -24,9 +24,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -60,8 +57,10 @@ fun UserDetailsScreen(
     usersSharedViewModel: UsersSharedViewModel = koinViewModel()
 ) {
     val quizzes by userDetailsViewModel.quizzes.collectAsStateWithLifecycle()
-    val user by usersSharedViewModel.user.collectAsStateWithLifecycle()
+    val user by userDetailsViewModel.user.collectAsStateWithLifecycle()
     val uiState by userDetailsViewModel.uiState.collectAsStateWithLifecycle()
+    
+    val selectedTabIndex by userDetailsViewModel.selectedTabIndex.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         if (user?.userId != id) {
@@ -132,8 +131,6 @@ fun UserDetailsScreen(
                                 usersSharedViewModel
                             )
                         }
-                        
-                        var selectedTabIndex by remember { mutableIntStateOf(0) }
 
                         if (foreignUser == null){
                             SecondaryTabRow(
@@ -143,7 +140,7 @@ fun UserDetailsScreen(
                                 Tab(
                                     selected = selectedTabIndex == 0,
                                     onClick = {
-                                        selectedTabIndex = 0
+                                        userDetailsViewModel.changeSelectedTabIndex(0)
                                         userDetailsViewModel.getQuizzesByUserId(id)
                                     },
                                 ) {
@@ -152,7 +149,7 @@ fun UserDetailsScreen(
                                 Tab(
                                     selected = selectedTabIndex == 1,
                                     onClick = {
-                                        selectedTabIndex = 1
+                                        userDetailsViewModel.changeSelectedTabIndex(1)
                                         userDetailsViewModel.getUserHistory()
                                     },
                                 ) {

@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -21,7 +22,7 @@ import com.github.projektmagma.magmaquiz.app.home.presentation.HomeViewModel
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuizCardSmall
 import com.github.projektmagma.magmaquiz.app.users.presentation.components.UserCard
 import org.koin.compose.viewmodel.koinViewModel
-import java.util.*
+import java.util.UUID
 
 @Composable
 fun HomeScreen(
@@ -30,18 +31,18 @@ fun HomeScreen(
 ) {
 
     val viewModel = koinViewModel<HomeViewModel>()
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
-    val recentQuizzes = viewModel.recentQuizzes.collectAsStateWithLifecycle()
-    val mostLikedQuizzes = viewModel.mostLikedQuizzes.collectAsStateWithLifecycle()
-    val friendsQuizzes = viewModel.friendsQuizzes.collectAsStateWithLifecycle()
-    val incomingFriends = viewModel.incomingFriends.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val recentQuizzes by viewModel.recentQuizzes.collectAsStateWithLifecycle()
+    val mostLikedQuizzes by viewModel.mostLikedQuizzes.collectAsStateWithLifecycle()
+    val friendsQuizzes by viewModel.friendsQuizzes.collectAsStateWithLifecycle()
+    val incomingFriends by viewModel.incomingFriends.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        when (uiState.value) {
+        when (uiState) {
             is UiState.Error -> FullSizeErrorIndicator(
                 onRetry = {
                     viewModel.downloadAllData()
@@ -66,7 +67,7 @@ fun HomeScreen(
                         )
 
                         AutoScalableLazyRow(
-                            itemList = mostLikedQuizzes.value,
+                            itemList = mostLikedQuizzes,
                             key = { it.id!! }
                         ) {
                             QuizCardSmall(
@@ -84,7 +85,7 @@ fun HomeScreen(
                         )
 
                         AutoScalableLazyRow(
-                            itemList = recentQuizzes.value,
+                            itemList = recentQuizzes,
                             key = { it.id!! }
                         ) {
                             QuizCardSmall(
@@ -102,7 +103,7 @@ fun HomeScreen(
                         )
 
                         AutoScalableLazyRow(
-                            itemList = incomingFriends.value,
+                            itemList = incomingFriends,
                             key = { it.userId!! }
                         ) {
                             UserCard(
@@ -119,7 +120,7 @@ fun HomeScreen(
                         )
 
                         AutoScalableLazyRow(
-                            itemList = friendsQuizzes.value,
+                            itemList = friendsQuizzes,
                             key = { it.id!! }
                         ) {
                             QuizCardSmall(

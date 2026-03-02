@@ -19,7 +19,6 @@ class UsersSharedViewModel(
     val state = _state.asStateFlow()
     
     private val _user = usersRepository.user
-    val user = _user.asStateFlow()
     
     fun onCommand(command: UsersSharedCommand){
         when (command) {

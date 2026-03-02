@@ -28,6 +28,9 @@ class UserDetailsViewModel(
     
     private val _user = usersRepository.user
     val user = _user.asStateFlow()
+
+    private val _selectedTabIndex = MutableStateFlow(0)
+    val selectedTabIndex = _selectedTabIndex.asStateFlow()
     
     fun checkOwnership(id: UUID): Boolean{
         return id == authRepository.thisUser.value?.userId
@@ -36,6 +39,10 @@ class UserDetailsViewModel(
     fun loadData(id: UUID){
         getQuizzesByUserId(id)
         getUserData(id)
+    }
+    
+    fun changeSelectedTabIndex(index: Int){
+        _selectedTabIndex.value = index
     }
 
     fun getQuizzesByUserId(id: UUID) {

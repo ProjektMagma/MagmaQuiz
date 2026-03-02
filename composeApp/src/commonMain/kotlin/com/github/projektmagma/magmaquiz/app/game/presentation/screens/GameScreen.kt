@@ -66,7 +66,10 @@ fun GameScreen(
     NavigationEventHandler(
         state = backState,
         isBackEnabled = gameState.isQuizFinished,
-        onBackCompleted = { navigateOnGameFinish() }
+        onBackCompleted = {
+            gameQuizViewModel.onCommand(GameCommand.FinishGame)
+            navigateOnGameFinish()
+        }
     )
     
     CustomWindowDraggableArea()
@@ -93,6 +96,7 @@ fun GameScreen(
 
                 Button(
                     onClick = {
+                        gameQuizViewModel.onCommand(GameCommand.FinishGame)
                         navigateOnGameFinish()
                     }
                 ) {

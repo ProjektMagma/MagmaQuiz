@@ -27,10 +27,10 @@ class HomeViewModel(
     val recentQuizzes = _recentQuizzes.asStateFlow()
 
     private val _mostLikedQuizzes = MutableStateFlow<List<Quiz>>(emptyList())
-    val mostLikedQuizzes = _recentQuizzes.asStateFlow()
+    val mostLikedQuizzes = _mostLikedQuizzes.asStateFlow()
 
     private val _friendsQuizzes = MutableStateFlow<List<Quiz>>(emptyList())
-    val friendsQuizzes = _recentQuizzes.asStateFlow()
+    val friendsQuizzes = _friendsQuizzes.asStateFlow()
 
     private val _incomingFriends = MutableStateFlow<List<ForeignUser>>(emptyList())
     val incomingFriends = _incomingFriends.asStateFlow()
