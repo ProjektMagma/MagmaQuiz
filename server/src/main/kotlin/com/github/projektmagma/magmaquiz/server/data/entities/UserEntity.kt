@@ -11,6 +11,7 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.User
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.lowerCase
 import org.jetbrains.exposed.v1.core.or
 import org.jetbrains.exposed.v1.dao.java.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -21,11 +22,11 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
     companion object : UUIDEntityClass<UserEntity>(UsersTable) {
 
         fun isNameTaken(name: String): Boolean {
-            return transaction { find { UsersTable.userName eq name }.firstOrNull() != null }
+            return transaction { find { UsersTable.userName.lowerCase() eq name.lowercase() }.firstOrNull() != null }
         }
 
         fun isEmailTaken(email: String): Boolean {
-            return transaction { find { UsersTable.userEmail eq email }.firstOrNull() != null }
+            return transaction { find { UsersTable.userEmail.lowerCase() eq email.lowercase() }.firstOrNull() != null }
         }
     }
 
@@ -134,6 +135,7 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
     }
 
     fun getLastPlayedQuizzes(): List<QuizEntity> {
-        return transaction { lastPlayedQuizzesList.toList() }
+        // TODO: reversed jest tymczasowo, trzeba by ręcznie szukać i sortować a nie via aby na pewno było po dacie utworzenia w tabeli UsersGameHistoryTable
+        return transaction { lastPlayedQuizzesList.toList().reversed() }
     }
 }

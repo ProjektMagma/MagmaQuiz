@@ -31,11 +31,9 @@ class AuthDataController(private val userRepository: UserRepository) {
     }
 
     fun authRegister(createUserValue: CreateUserValue): NetworkResource<User> {
-        val isUserTaken = userRepository.getUserByEmail(createUserValue.userEmail) != null
-
-        if (isUserTaken) {
+        if (UserEntity.isEmailTaken(createUserValue.userEmail))
             return NetworkResource.Error(HttpStatusCode.Conflict)
-        }
+
 
         val dbUser = transaction {
             UserEntity.new {
