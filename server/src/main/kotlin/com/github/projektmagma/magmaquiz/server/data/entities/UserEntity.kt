@@ -43,7 +43,7 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
     var userTown by UsersTable.userTown
 
     private val quizList by QuizEntity referrersOn QuizzesTable.quizCreator
-    private val lastPlayedQuizzesList by QuizEntity via UsersGameHistoryTable
+    private val playHistoryList by UserGameHistoryEntity referrersOn UsersGameHistoryTable.user
     private val favoriteQuizzesList by QuizEntity via UsersFavoriteQuizzesTable
 
     override fun toDomain(command: UserConversionCommand): User {
@@ -126,16 +126,35 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
     }
 
 
-    fun favoriteQuizzes(): List<QuizEntity> {
-        return transaction { favoriteQuizzesList.toList() }
+    fun favoriteQuizzes(count: Int): List<QuizEntity> {
+        return transaction {
+            favoriteQuizzesList
+                .filter { it.isActive && it.isPublic || it.isUserCreator(this@UserEntity) }
+                .sortedBy { it.likesCount }
+                .toList()
+                .take(count)
+        }
     }
 
-    fun getUserQuizzes(): List<QuizEntity> {
-        return transaction { quizList.toList() }
+    fun getUserQuizzes(count: Int): List<QuizEntity> {
+        return transaction {
+            quizList
+                .filter { it.isActive && it.isPublic || it.isUserCreator(this@UserEntity) }
+                .sortedBy { it.likesCount }
+                .toList()
+                .take(count)
+        }
     }
 
-    fun getLastPlayedQuizzes(): List<QuizEntity> {
-        // TODO: reversed jest tymczasowo, trzeba by ręcznie szukać i sortować a nie via aby na pewno było po dacie utworzenia w tabeli UsersGameHistoryTable
-        return transaction { lastPlayedQuizzesList.toList().reversed() }
+    fun getLastPlayedQuizzes(count: Int): List<QuizEntity> {
+        // TODO: Sprawdzić dobrze czy działa
+        return transaction {
+            playHistoryList
+                .sortedBy { it.createdAt }
+                .reversed()
+                .map { it.quiz }
+                .filter { it.isActive && it.isPublic || it.isUserCreator(this@UserEntity) }
+                .take(count)
+        }
     }
 }

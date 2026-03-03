@@ -6,17 +6,12 @@ import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import com.github.projektmagma.magmaquiz.server.data.util.respondToResource
 import com.github.projektmagma.magmaquiz.shared.data.domain.QuizReview
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
-import io.ktor.server.application.Application
-import io.ktor.server.auth.authenticate
-import io.ktor.server.request.receive
-import io.ktor.server.routing.delete
-import io.ktor.server.routing.get
-import io.ktor.server.routing.post
-import io.ktor.server.routing.route
-import io.ktor.server.routing.routing
-import io.ktor.server.sessions.get
-import io.ktor.server.sessions.sessions
-import java.util.UUID
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.request.*
+import io.ktor.server.routing.*
+import io.ktor.server.sessions.*
+import java.util.*
 
 fun Application.quizRoutes(quizDataController: QuizDataController) {
     routing {
@@ -71,20 +66,23 @@ fun Application.quizRoutes(quizDataController: QuizDataController) {
                 get("/changeFavoriteStatus/{quizId}") {
                     val session = call.sessions.get<UserSession>()!!
                     val quizId = UUID.fromString(call.parameters["quizId"]!!)
+
                     call.respondToResource(quizDataController.quizChangeFavoriteStatus(quizId, session))
                 }
 
-                get("/MyGameHistory") {
+                get("/MyGameHistory/{count}") {
                     val session = call.sessions.get<UserSession>()!!
-                    call.respondToResource(quizDataController.quizMyGameHistory(session))
+                    val count = call.parameters["count"]!!.toInt()
+
+                    call.respondToResource(quizDataController.quizMyGameHistory(session, count))
                 }
 
-
-
-                get("/findByUser/{userId}") {
+                get("/findByUser/{count}/{userId}") {
                     val session = call.sessions.get<UserSession>()!!
+                    val count = call.parameters["count"]!!.toInt()
                     val userId = UUID.fromString(call.parameters["userId"]!!)
-                    call.respondToResource(quizDataController.quizFindByUserId(session, userId))
+
+                    call.respondToResource(quizDataController.quizFindByUserId(session, count, userId))
                 }
 
                 delete("/{quizId}") {
