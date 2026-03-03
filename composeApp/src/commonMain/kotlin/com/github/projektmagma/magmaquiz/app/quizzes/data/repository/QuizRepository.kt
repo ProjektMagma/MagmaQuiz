@@ -26,6 +26,11 @@ class QuizRepository(
     
     val userDetailsQuizList = MutableStateFlow<List<Quiz>?>(emptyList())
 
+
+    val recentQuizzes = MutableStateFlow<List<Quiz>>(emptyList())
+    val mostLikedQuizzes = MutableStateFlow<List<Quiz>>(emptyList())
+    val friendsQuizzes = MutableStateFlow<List<Quiz>>(emptyList())
+
     suspend fun getQuizById(id: UUID): Resource<Quiz, NetworkError> {
         return quizService.getQuizById(id)
     }
@@ -48,7 +53,11 @@ class QuizRepository(
         quizListState.update {
             it.copy(quizzes = it.quizzes.changeLikeStatusInList(id))
         }
+        
         userDetailsQuizList.value = userDetailsQuizList.value?.changeLikeStatusInList(id)
+        recentQuizzes.value = recentQuizzes.value.changeLikeStatusInList(id)
+        mostLikedQuizzes.value = mostLikedQuizzes.value.changeLikeStatusInList(id)
+        friendsQuizzes.value = friendsQuizzes.value.changeLikeStatusInList(id)
 
         return quizService.changeFavoriteStatus(id)
     }
@@ -63,6 +72,17 @@ class QuizRepository(
 
     suspend fun deleteQuiz(id: UUID): Resource<Unit, NetworkError> {
         return quizService.deleteQuiz(id)
+    }
+    
+    fun deleteQuizInList(id: UUID){
+        quizListState.update {
+            it.copy(quizzes = it.quizzes.deleteQuizInList(id))
+        }
+
+        userDetailsQuizList.value = userDetailsQuizList.value?.deleteQuizInList(id)
+        recentQuizzes.value = recentQuizzes.value.deleteQuizInList(id)
+        mostLikedQuizzes.value = mostLikedQuizzes.value.deleteQuizInList(id)
+        friendsQuizzes.value = friendsQuizzes.value.deleteQuizInList(id)
     }
 
     suspend fun getMyFavorites(name: String, count: Int = 10): Resource<List<Quiz>, NetworkError> {
@@ -112,5 +132,9 @@ class QuizRepository(
                 quiz
             }
         }
+    }
+    
+    fun List<Quiz>.deleteQuizInList(id: UUID): List<Quiz> {
+        return this.filter { it.id != id }
     }
 }

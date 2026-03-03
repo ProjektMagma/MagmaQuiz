@@ -7,7 +7,6 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiStat
 import com.github.projektmagma.magmaquiz.app.quizzes.data.repository.QuizRepository
 import com.github.projektmagma.magmaquiz.app.users.data.repository.UsersRepository
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
-import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenError
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,13 +22,12 @@ class HomeViewModel(
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState = _uiState.asStateFlow()
 
-    private val _recentQuizzes = MutableStateFlow<List<Quiz>>(emptyList())
+    
+    private val _recentQuizzes = quizRepository.recentQuizzes
     val recentQuizzes = _recentQuizzes.asStateFlow()
-
-    private val _mostLikedQuizzes = MutableStateFlow<List<Quiz>>(emptyList())
+    private val _mostLikedQuizzes = quizRepository.mostLikedQuizzes
     val mostLikedQuizzes = _mostLikedQuizzes.asStateFlow()
-
-    private val _friendsQuizzes = MutableStateFlow<List<Quiz>>(emptyList())
+    private val _friendsQuizzes = quizRepository.friendsQuizzes
     val friendsQuizzes = _friendsQuizzes.asStateFlow()
 
     private val _incomingFriends = MutableStateFlow<List<ForeignUser>>(emptyList())

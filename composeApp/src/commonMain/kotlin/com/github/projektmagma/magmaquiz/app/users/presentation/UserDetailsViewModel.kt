@@ -11,7 +11,6 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenErro
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -97,12 +96,8 @@ class UserDetailsViewModel(
         viewModelScope.launch { 
             quizRepository.deleteQuiz(id)
                 .whenSuccess {
-                     _quizzes.update { quizzes -> 
-                        quizzes?.filter { quiz ->
-                            quiz.id != id
-                        }
-                    }
-                    _uiState.value = UiState.Success 
+                    _uiState.value = UiState.Success
+                    quizRepository.deleteQuizInList(id)
                 }
                 .whenError { _uiState.value = UiState.Error(it.error.toResId()) }
         }

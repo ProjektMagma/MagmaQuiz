@@ -10,7 +10,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -23,10 +23,6 @@ fun FavoriteButton(
     isLiked: Boolean,
     changeFavoriteStatus: () -> Unit
 ) {
-
-    var isLiked by remember { mutableStateOf(isLiked) }
-    var likesCount by remember { mutableIntStateOf(likesCount) }
-
     Row(
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically
@@ -38,19 +34,13 @@ fun FavoriteButton(
             fontWeight = FontWeight.Bold
         )
         IconButton(
-            onClick = {
-                changeFavoriteStatus()
-                isLiked = !isLiked
-                if (isLiked) likesCount++
-                else likesCount--
-            }
+            onClick = { changeFavoriteStatus() }
         ) {
             Icon(
                 imageVector = if (isLiked) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
                 tint = favoritePink,
                 contentDescription = "FavoriteButton"
             )
-
         }
     }
 }
