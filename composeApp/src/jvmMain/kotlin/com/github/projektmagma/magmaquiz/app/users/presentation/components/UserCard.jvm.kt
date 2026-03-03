@@ -26,7 +26,7 @@ actual fun UserCard(
     navigateToUserDetails: (id: UUID) -> Unit,
 ) {
     UniversalCardContainer(
-        modifier = Modifier.padding(8.dp),
+        modifier = Modifier.widthIn(300.dp, 500.dp).padding(8.dp),
         onClick = { navigateToUserDetails(user.userId!!) }) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(8.dp),

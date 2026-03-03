@@ -7,14 +7,10 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.QuizReview
 import com.github.projektmagma.magmaquiz.shared.data.domain.Tag
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Resource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
-import io.ktor.client.HttpClient
-import io.ktor.client.request.delete
-import io.ktor.client.request.get
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
-import java.util.UUID
+import io.ktor.client.*
+import io.ktor.client.request.*
+import io.ktor.http.*
+import java.util.*
 
 class QuizService(
     private val httpClient: HttpClient,
@@ -60,16 +56,16 @@ class QuizService(
             httpClient.get("quiz/changeFavoriteStatus/$id")
         }
     }
-    
-    suspend fun getMyGameHistory(): Resource<List<Quiz>, NetworkError>{
+
+    suspend fun getMyGameHistory(count: Int = 100): Resource<List<Quiz>, NetworkError> {
         return safeCall<List<Quiz>> {
-            httpClient.get("quiz/MyGameHistory")
+            httpClient.get("quiz/MyGameHistory/$count")
         }
     }
 
-    suspend fun getQuizzesByUserId(id: UUID): Resource<List<Quiz>, NetworkError> {
+    suspend fun getQuizzesByUserId(id: UUID, count: Int = 100): Resource<List<Quiz>, NetworkError> {
         return safeCall<List<Quiz>> {
-            httpClient.get("quiz/findByUser/$id")
+            httpClient.get("quiz/findByUser/$count/$id")
         }
     }
 

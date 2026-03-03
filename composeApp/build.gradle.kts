@@ -49,7 +49,7 @@ kotlin {
             implementation(libs.filekit.dialogs)
             implementation(libs.filekit.dialogs.compose)
             implementation(libs.filekit.coil)
-            
+
             implementation(libs.krop)
             implementation(libs.krop.filekit)
 
@@ -92,7 +92,7 @@ kotlin {
 }
 
 val appPackageRoute = "com.github.projektmagma.magmaquiz"
-val appVersion = "0.1.0"
+val appVersion = "0.1.1"
 
 android {
     namespace = appPackageRoute
@@ -152,6 +152,7 @@ compose.desktop {
             includeAllModules = false
             vendor = "Projekt Magma"
 
+            modules("java.instrument", "java.management", "jdk.security.auth", "jdk.unsupported")
 
             windows {
                 dirChooser = false
@@ -163,7 +164,7 @@ compose.desktop {
 
             linux {
                 shortcut = true
-                installationPath = "./ProjektMagma/MagmaQuiz"
+                installationPath = "/usr/lib/ProjektMagma/MagmaQuiz"
                 iconFile = project.file("./src/commonMain/composeResources/drawable/app_icon.png")
             }
         }
