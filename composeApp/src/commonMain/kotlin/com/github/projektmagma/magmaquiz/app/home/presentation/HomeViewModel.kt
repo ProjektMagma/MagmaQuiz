@@ -12,7 +12,7 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSucc
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.util.UUID
+import java.util.*
 
 class HomeViewModel(
     private val quizRepository: QuizRepository,
@@ -22,7 +22,7 @@ class HomeViewModel(
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState = _uiState.asStateFlow()
 
-    
+
     private val _recentQuizzes = quizRepository.recentQuizzes
     val recentQuizzes = _recentQuizzes.asStateFlow()
     private val _mostLikedQuizzes = quizRepository.mostLikedQuizzes

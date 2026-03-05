@@ -102,4 +102,10 @@
     <string name="add_tag">Add tag</string>
     <string name="quizzes">Quizzes</string>
     <string name="game_history">Game history</string>
+    <string name="good_to_see_you">Good to see you!</string>
+    <string name="the_most_liked_quizzes">The most liked quizzes by community</string>
+    <string name="recently_added_quizzes">Recently added quizzes</string>
+    <string name="pepole_who_whant_know_you">People who want to get to know you</string>
+    <string name="new_quizzes_from_your_friends">New quizzes from your friends</string>
+    <string name="play_single">Play</string>
 </resources>

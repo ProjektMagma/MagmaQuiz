@@ -1,6 +1,9 @@
 package com.github.projektmagma.magmaquiz.app.users.presentation.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,43 +23,44 @@ import org.jetbrains.compose.resources.stringResource
 import java.util.*
 
 @Composable
-actual fun UserCard(
+actual fun UserCardSmall(
     user: ForeignUser,
     usersSharedViewModel: UsersSharedViewModel,
-    navigateToUserDetails: (id: UUID) -> Unit,
+    navigateToUserDetails: (id: UUID) -> Unit
 ) {
     UniversalCardContainer(
-        modifier = Modifier.fillMaxWidth().padding(8.dp),
+        modifier = Modifier
+            .width(200.dp)
+            .padding(8.dp),
         onClick = { navigateToUserDetails(user.userId!!) }) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = user.userName,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
-                Row {
-                    Text(text = "${stringResource(Res.string.last_activity)} ")
-                    Text(
-                        text = convertLongSecondsToString(user.lastActivity),
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                FriendshipButtons(
-                    user = user,
-                    usersSharedViewModel = usersSharedViewModel
-                )
-            }
+            Text(
+                text = user.userName,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
             ProfilePictureIcon(user.userProfilePicture)
+
+            Text(
+                text = stringResource(Res.string.last_activity),
+                style = MaterialTheme.typography.bodySmall
+            )
+
+            Text(
+                text = convertLongSecondsToString(user.lastActivity),
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.bodySmall
+            )
+
+            FriendshipButtons(
+                user = user,
+                usersSharedViewModel = usersSharedViewModel,
+                useColumn = true
+            )
         }
     }
 }

@@ -1,26 +1,10 @@
 package com.github.projektmagma.magmaquiz.app.quizzes.presentation.components
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -36,7 +20,7 @@ import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.delete
 import magmaquiz.composeapp.generated.resources.edit
 import org.jetbrains.compose.resources.stringResource
-import java.util.UUID
+import java.util.*
 
 @Composable
 fun QuizCardSmall(
@@ -53,7 +37,7 @@ fun QuizCardSmall(
     var expanded by remember { mutableStateOf(false) }
 
     UniversalCardContainer(
-        modifier = Modifier.widthIn(200.dp, 300.dp).padding(8.dp),
+        modifier = Modifier.widthIn(200.dp, 400.dp).padding(8.dp),
         onClick = { navigateToQuizDetails(quiz.id!!) }) {
 
         if (canEdit) {
@@ -102,16 +86,20 @@ fun QuizCardSmall(
             ContentImage(quiz.quizImage, 128.dp)
             Text(
                 text = quiz.quizName,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1,
+                minLines = 1
             )
             Text(
                 text = quiz.quizDescription,
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 overflow = TextOverflow.Ellipsis,
-                maxLines = 2
+                maxLines = 2,
+                minLines = 2
             )
             Row(
                 modifier = Modifier.fillMaxWidth(),

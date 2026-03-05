@@ -1,24 +1,12 @@
 package com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -32,9 +20,12 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.ui.theme.favorite
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.QuizDetailsViewModel
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuestionNumber
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.TagList
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.play_single
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
-import java.util.UUID
+import java.util.*
 
 @Composable
 fun QuizDetailsScreen(
@@ -44,7 +35,7 @@ fun QuizDetailsScreen(
     val quizDetailsViewModel: QuizDetailsViewModel = koinViewModel { parametersOf(id) }
 
     val quiz by quizDetailsViewModel.quiz.collectAsStateWithLifecycle()
-    
+
     val state by quizDetailsViewModel.quizListState.collectAsStateWithLifecycle()
     val currentQuiz = state.quizzes.firstOrNull { it.id == id }
 
@@ -136,28 +127,38 @@ fun QuizDetailsScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
             }
-            Row(
+
+            Button(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                onClick = {
+                    navigateToPlayScreen()
+                    quizDetailsViewModel.addQuizToMyHistory(id)
+                }
             ) {
-                Button(
-                    modifier = Modifier.weight(0.5f),
-                    onClick = {
-                        navigateToPlayScreen()
-                        quizDetailsViewModel.addQuizToMyHistory(id)
-                    }
-                ) {
-                    Text(text = "Graj")
-                }
-                Button(
-                    modifier = Modifier.weight(0.5f),
-                    onClick = {
-                        navigateToPlayScreen()
-                    }
-                ) {
-                    Text(text = "Graj multi")
-                }
+                Text(text = stringResource(Res.string.play_single))
             }
+//            Row(
+//                modifier = Modifier.fillMaxWidth(),
+//                horizontalArrangement = Arrangement.spacedBy(8.dp)
+//            ) {
+//                Button(
+//                    modifier = Modifier.weight(0.5f),
+//                    onClick = {
+//                        navigateToPlayScreen()
+//                        quizDetailsViewModel.addQuizToMyHistory(id)
+//                    }
+//                ) {
+//                    Text(text = "Graj")
+//                }
+//                Button(
+//                    modifier = Modifier.weight(0.5f),
+//                    onClick = {
+//                        navigateToPlayScreen()
+//                    }
+//                ) {
+//                    Text(text = "Graj multi")
+//                }
+//            }
 
         }
     }

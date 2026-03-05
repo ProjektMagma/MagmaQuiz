@@ -20,13 +20,13 @@ import org.jetbrains.compose.resources.stringResource
 import java.util.*
 
 @Composable
-actual fun UserCard(
+actual fun UserCardSmall(
     user: ForeignUser,
     usersSharedViewModel: UsersSharedViewModel,
     navigateToUserDetails: (id: UUID) -> Unit,
 ) {
     UniversalCardContainer(
-        modifier = Modifier.fillMaxWidth().padding(8.dp),
+        modifier = Modifier.width(400.dp).padding(8.dp),
         onClick = { navigateToUserDetails(user.userId!!) }) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(8.dp),
@@ -36,27 +36,35 @@ actual fun UserCard(
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                Text(
-                    text = user.userName,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
-                Row {
-                    Text(text = "${stringResource(Res.string.last_activity)} ")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Text(
-                        text = convertLongSecondsToString(user.lastActivity),
+                        text = user.userName,
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
+                    ProfilePictureIcon(user.userProfilePicture)
                 }
+                Text(
+                    text = stringResource(Res.string.last_activity),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = convertLongSecondsToString(user.lastActivity),
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 FriendshipButtons(
                     user = user,
-                    usersSharedViewModel = usersSharedViewModel
+                    usersSharedViewModel = usersSharedViewModel,
                 )
             }
-            ProfilePictureIcon(user.userProfilePicture)
         }
     }
 }

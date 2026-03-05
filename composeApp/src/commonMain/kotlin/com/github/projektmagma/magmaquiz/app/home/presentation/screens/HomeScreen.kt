@@ -20,9 +20,11 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.components.FullSi
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
 import com.github.projektmagma.magmaquiz.app.home.presentation.HomeViewModel
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuizCardSmall
-import com.github.projektmagma.magmaquiz.app.users.presentation.components.UserCard
+import com.github.projektmagma.magmaquiz.app.users.presentation.components.UserCardSmall
+import magmaquiz.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-import java.util.UUID
+import java.util.*
 
 @Composable
 fun HomeScreen(
@@ -54,14 +56,14 @@ fun HomeScreen(
                     item {
                         Text(
                             modifier = Modifier.fillMaxWidth(),
-                            text = "Dobrze cię widzieć!",
+                            text = stringResource(Res.string.good_to_see_you),
                             style = MaterialTheme.typography.titleMedium,
                             textAlign = TextAlign.Center
                         )
 
 
                         Text(
-                            text = "Najbardziej lubiane quizy przez społeczność",
+                            text = stringResource(Res.string.the_most_liked_quizzes),
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Bold
                         )
@@ -79,7 +81,7 @@ fun HomeScreen(
                         }
 
                         Text(
-                            text = "Ostatnie quizy, które zostały dodane",
+                            text = stringResource(Res.string.recently_added_quizzes),
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Bold
                         )
@@ -97,7 +99,7 @@ fun HomeScreen(
                         }
 
                         Text(
-                            text = "Osoby, które chcą cię poznać",
+                            text = stringResource(Res.string.pepole_who_whant_know_you),
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Bold
                         )
@@ -106,7 +108,7 @@ fun HomeScreen(
                             itemList = incomingFriends,
                             key = { it.userId!! }
                         ) {
-                            UserCard(
+                            UserCardSmall(
                                 it,
                                 navigateToUserDetails = navigateToUserDetails,
                                 usersSharedViewModel = koinViewModel()
@@ -114,7 +116,7 @@ fun HomeScreen(
                         }
 
                         Text(
-                            text = "Nowe quizy twoich znajomych",
+                            text = stringResource(Res.string.new_quizzes_from_your_friends),
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Bold
                         )
