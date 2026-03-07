@@ -104,7 +104,7 @@ class QuizDataController(
         val thisUser = userRepository.getUserData(session)
 
         val quizzesList =
-            thisUser.favoriteQuizzes(count)
+            thisUser.favoriteQuizzes(thisUser, count)
                 .filter { stringToSearch.isNullOrBlank() || it.quizName.equals(stringToSearch, true) }
                 .map { it.toDomain(QuizConversionCommand.WithUserNoQuestions(thisUser)) }
 
@@ -119,7 +119,7 @@ class QuizDataController(
 
 
         val quizList =
-            profileUser.getUserQuizzes(count).map {
+            profileUser.getUserQuizzes(thisUser, count).map {
                 it.toDomain(QuizConversionCommand.WithUserNoQuestions(thisUser))
             }
 
@@ -170,7 +170,7 @@ class QuizDataController(
         val thisUser = userRepository.getUserData(session)
         val quizzesList = friendshipRepository.userFriendList(thisUser)
             .map {
-                it.getUserQuizzes(Int.MAX_VALUE)
+                it.getUserQuizzes(thisUser, Int.MAX_VALUE)
                     .filter { quiz ->
                         stringToSearch.isNullOrBlank() || quiz.quizName.equals(stringToSearch, true)
                     }
@@ -202,7 +202,7 @@ class QuizDataController(
     fun quizMyGameHistory(session: UserSession, count: Int): NetworkResource<List<Quiz>> {
         val thisUser = userRepository.getUserData(session)
 
-        return NetworkResource.Success(thisUser.getLastPlayedQuizzes(count).map {
+        return NetworkResource.Success(thisUser.getLastPlayedQuizzes(thisUser, count).map {
             it.toDomain(QuizConversionCommand.WithUserNoQuestions(thisUser))
         })
     }

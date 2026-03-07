@@ -22,11 +22,11 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
     companion object : UUIDEntityClass<UserEntity>(UsersTable) {
 
         fun isNameTaken(name: String): Boolean {
-            return transaction { find { UsersTable.userName.lowerCase() eq name.lowercase() }.firstOrNull() != null }
+            return transaction { find { UsersTable.userName.lowerCase() eq name.lowercase() }.any() }
         }
 
         fun isEmailTaken(email: String): Boolean {
-            return transaction { find { UsersTable.userEmail.lowerCase() eq email.lowercase() }.firstOrNull() != null }
+            return transaction { find { UsersTable.userEmail.lowerCase() eq email.lowercase() }.any() }
         }
     }
 
@@ -126,34 +126,34 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
     }
 
 
-    fun favoriteQuizzes(count: Int): List<QuizEntity> {
+    fun favoriteQuizzes(caller: UserEntity, count: Int): List<QuizEntity> {
         return transaction {
             favoriteQuizzesList
-                .filter { it.isActive && it.isPublic || it.isUserCreator(this@UserEntity) }
+                .filter { it.isActive && it.isPublic || it.isUserCreator(caller) }
                 .sortedBy { it.likesCount }
                 .toList()
                 .take(count)
         }
     }
 
-    fun getUserQuizzes(count: Int): List<QuizEntity> {
+    fun getUserQuizzes(caller: UserEntity, count: Int): List<QuizEntity> {
         return transaction {
             quizList
-                .filter { it.isActive && it.isPublic || it.isUserCreator(this@UserEntity) }
+                .filter { it.isActive && it.isPublic || it.isUserCreator(caller) }
                 .sortedBy { it.likesCount }
                 .toList()
                 .take(count)
         }
     }
 
-    fun getLastPlayedQuizzes(count: Int): List<QuizEntity> {
+    fun getLastPlayedQuizzes(caller: UserEntity, count: Int): List<QuizEntity> {
         // TODO: Sprawdzić dobrze czy działa
         return transaction {
             playHistoryList
                 .sortedBy { it.createdAt }
                 .reversed()
                 .map { it.quiz }
-                .filter { it.isActive && it.isPublic || it.isUserCreator(this@UserEntity) }
+                .filter { it.isActive && it.isPublic || it.isUserCreator(caller) }
                 .take(count)
         }
     }
