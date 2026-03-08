@@ -59,6 +59,7 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.UiEvent
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
+import com.github.projektmagma.magmaquiz.app.quizzes.domain.validators.toResId
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.CreateQuizViewModel
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuestionCard
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuizCoverImage
@@ -281,7 +282,7 @@ fun CreateQuizScreen(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                                 ) {
-                                    quiz.tagList.forEachIndexed { index, tag ->
+                                    quiz.tagList.forEach { tag ->
                                         InputChip(
                                             selected = false,
                                             onClick = {},
@@ -291,9 +292,8 @@ fun CreateQuizScreen(
                                                     modifier = Modifier
                                                         .size(16.dp)
                                                         .clickable {
-                                                            createQuizViewModel.onCommand(
-                                                                QuizCommand.RemoveTag(index)
-                                                            )
+                                                            createQuizViewModel.onCommand(QuizCommand.RemoveTag(tag))
+                                                            tagListExpanded = true
                                                         },
                                                     imageVector = Icons.Default.Close,
                                                     contentDescription = "Remove tag"
@@ -309,9 +309,7 @@ fun CreateQuizScreen(
                                             .padding(vertical = 12.dp),
                                         value = state.tagName,
                                         onValueChange = {
-                                            createQuizViewModel.onCommand(
-                                                QuizCommand.TagNameChanged(it)
-                                            )
+                                            createQuizViewModel.onCommand(QuizCommand.TagNameChanged(it))
                                             tagListExpanded = true
                                         },
                                         textStyle = MaterialTheme.typography.bodyMedium.copy(
@@ -319,7 +317,7 @@ fun CreateQuizScreen(
                                         ),
                                         singleLine = true,
                                         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, autoCorrectEnabled = false),
                                         keyboardActions = KeyboardActions(
                                             onDone = {
                                                 createQuizViewModel.onCommand(
@@ -341,6 +339,11 @@ fun CreateQuizScreen(
                                         }
                                     )
                                 }
+                                
+                                Text(
+                                    modifier = Modifier.align(Alignment.End),
+                                    text="${state.quizModel.tagList.size} / 20"
+                                )
                             }
                         }
 
@@ -359,6 +362,11 @@ fun CreateQuizScreen(
                             }
                         }
                     }
+                    
+                    Text(
+                        text = if (state.tagError != null) stringResource(state.tagError!!.toResId()) else "",
+                        color = MaterialTheme.colorScheme.error
+                    )
                 }
             }
 

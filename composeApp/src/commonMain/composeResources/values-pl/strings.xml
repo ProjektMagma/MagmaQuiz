@@ -104,4 +104,6 @@
     <string name="pepole_who_whant_know_you">Osoby, które chcą cię poznać</string>
     <string name="new_quizzes_from_your_friends">Nowe quizy twoich znajomych</string>
     <string name="play_single">Graj</string>
+    <string name="too_many_tag">Maksymalnie 20 tagów</string>
+    <string name="duplicated_tags">Tagi nie mogą się duplikować</string>
 </resources>
