@@ -34,11 +34,9 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -62,6 +60,7 @@ import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
 import com.github.projektmagma.magmaquiz.app.quizzes.domain.validators.toResId
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.CreateQuizViewModel
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuestionCard
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuestionTypeDialog
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuizCoverImage
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuizDataTextField
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.QuizCommand
@@ -70,16 +69,13 @@ import magmaquiz.composeapp.generated.resources.add_question
 import magmaquiz.composeapp.generated.resources.add_tag
 import magmaquiz.composeapp.generated.resources.all_changes_remove
 import magmaquiz.composeapp.generated.resources.are_you_sure
-import magmaquiz.composeapp.generated.resources.choose_type
 import magmaquiz.composeapp.generated.resources.description
-import magmaquiz.composeapp.generated.resources.multi_answer
 import magmaquiz.composeapp.generated.resources.name
 import magmaquiz.composeapp.generated.resources.no
 import magmaquiz.composeapp.generated.resources.private
 import magmaquiz.composeapp.generated.resources.public
 import magmaquiz.composeapp.generated.resources.save_icon
 import magmaquiz.composeapp.generated.resources.save_quiz
-import magmaquiz.composeapp.generated.resources.single_answer
 import magmaquiz.composeapp.generated.resources.success_quiz_add
 import magmaquiz.composeapp.generated.resources.tags
 import magmaquiz.composeapp.generated.resources.visibility
@@ -97,9 +93,8 @@ fun CreateQuizScreen(
 ) {
     var expanded by remember { mutableStateOf(false) }
     var tagListExpanded by remember { mutableStateOf(false) }
-
-    val modalBottomSheetState = rememberModalBottomSheetState()
-    var showBottomSheet by remember { mutableStateOf(false) }
+    
+    var showQuestionDialog by remember { mutableStateOf(false) }
     var showAlertDialog by remember { mutableStateOf(false) }
     val state by createQuizViewModel.state.collectAsStateWithLifecycle()
     val backState = rememberNavigationEventState(
@@ -382,45 +377,20 @@ fun CreateQuizScreen(
 
             item {
                 Button(onClick = {
-                    showBottomSheet = true
+                    showQuestionDialog = true
                 }) {
                     Text(text = stringResource(Res.string.add_question))
                 }
-
-                if (showBottomSheet) {
-                    ModalBottomSheet(
-                        onDismissRequest = {
-                            showBottomSheet = false
+                
+                if (showQuestionDialog) {
+                    QuestionTypeDialog(
+                        onClick = {
+                            showQuestionDialog = false
+                            createQuizViewModel.onCommand(QuizCommand.QuestionEditor.Init(it))
+                            navigateToQuestionCreate(it)
                         },
-                        sheetState = modalBottomSheetState
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Text(text = stringResource(Res.string.choose_type))
-
-                            Button(
-                                onClick = {
-                                    createQuizViewModel.onCommand(QuizCommand.QuestionEditor.Init(false))
-                                    navigateToQuestionCreate(false)
-                                }
-                            ) {
-                                Text(text = stringResource(Res.string.single_answer))
-                            }
-
-                            Button(
-                                onClick = {
-                                    createQuizViewModel.onCommand(QuizCommand.QuestionEditor.Init(true))
-                                    navigateToQuestionCreate(true)
-                                }
-                            ) {
-                                Text(text = stringResource(Res.string.multi_answer))
-                            }
-                        }
-                    }
+                        changeDialogVisibility = { showQuestionDialog = false }
+                    )
                 }
             }
         }
