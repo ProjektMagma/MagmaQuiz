@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class QuizReview(
-    val author: ForeignUser,
+    val author: ForeignUser? = null,
     val rating: Int,
     val comment: String
 )

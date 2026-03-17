@@ -7,10 +7,14 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.QuizReview
 import com.github.projektmagma.magmaquiz.shared.data.domain.Tag
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Resource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
-import io.ktor.client.*
-import io.ktor.client.request.*
-import io.ktor.http.*
-import java.util.*
+import io.ktor.client.HttpClient
+import io.ktor.client.request.delete
+import io.ktor.client.request.get
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import java.util.UUID
 
 class QuizService(
     private val httpClient: HttpClient,
@@ -114,6 +118,7 @@ class QuizService(
     suspend fun createQuizReview(uuid: UUID, quizReview: QuizReview): Resource<Unit, NetworkError>{
         return safeCall<Unit> { 
             httpClient.post("quiz/reviews/create/$uuid"){
+                contentType(ContentType.Application.Json)
                 setBody(quizReview)
             }
         }

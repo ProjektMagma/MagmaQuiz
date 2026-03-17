@@ -12,6 +12,7 @@ import com.github.projektmagma.magmaquiz.app.quizzes.presentation.QuizzesListVie
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.CreateQuestionScreen
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.CreateQuizScreen
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.QuizDetailsScreen
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.QuizReviewsScreen
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.QuizzesScreen
 import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.SettingsScreen
 import com.github.projektmagma.magmaquiz.app.users.presentation.UserDetailsViewModel
@@ -41,6 +42,9 @@ fun MainNavigation(
                         },
                         navigateToUserDetails = {
                             navigator.navigate(Route.Menus.Users.UserDetails(it))
+                        },
+                        navigateToQuizReviews = {
+                            navigator.navigate(Route.Menus.Quizzes.QuizReviews(it))
                         }
                     )
                 }
@@ -57,7 +61,8 @@ fun MainNavigation(
                         navigateToQuizDetails = { id ->
                             navigator.navigate(Route.Menus.Quizzes.QuizDetails(id))
                         },
-                        quizzesListViewModel = quizzesListViewModel
+                        quizzesListViewModel = quizzesListViewModel,
+                        navigateToQuizReviews = { navigator.navigate(Route.Menus.Quizzes.QuizReviews(it)) },
                     )
                 }
                 entry<Route.Menus.Quizzes.QuizDetails> {
@@ -66,6 +71,9 @@ fun MainNavigation(
                         navigateToPlayScreen = {
                             navigateToGameScreen()
                         },
+                        navigateToReviewsScreen = { id ->
+                            navigator.navigate(Route.Menus.Quizzes.QuizReviews(id))
+                        }
                     )
                 }
                 entry<Route.Menus.Quizzes.CreateQuiz> {
@@ -86,6 +94,9 @@ fun MainNavigation(
                         navigateBack = { navigator.goBack() }
                     )
                 }
+                entry<Route.Menus.Quizzes.QuizReviews> {
+                    QuizReviewsScreen(it.id)
+                }
                 entry<Route.Menus.Users.UserDetails> { parameters ->
                     UserDetailsScreen(
                         id = parameters.id,
@@ -93,7 +104,8 @@ fun MainNavigation(
                         navigateToEditScreen = { navigator.navigate(Route.Menus.Quizzes.CreateQuiz) },
                         navigateToQuizDetails = { navigator.navigate(Route.Menus.Quizzes.QuizDetails(it)) },
                         navigateToSettingsScreen = { navigator.navigate(Route.Menus.Settings) },
-                        userDetailsViewModel = userDetailsViewModel
+                        userDetailsViewModel = userDetailsViewModel,
+                        navigateToQuizReviews = { navigator.navigate(Route.Menus.Quizzes.QuizReviews(it)) }
                     )
                 }
                 entry<Route.Menus.Users.Find> {

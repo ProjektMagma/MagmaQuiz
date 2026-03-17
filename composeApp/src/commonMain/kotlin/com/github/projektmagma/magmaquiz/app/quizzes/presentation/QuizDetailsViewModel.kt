@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
 import com.github.projektmagma.magmaquiz.app.quizzes.data.repository.QuizRepository
+import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenError
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +20,7 @@ class QuizDetailsViewModel(
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState = _uiState.asStateFlow()
     
-    private val _quiz = quizRepository.quiz
+    private val _quiz = MutableStateFlow<Quiz?>(null)
     val quiz = _quiz.asStateFlow()
 
     private val _quizListState = quizRepository.quizListState
@@ -35,7 +36,10 @@ class QuizDetailsViewModel(
     private fun getQuizById(id: UUID) {
         viewModelScope.launch {
             _quiz.value = null
-            quizRepository.getQuizById(id).whenSuccess { _quiz.value = it.data }
+            quizRepository.getQuizById(id).whenSuccess { 
+                _quiz.value = it.data
+                quizRepository.quiz.value = it.data
+            }
         }
     }
 

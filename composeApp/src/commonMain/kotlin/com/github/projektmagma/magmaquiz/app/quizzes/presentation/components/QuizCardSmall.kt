@@ -1,10 +1,27 @@
 package com.github.projektmagma.magmaquiz.app.quizzes.presentation.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -20,7 +37,7 @@ import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.delete
 import magmaquiz.composeapp.generated.resources.edit
 import org.jetbrains.compose.resources.stringResource
-import java.util.*
+import java.util.UUID
 
 @Composable
 fun QuizCardSmall(
@@ -29,6 +46,7 @@ fun QuizCardSmall(
     navigateToQuizDetails: (id: UUID) -> Unit,
     showUserButton: Boolean = true,
     canEdit: Boolean = false,
+    navigateToQuizReviews: () -> Unit,
     onDeleteClick: () -> Unit = {},
     onEditClick: () -> Unit = {},
     navigateToEditScreen: () -> Unit = {},
@@ -103,7 +121,8 @@ fun QuizCardSmall(
             )
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = if (showUserButton) Arrangement.SpaceBetween else Arrangement.End
+                horizontalArrangement = if (showUserButton) Arrangement.SpaceBetween else Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 if (showUserButton)
                     UserProfileButton(
@@ -112,11 +131,24 @@ fun QuizCardSmall(
                         onClick = { navigateToUserDetails(quiz.quizCreator!!.userId!!) }
                     )
 
-                FavoriteButton(
-                    likesCount = quiz.likesCount,
-                    isLiked = quiz.likedByYou,
-                    changeFavoriteStatus = changeFavoriteStatus
-                )
+                Row {
+                    IconButton(
+                        onClick = {
+                            navigateToQuizReviews()
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Comment,
+                            contentDescription = null
+                        )
+                    }
+
+                    FavoriteButton(
+                        likesCount = quiz.likesCount,
+                        isLiked = quiz.likedByYou,
+                        changeFavoriteStatus = changeFavoriteStatus
+                    )
+                }
             }
         }
     }

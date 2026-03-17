@@ -5,6 +5,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Comment
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,15 +32,16 @@ import java.util.UUID
 @Composable
 actual fun QuizCard(
     quiz: Quiz,
-    navigateToQuizDetails: (id: UUID) -> Unit,
+    navigateToQuizDetails: () -> Unit,
     navigateToUserDetails: (id: UUID) -> Unit,
+    navigateToQuizReviews: () -> Unit,
     changeFavoriteStatus: () -> Unit,
 ) {
 
     UniversalCardContainer(
         modifier = Modifier.padding(vertical = 4.dp),
         onClick = {
-            navigateToQuizDetails(quiz.id!!)
+            navigateToQuizDetails()
         }
     ) {
         Column(
@@ -61,11 +66,23 @@ actual fun QuizCard(
                         }
                     )
                 }
-                FavoriteButton(
-                    likesCount = quiz.likesCount,
-                    isLiked = quiz.likedByYou,
-                    changeFavoriteStatus = changeFavoriteStatus
-                )
+                Row {
+                    IconButton(
+                        onClick = {
+                            navigateToQuizReviews()
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Comment,
+                            contentDescription = null
+                        )
+                    }
+                    FavoriteButton(
+                        likesCount = quiz.likesCount,
+                        isLiked = quiz.likedByYou,
+                        changeFavoriteStatus = changeFavoriteStatus
+                    )
+                }
             }
 
             Text(

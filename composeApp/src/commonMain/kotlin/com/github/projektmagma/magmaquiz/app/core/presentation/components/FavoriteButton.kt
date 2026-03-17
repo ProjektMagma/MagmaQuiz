@@ -27,12 +27,6 @@ fun FavoriteButton(
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            modifier = Modifier.padding(bottom = 8.dp),
-            text = "$likesCount",
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Bold
-        )
         IconButton(
             onClick = { changeFavoriteStatus() }
         ) {
@@ -42,5 +36,11 @@ fun FavoriteButton(
                 contentDescription = "FavoriteButton"
             )
         }
+        Text(
+            modifier = Modifier.padding(bottom = 8.dp),
+            text = "$likesCount",
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
