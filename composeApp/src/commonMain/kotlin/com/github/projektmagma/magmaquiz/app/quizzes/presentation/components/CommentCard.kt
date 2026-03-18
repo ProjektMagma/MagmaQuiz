@@ -30,14 +30,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.ProfilePictureIcon
-import com.github.projektmagma.magmaquiz.shared.data.domain.QuizReview
+import com.github.projektmagma.magmaquiz.app.quizzes.domain.model.QuizReviewModel
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.delete
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun CommentCard(
-    review: QuizReview,
+    review: QuizReviewModel,
     showOptions: Boolean,
     modifier: Modifier = Modifier,
     deleteReview: () -> Unit
@@ -124,11 +124,13 @@ fun CommentCard(
                 }
             }
 
-            Text(
-                text = review.comment,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            if (review.comment.isNotEmpty()){
+                Text(
+                    text = review.comment,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }

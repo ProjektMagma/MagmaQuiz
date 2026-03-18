@@ -97,6 +97,10 @@ actual fun QuizCard(
                 textAlign = TextAlign.Center
             )
             ContentImage(quiz.quizImage)
+
+            StarRating(
+                rating = quiz.averageRating
+            )
             
             TagList(quiz.tagList)
 

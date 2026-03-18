@@ -86,7 +86,7 @@ fun QuizReviewsScreen(
                     modifier = Modifier.weight(1f), value = state.content,
                     onValueChange = { quizReviewsViewModel.onCommand(QuizReviewCommand.ContentChanged(it)) }
                 )
-                val canSubmit = state.rating > 0 && state.content.isNotEmpty()
+                val canSubmit = state.rating > 0
 
                 IconButton(
                     enabled = canSubmit,

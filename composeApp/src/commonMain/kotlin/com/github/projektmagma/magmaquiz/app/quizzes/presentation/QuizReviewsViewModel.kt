@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.github.projektmagma.magmaquiz.app.auth.data.AuthRepository
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
 import com.github.projektmagma.magmaquiz.app.quizzes.data.repository.QuizRepository
+import com.github.projektmagma.magmaquiz.app.quizzes.domain.mappers.toModel
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.QuizReviewCommand
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.QuizReviewState
 import com.github.projektmagma.magmaquiz.shared.data.domain.QuizReview
@@ -48,7 +49,7 @@ class QuizReviewsViewModel(
         viewModelScope.launch {
             quizRepository.getQuizReviews(id)
                 .whenSuccess { result ->
-                    _state.update { it.copy(reviews = result.data) }
+                    _state.update { it.copy(reviews = result.data.map { review -> review.toModel() }) }
                     _uiState.value = UiState.Success
                 }
         }
@@ -56,13 +57,23 @@ class QuizReviewsViewModel(
     
     private fun createReview(){
         viewModelScope.launch { 
+            val review = QuizReview(
+                comment = _state.value.content,
+                rating = _state.value.rating
+            )
+            
             quizRepository.createQuizReview(
                 id,
-                QuizReview(
-                    comment = _state.value.content,
-                    rating = _state.value.rating
-                )
-            )
+                review
+            ).whenSuccess { 
+                _state.update { 
+                    it.copy(
+                        reviews = it.reviews + review.toModel(authRepository.thisUser.value!!),
+                        rating = 0,
+                        content = ""
+                    )
+                }
+            }
         }
     }
     

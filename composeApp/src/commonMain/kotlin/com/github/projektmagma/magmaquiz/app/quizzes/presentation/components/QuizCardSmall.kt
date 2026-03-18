@@ -119,6 +119,11 @@ fun QuizCardSmall(
                 maxLines = 2,
                 minLines = 2
             )
+            
+            StarRating(
+                rating = quiz.averageRating
+            )
+            
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = if (showUserButton) Arrangement.SpaceBetween else Arrangement.End,

@@ -85,8 +85,15 @@ actual fun QuizCard(
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center
             )
+            
             ContentImage(quiz.quizImage)
+
+            StarRating(
+                rating = quiz.averageRating
+            )
+            
             TagList(quiz.tagList)
+            
             Row(
                 modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
