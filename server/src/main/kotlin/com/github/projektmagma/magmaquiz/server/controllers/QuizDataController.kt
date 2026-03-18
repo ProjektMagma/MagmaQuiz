@@ -12,8 +12,9 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.QuizReview
 import com.github.projektmagma.magmaquiz.shared.data.domain.Tag
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkResource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
-import io.ktor.http.*
-import java.util.*
+import io.ktor.http.HttpStatusCode
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import java.util.UUID
 
 
 class QuizDataController(
@@ -212,7 +213,7 @@ class QuizDataController(
         val dbQuiz = quizRepository.getQuizData(quizId)
             ?: return NetworkResource.Error(HttpStatusCode.NotFound)
 
-        if (userRepository.getUserReviews(thisUser).any { it.quiz.id == dbQuiz.id })
+        if (userRepository.hasUserReviewForQuiz(thisUser.id.value, dbQuiz.id.value))
             return NetworkResource.Error(HttpStatusCode.Conflict)
 
         quizRepository.createReview(review, dbQuiz, thisUser)
@@ -234,16 +235,16 @@ class QuizDataController(
         )
     }
 
-    fun quizDeleteReview(session: UserSession, quizId: UUID): NetworkResource<Unit> {
+    fun quizDeleteReview(session: UserSession, quizId: UUID): NetworkResource<Unit> = transaction {
         val thisUser = userRepository.getUserData(session)
         val dbQuiz = quizRepository.getQuizData(quizId)
-            ?: return NetworkResource.Error(HttpStatusCode.NotFound)
+            ?: return@transaction NetworkResource.Error(HttpStatusCode.NotFound)
 
         val dbReview = userRepository.getUserReviews(thisUser).firstOrNull { it.quiz.id == dbQuiz.id }
-            ?: return NetworkResource.Error(HttpStatusCode.NotFound)
+            ?: return@transaction NetworkResource.Error(HttpStatusCode.NotFound)
 
         dbReview.setIsActive(false)
 
-        return NetworkResource.Success(Unit)
+        return@transaction NetworkResource.Success(Unit)
     }
 }

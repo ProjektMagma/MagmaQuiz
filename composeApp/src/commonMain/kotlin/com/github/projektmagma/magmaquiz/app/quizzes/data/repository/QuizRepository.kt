@@ -117,7 +117,7 @@ class QuizRepository(
         return quizService.deleteQuizReview(uuid)
     }
     
-    suspend fun getTags(name: String = "", count: Int = 10): Resource<List<Tag>, NetworkError>{
+    suspend fun getTags(name: String = "", count: Int = 5): Resource<List<Tag>, NetworkError>{
         return quizService.getTags(name, count)
     }
 

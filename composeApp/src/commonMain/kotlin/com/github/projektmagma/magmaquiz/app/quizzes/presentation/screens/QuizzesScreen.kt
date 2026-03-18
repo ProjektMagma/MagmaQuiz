@@ -13,12 +13,13 @@ import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.Qui
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuizSearchFieldAndFilters
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.QuizListCommand
 import org.koin.compose.viewmodel.koinViewModel
-import java.util.*
+import java.util.UUID
 
 @Composable
 fun QuizzesScreen(
     navigateToQuizDetails: (id: UUID) -> Unit,
     navigateToUserDetails: (id: UUID) -> Unit,
+    navigateToQuizReviews: (id: UUID) -> Unit,
     quizzesListViewModel: QuizzesListViewModel = koinViewModel()
 ) {
     val state by quizzesListViewModel.quizListState.collectAsStateWithLifecycle()
@@ -49,7 +50,8 @@ fun QuizzesScreen(
                     },
                     changeFavoriteStatus = {
                         quizzesListViewModel.onCommand(QuizListCommand.FavoriteStatusChanged(quiz.id!!))
-                    }
+                    },
+                    navigateToQuizReviews = { navigateToQuizReviews(quiz.id!!) },
                 )
             }
         )

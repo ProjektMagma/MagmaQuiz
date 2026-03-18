@@ -101,10 +101,10 @@ class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable),
         }
     }
 
-    private fun getAverageRating(): Double {
+    private fun getAverageRating(): Float {
         return transaction {
             val ratings = reviewList.map { it.rating }
-            if (ratings.isEmpty()) 0.0 else ratings.average()
+            if (ratings.isEmpty()) 0f else ratings.average().toFloat()
         }
     }
 

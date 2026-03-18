@@ -21,15 +21,21 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiStat
 import com.github.projektmagma.magmaquiz.app.home.presentation.HomeViewModel
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuizCardSmall
 import com.github.projektmagma.magmaquiz.app.users.presentation.components.UserCardSmall
-import magmaquiz.composeapp.generated.resources.*
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.good_to_see_you
+import magmaquiz.composeapp.generated.resources.new_quizzes_from_your_friends
+import magmaquiz.composeapp.generated.resources.pepole_who_whant_know_you
+import magmaquiz.composeapp.generated.resources.recently_added_quizzes
+import magmaquiz.composeapp.generated.resources.the_most_liked_quizzes
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-import java.util.*
+import java.util.UUID
 
 @Composable
 fun HomeScreen(
     navigateToQuizDetails: (id: UUID) -> Unit,
     navigateToUserDetails: (id: UUID) -> Unit,
+    navigateToQuizReviews: (id: UUID) -> Unit
 ) {
 
     val viewModel = koinViewModel<HomeViewModel>()
@@ -76,7 +82,8 @@ fun HomeScreen(
                                 it,
                                 navigateToQuizDetails = navigateToQuizDetails,
                                 navigateToUserDetails = navigateToUserDetails,
-                                changeFavoriteStatus = { viewModel.changeFavoriteStatus(it.id!!) }
+                                changeFavoriteStatus = { viewModel.changeFavoriteStatus(it.id!!) },
+                                navigateToQuizReviews = { navigateToQuizReviews(it.id!!) }
                             )
                         }
 
@@ -94,7 +101,8 @@ fun HomeScreen(
                                 it,
                                 navigateToQuizDetails = navigateToQuizDetails,
                                 navigateToUserDetails = navigateToUserDetails,
-                                changeFavoriteStatus = { viewModel.changeFavoriteStatus(it.id!!) }
+                                changeFavoriteStatus = { viewModel.changeFavoriteStatus(it.id!!) },
+                                navigateToQuizReviews = { navigateToQuizReviews(it.id!!) }
                             )
                         }
 
@@ -129,7 +137,8 @@ fun HomeScreen(
                                 it,
                                 navigateToQuizDetails = navigateToQuizDetails,
                                 navigateToUserDetails = navigateToUserDetails,
-                                changeFavoriteStatus = { viewModel.changeFavoriteStatus(it.id!!) }
+                                changeFavoriteStatus = { viewModel.changeFavoriteStatus(it.id!!) },
+                                navigateToQuizReviews = { navigateToQuizReviews(it.id!!) }
                             )
                         }
                     }

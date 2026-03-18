@@ -11,6 +11,7 @@ import com.github.projektmagma.magmaquiz.app.quizzes.data.repository.QuizReposit
 import com.github.projektmagma.magmaquiz.app.quizzes.domain.validators.toResId
 import com.github.projektmagma.magmaquiz.app.quizzes.domain.validators.validateQuestion
 import com.github.projektmagma.magmaquiz.app.quizzes.domain.validators.validateQuiz
+import com.github.projektmagma.magmaquiz.app.quizzes.domain.validators.validateTag
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.AnswerModel
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.CreateQuizState
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.QuestionModel
@@ -60,31 +61,27 @@ class CreateQuizViewModel(
             is QuizCommand.SetForEdit -> getQuizForEdit(quizCommand.id)
             QuizCommand.ResetState -> resetState()
             is QuizCommand.TagNameChanged -> {
-                if (quizCommand.name.isEmpty()) {
-                    _state.update { it.copy(tagList = emptyList()) }
+                val name = quizCommand.name
+                val trimmed = name.trim()
+                _state.update { it.copy(tagName = trimmed) }
+
+                if (name.lastOrNull() == ' ') {
+                    addNewTag(trimmed)
+                } else {
+                    getTags()
                 }
-                _state.update { it.copy(tagName = quizCommand.name.trim()) }
-                getTags()
             }
             
-            is QuizCommand.AddNewTag -> if (quizCommand.tagName.isNotEmpty()){
-                _state.update {
-                    it.copy(
-                        quizModel = it.quizModel.copy(
-                            tagList = _state.value.quizModel.tagList.plus(quizCommand.tagName)
-                        ),
-                        tagName = "",
-                        tagList = emptyList()
-                    )
-                }
-                getTags()
+            is QuizCommand.AddNewTag -> {
+                addNewTag(quizCommand.tagName)
             }
 
             is QuizCommand.RemoveTag -> _state.update {
                 it.copy(
                     quizModel = it.quizModel.copy(
-                        tagList = it.quizModel.tagList.filterIndexed { index, _ -> index != quizCommand.index }
-                    )
+                        tagList = it.quizModel.tagList.filter { name -> name != quizCommand.name }
+                    ),
+                    tagError = null
                 )
             }
                 
@@ -175,13 +172,39 @@ class CreateQuizViewModel(
         }
     }
     
+    private fun addNewTag(tagName: String){
+        if (tagName.isNotEmpty()) {
+            _state.update {
+                it.copy(tagError = validateTag(
+                    tagName,
+                    _state.value.quizModel.tagList)
+                )
+            }
+
+            if (_state.value.tagError == null){
+                _state.update {
+                    it.copy(
+                        quizModel = it.quizModel.copy(
+                            tagList = _state.value.quizModel.tagList.plus(tagName)
+                        ),
+                        tagName = "",
+                        tagList = emptyList()
+                    )
+                }
+            }
+            
+            getTags()
+        }
+    }
+    
     private fun getTags(){
         viewModelScope.launch {
             withSearchDelay(true, 100) {
                 quizRepository.getTags(_state.value.tagName)
                     .whenSuccess { result ->
+                        val newList = result.data.filter { it.tagName !in _state.value.quizModel.tagList }
                         _state.update {
-                            it.copy(tagList = result.data)
+                            it.copy(tagList = newList)
                         }
                     }
             }

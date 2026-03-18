@@ -1,12 +1,25 @@
 package com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -25,12 +38,13 @@ import magmaquiz.composeapp.generated.resources.play_single
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
-import java.util.*
+import java.util.UUID
 
 @Composable
 fun QuizDetailsScreen(
     id: UUID,
     navigateToPlayScreen: () -> Unit,
+    navigateToReviewsScreen: (id: UUID) -> Unit
 ) {
     val quizDetailsViewModel: QuizDetailsViewModel = koinViewModel { parametersOf(id) }
 
@@ -85,7 +99,7 @@ fun QuizDetailsScreen(
                         ) {
                             IconButton(
                                 onClick = {
-                                    quizDetailsViewModel.changeFavoriteStatus(quiz?.id!!)
+                                    quizDetailsViewModel.changeFavoriteStatus(id)
                                 }
                             ) {
                                 Icon(
@@ -105,6 +119,17 @@ fun QuizDetailsScreen(
                         style = MaterialTheme.typography.labelMedium
                     )
 
+                    IconButton(
+                        onClick = {
+                            navigateToReviewsScreen(id)
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Comment,
+                            contentDescription = null
+                        )
+                    }
+                    
                     TagList(
                         tagList = quiz!!.tagList
                     )

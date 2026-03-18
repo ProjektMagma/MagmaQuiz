@@ -113,6 +113,7 @@ val serializersConfig = SavedStateConfiguration {
                 Route.Menus.Users.UserDetails::class,
                 Route.Menus.Users.UserDetails.serializer()
             )
+            subclass(Route.Menus.Quizzes.QuizReviews::class, Route.Menus.Quizzes.QuizReviews.serializer())
             subclass(Route.Menus.Users.Find::class, Route.Menus.Users.Find.serializer())
             subclass(Route.Menus.Users.Friends::class, Route.Menus.Users.Friends.serializer())
             subclass(Route.Menus.Settings.Profile::class, Route.Menus.Settings.Profile.serializer())

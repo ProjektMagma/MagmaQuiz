@@ -1,0 +1,9 @@
+package com.github.projektmagma.magmaquiz.app.quizzes.presentation.model
+
+import com.github.projektmagma.magmaquiz.app.quizzes.domain.model.QuizReviewModel
+
+data class QuizReviewState(
+    val content: String = "",
+    val rating: Int = 0,
+    val reviews: List<QuizReviewModel> = emptyList(),
+)

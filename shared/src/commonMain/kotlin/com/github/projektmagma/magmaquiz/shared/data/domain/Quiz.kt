@@ -2,7 +2,7 @@ package com.github.projektmagma.magmaquiz.shared.data.domain
 
 import com.github.projektmagma.magmaquiz.shared.data.domain.serializers.UUIDSerializer
 import kotlinx.serialization.Serializable
-import java.util.*
+import java.util.UUID
 
 @Serializable
 data class Quiz(
@@ -15,7 +15,7 @@ data class Quiz(
     val quizCreator: ForeignUser? = null,
     var likesCount: Int,
     val likedByYou: Boolean,
-    val averageRating: Double,
+    val averageRating: Float,
     val tagList: List<Tag>,
     val createdAt: Long,
     val modifiedAt: Long,

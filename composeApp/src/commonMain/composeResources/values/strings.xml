@@ -108,4 +108,6 @@
     <string name="pepole_who_whant_know_you">People who want to get to know you</string>
     <string name="new_quizzes_from_your_friends">New quizzes from your friends</string>
     <string name="play_single">Play</string>
+    <string name="too_many_tag">Max 20 tags</string>
+    <string name="duplicated_tags">Tags cannot be duplicated</string>
 </resources>
