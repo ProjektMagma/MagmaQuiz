@@ -19,7 +19,7 @@ import java.util.UUID
 fun QuizzesScreen(
     navigateToQuizDetails: (id: UUID) -> Unit,
     navigateToUserDetails: (id: UUID) -> Unit,
-    navigateToQuizReviews: (id: UUID) -> Unit,
+    navigateToQuizReviews: (id: UUID, reviewed: Boolean) -> Unit,
     quizzesListViewModel: QuizzesListViewModel = koinViewModel()
 ) {
     val state by quizzesListViewModel.quizListState.collectAsStateWithLifecycle()
@@ -51,7 +51,7 @@ fun QuizzesScreen(
                     changeFavoriteStatus = {
                         quizzesListViewModel.onCommand(QuizListCommand.FavoriteStatusChanged(quiz.id!!))
                     },
-                    navigateToQuizReviews = { navigateToQuizReviews(quiz.id!!) },
+                    navigateToQuizReviews = { navigateToQuizReviews(quiz.id!!, quiz.reviewedByYou) },
                 )
             }
         )

@@ -7,5 +7,5 @@ sealed interface QuizReviewCommand {
     data class RatingChanged(val newRating: Int): QuizReviewCommand
     data object GetReviews: QuizReviewCommand
     data object CreateReview: QuizReviewCommand
-    data class DeleteReview(val id: UUID): QuizReviewCommand
+    data class DeleteReview(val id: UUID, val rating: Int): QuizReviewCommand
 }

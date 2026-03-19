@@ -51,7 +51,7 @@ fun UserDetailsScreen(
     id: UUID,
     navigateToEditScreen: (id: UUID) -> Unit,
     navigateToQuizDetails: (id: UUID) -> Unit,
-    navigateToQuizReviews: (id: UUID) -> Unit,
+    navigateToQuizReviews: (id: UUID, reviewed: Boolean) -> Unit,
     navigateToSettingsScreen: () -> Unit,
     userDetailsViewModel: UserDetailsViewModel,
     createQuizViewModel: CreateQuizViewModel = koinViewModel(),
@@ -172,7 +172,7 @@ fun UserDetailsScreen(
                             canEdit = userDetailsViewModel.checkOwnership(quiz.quizCreator?.userId!!),
                             onDeleteClick = { userDetailsViewModel.deleteQuiz(quiz.id!!) },
                             onEditClick = { createQuizViewModel.onCommand(QuizCommand.SetForEdit(quiz.id!!)) },
-                            navigateToQuizReviews = { navigateToQuizReviews(quiz.id!!) },
+                            navigateToQuizReviews = { navigateToQuizReviews(quiz.id!!, quiz.reviewedByYou) },
                         )
 
                         Spacer(modifier = Modifier.height(8.dp))

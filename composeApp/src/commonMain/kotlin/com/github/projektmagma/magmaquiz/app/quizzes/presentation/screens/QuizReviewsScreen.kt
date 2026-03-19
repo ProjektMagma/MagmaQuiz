@@ -19,11 +19,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -32,15 +34,19 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiStat
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.QuizReviewsViewModel
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.CommentCard
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.QuizReviewCommand
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.already_reviewed
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import java.util.UUID
 
 @Composable
 fun QuizReviewsScreen(
-    id: UUID
+    id: UUID,
+    reviewed: Boolean
 ) {
-    val quizReviewsViewModel: QuizReviewsViewModel = koinViewModel { parametersOf(id) }
+    val quizReviewsViewModel: QuizReviewsViewModel = koinViewModel { parametersOf(id, reviewed) }
     val state by quizReviewsViewModel.state.collectAsStateWithLifecycle()
     val uiState by quizReviewsViewModel.uiState.collectAsStateWithLifecycle()
 
@@ -64,7 +70,7 @@ fun QuizReviewsScreen(
                         CommentCard(
                             review = it,
                             showOptions = quizReviewsViewModel.checkOwnership(it.author?.userId!!),
-                            deleteReview = { quizReviewsViewModel.onCommand(QuizReviewCommand.DeleteReview(id)) }
+                            deleteReview = { quizReviewsViewModel.onCommand(QuizReviewCommand.DeleteReview(id, it.rating)) }
                         )
                     }
                 }
@@ -73,33 +79,42 @@ fun QuizReviewsScreen(
         
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.Bottom
+            verticalArrangement = Arrangement.Bottom,
         ) {
-            RatingInput(
-                rating = state.rating,
-                onRatingChange = { quizReviewsViewModel.onCommand(QuizReviewCommand.RatingChanged(it)) },
-            )
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                OutlinedTextField(
-                    modifier = Modifier.weight(1f), value = state.content,
-                    onValueChange = { quizReviewsViewModel.onCommand(QuizReviewCommand.ContentChanged(it)) }
+            if (state.hasReviewed){
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(Res.string.already_reviewed),
+                    textAlign = TextAlign.Center
                 )
-                val canSubmit = state.rating > 0
-
-                IconButton(
-                    enabled = canSubmit,
-                    onClick = {
-                        quizReviewsViewModel.onCommand(QuizReviewCommand.CreateReview)
-                    }
+            } else {
+                RatingInput(
+                    rating = state.rating,
+                    onRatingChange = { quizReviewsViewModel.onCommand(QuizReviewCommand.RatingChanged(it)) },
+                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Upload,
-                        contentDescription = null,
-                        tint = if (canSubmit) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                    OutlinedTextField(
+                        modifier = Modifier.weight(1f), 
+                        value = state.content,
+                        onValueChange = { quizReviewsViewModel.onCommand(QuizReviewCommand.ContentChanged(it)) }
                     )
-                }
+                    val canSubmit = state.rating > 0
+
+                    IconButton(
+                        enabled = canSubmit,
+                        onClick = {
+                            quizReviewsViewModel.onCommand(QuizReviewCommand.CreateReview)
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Upload,
+                            contentDescription = null,
+                            tint = if (canSubmit) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                        )
+                    }
+                }   
             }
         }
     }

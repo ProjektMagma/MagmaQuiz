@@ -1,5 +1,6 @@
 package com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create
 
+import com.github.projektmagma.magmaquiz.shared.data.domain.QuizVisibility
 import java.util.UUID
 
 data class QuizModel(
@@ -7,7 +8,7 @@ data class QuizModel(
     val name: String = "",
     val description: String = "",
     val image: ByteArray? = null,
-    val isPublic: Boolean = false,
+    val visibility: QuizVisibility = QuizVisibility.Public,
     val tagList: List<String> = emptyList(),
     val questionList: List<QuestionModel> = emptyList()
 )

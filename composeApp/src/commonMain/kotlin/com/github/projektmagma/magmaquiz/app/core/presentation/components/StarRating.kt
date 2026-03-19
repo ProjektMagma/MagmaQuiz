@@ -1,4 +1,4 @@
-package com.github.projektmagma.magmaquiz.app.quizzes.presentation.components
+package com.github.projektmagma.magmaquiz.app.core.presentation.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlin.math.roundToInt
 
 @Composable
 fun StarRating(
@@ -30,9 +31,11 @@ fun StarRating(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        val halfRating = (rating * 2).roundToInt() / 2f
+        
         for (index in 0 until 5) {
             val starStart = index.toFloat()
-            val fillFraction = (rating - starStart).coerceIn(0f, 1f)
+            val fillFraction = (halfRating - starStart).coerceIn(0f, 1f)
 
             Box(
                 modifier = Modifier
@@ -62,6 +65,11 @@ fun StarRating(
             }
         }
 
-        Text(rating.toString())
+        val ratingText = if (halfRating % 1f == 0f) {
+            "${halfRating.toInt()}"
+        } else {
+            "$halfRating"
+        }
+        Text(ratingText)
     }
 }

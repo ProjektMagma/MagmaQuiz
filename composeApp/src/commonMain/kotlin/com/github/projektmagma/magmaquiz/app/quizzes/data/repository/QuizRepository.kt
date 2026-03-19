@@ -50,14 +50,9 @@ class QuizRepository(
     suspend fun changeFavoriteStatus(
         id: UUID
     ): Resource<Unit, NetworkError> {
-        quizListState.update {
-            it.copy(quizzes = it.quizzes.changeLikeStatusInList(id))
+        updateAllLists { 
+            it.changeLikeStatusInList(id)
         }
-        
-        userDetailsQuizList.value = userDetailsQuizList.value?.changeLikeStatusInList(id)
-        recentQuizzes.value = recentQuizzes.value.changeLikeStatusInList(id)
-        mostLikedQuizzes.value = mostLikedQuizzes.value.changeLikeStatusInList(id)
-        friendsQuizzes.value = friendsQuizzes.value.changeLikeStatusInList(id)
 
         return quizService.changeFavoriteStatus(id)
     }
@@ -75,14 +70,9 @@ class QuizRepository(
     }
     
     fun deleteQuizInList(id: UUID){
-        quizListState.update {
-            it.copy(quizzes = it.quizzes.deleteQuizInList(id))
+        updateAllLists { 
+            it.deleteQuizInList(id)
         }
-
-        userDetailsQuizList.value = userDetailsQuizList.value?.deleteQuizInList(id)
-        recentQuizzes.value = recentQuizzes.value.deleteQuizInList(id)
-        mostLikedQuizzes.value = mostLikedQuizzes.value.deleteQuizInList(id)
-        friendsQuizzes.value = friendsQuizzes.value.deleteQuizInList(id)
     }
 
     suspend fun getMyFavorites(name: String, count: Int = 10): Resource<List<Quiz>, NetworkError> {
@@ -110,15 +100,38 @@ class QuizRepository(
     }
     
     suspend fun createQuizReview(uuid: UUID, review: QuizReview): Resource<Unit, NetworkError>{
-        return quizService.createQuizReview(uuid, review)
+        val result = quizService.createQuizReview(uuid, review)
+        
+        updateAllLists { 
+            it.changeRating(uuid, review.rating)
+        }
+        return result
     }
     
-    suspend fun deleteQuizReview(uuid: UUID): Resource<Unit, NetworkError>{
-        return quizService.deleteQuizReview(uuid)
+    suspend fun deleteQuizReview(uuid: UUID, rating: Int): Resource<Unit, NetworkError>{
+        val newRating = -rating
+        updateAllLists { 
+            it.changeRating(uuid, newRating)
+        }
+        
+        return quizService.deleteQuizReview(uuid, rating)
     }
     
     suspend fun getTags(name: String = "", count: Int = 5): Resource<List<Tag>, NetworkError>{
         return quizService.getTags(name, count)
+    }
+    
+    fun updateAllLists(transform: (List<Quiz>) -> List<Quiz>){
+        quizListState.update {
+            it.copy(
+                quizzes = transform(it.quizzes)
+            )
+        }
+
+        userDetailsQuizList.update { quizzes -> quizzes?.let(transform) }
+        recentQuizzes.update(transform)
+        mostLikedQuizzes.update(transform)
+        friendsQuizzes.update(transform)
     }
 
     fun List<Quiz>.changeLikeStatusInList(id: UUID): List<Quiz>{
@@ -127,6 +140,21 @@ class QuizRepository(
                 quiz.copy(
                     likedByYou = !quiz.likedByYou,
                     likesCount = if (quiz.likedByYou) quiz.likesCount - 1 else quiz.likesCount + 1
+                )
+            } else {
+                quiz
+            }
+        }
+    }
+
+    fun List<Quiz>.changeRating(id: UUID, rate: Int): List<Quiz> {
+        return this.map { quiz ->
+            val reviewDigit = if (rate > 0) 1 else -1
+            val reviewCount = quiz.reviewCount + reviewDigit
+            if (quiz.id == id) {
+                quiz.copy(
+                    reviewCount = reviewCount,
+                    averageRating = (quiz.averageRating + rate) / reviewCount.coerceAtLeast(1),
                 )
             } else {
                 quiz

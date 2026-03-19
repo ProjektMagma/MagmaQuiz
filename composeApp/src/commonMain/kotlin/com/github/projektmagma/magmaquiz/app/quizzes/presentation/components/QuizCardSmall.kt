@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -29,8 +28,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import com.github.projektmagma.magmaquiz.app.core.presentation.components.CommentButton
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.ContentImage
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.FavoriteButton
+import com.github.projektmagma.magmaquiz.app.core.presentation.components.StarRating
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.UniversalCardContainer
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 import magmaquiz.composeapp.generated.resources.Res
@@ -119,7 +120,7 @@ fun QuizCardSmall(
                 maxLines = 2,
                 minLines = 2
             )
-            
+
             StarRating(
                 rating = quiz.averageRating
             )
@@ -137,16 +138,10 @@ fun QuizCardSmall(
                     )
 
                 Row {
-                    IconButton(
-                        onClick = {
-                            navigateToQuizReviews()
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Comment,
-                            contentDescription = null
-                        )
-                    }
+                    CommentButton(
+                        navigateToQuizReviews = { navigateToQuizReviews() },
+                        reviewCount = quiz.reviewCount
+                    )
 
                     FavoriteButton(
                         likesCount = quiz.likesCount,

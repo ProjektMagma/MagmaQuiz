@@ -24,6 +24,7 @@
     <string name="save_quiz">Zapisz quiz</string>
     <string name="save_icon">Ikona zapisu</string>
     <string name="public">Publiczny</string>
+    <string name="friend_only">Tylko dla znajomych</string>
     <string name="private">Prywatny</string>
     <string name="add_question">Dodaj pytanie</string>
     <string name="visibility">Widoczność</string>
@@ -106,4 +107,5 @@
     <string name="play_single">Graj</string>
     <string name="too_many_tag">Maksymalnie 20 tagów</string>
     <string name="duplicated_tags">Tagi nie mogą się duplikować</string>
+    <string name="already_reviewed">Już oceniłeś ten quiz</string>
 </resources>

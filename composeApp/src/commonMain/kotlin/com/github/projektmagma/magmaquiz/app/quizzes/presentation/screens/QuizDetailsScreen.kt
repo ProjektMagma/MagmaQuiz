@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Button
@@ -26,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.github.projektmagma.magmaquiz.app.core.presentation.components.CommentButton
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.ContentImage
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.FullSizeCircularProgressIndicator
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.ProfilePictureIcon
@@ -44,7 +44,7 @@ import java.util.UUID
 fun QuizDetailsScreen(
     id: UUID,
     navigateToPlayScreen: () -> Unit,
-    navigateToReviewsScreen: (id: UUID) -> Unit
+    navigateToReviewsScreen: (id: UUID, reviewed: Boolean) -> Unit
 ) {
     val quizDetailsViewModel: QuizDetailsViewModel = koinViewModel { parametersOf(id) }
 
@@ -119,16 +119,13 @@ fun QuizDetailsScreen(
                         style = MaterialTheme.typography.labelMedium
                     )
 
-                    IconButton(
-                        onClick = {
-                            navigateToReviewsScreen(id)
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Comment,
-                            contentDescription = null
-                        )
-                    }
+                    CommentButton(
+                        navigateToQuizReviews = { navigateToReviewsScreen(
+                            quiz?.id!!, 
+                            quiz!!.reviewedByYou
+                        ) },
+                        reviewCount = quiz!!.reviewCount
+                    )
                     
                     TagList(
                         tagList = quiz!!.tagList

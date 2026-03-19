@@ -18,10 +18,11 @@ import java.util.UUID
 
 class QuizReviewsViewModel(
     private val id: UUID,
+    reviewed: Boolean,
     private val quizRepository: QuizRepository,
     private val authRepository: AuthRepository
 ): ViewModel() {
-    private val _state = MutableStateFlow(QuizReviewState())
+    private val _state = MutableStateFlow(QuizReviewState(hasReviewed = reviewed))
     val state = _state.asStateFlow()
     
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
@@ -37,7 +38,7 @@ class QuizReviewsViewModel(
             QuizReviewCommand.CreateReview -> createReview()
             is QuizReviewCommand.GetReviews -> getReviews()
             is QuizReviewCommand.RatingChanged -> _state.update { it.copy(rating = command.newRating) }
-            is QuizReviewCommand.DeleteReview -> deleteReview(command.id)
+            is QuizReviewCommand.DeleteReview -> deleteReview(command.id, command.rating)
         }
     }
     
@@ -70,20 +71,22 @@ class QuizReviewsViewModel(
                     it.copy(
                         reviews = it.reviews + review.toModel(authRepository.thisUser.value!!),
                         rating = 0,
-                        content = ""
+                        content = "",
+                        hasReviewed = true
                     )
                 }
             }
         }
     }
     
-    private fun deleteReview(id: UUID){
+    private fun deleteReview(id: UUID, rating: Int){
         viewModelScope.launch { 
-            quizRepository.deleteQuizReview(id)
+            quizRepository.deleteQuizReview(id, rating)
                 .whenSuccess { 
                     _state.update { 
                         it.copy(
-                            reviews = it.reviews.filter { review -> review.author?.userName != authRepository.thisUser.value?.userName}
+                            reviews = it.reviews.filter { review -> review.author?.userName != authRepository.thisUser.value?.userName},
+                            hasReviewed = false
                         )
                     }
                 }

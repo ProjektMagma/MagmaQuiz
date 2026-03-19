@@ -13,8 +13,8 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.QuizReview
 import com.github.projektmagma.magmaquiz.shared.data.domain.Tag
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkResource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
-import io.ktor.http.*
-import java.util.*
+import io.ktor.http.HttpStatusCode
+import java.util.UUID
 
 
 class QuizDataController(
@@ -241,11 +241,11 @@ class QuizDataController(
         val dbQuiz = quizRepository.getQuizData(quizId)
             ?: return NetworkResource.Error(HttpStatusCode.NotFound)
 
-        val dbReview = userRepository.getUserReviews(thisUser).firstOrNull { it.quiz.id == dbQuiz.id }
+        val dbReview = quizRepository.getUserQuizReview(dbQuiz, thisUser)
             ?: return NetworkResource.Error(HttpStatusCode.NotFound)
 
         dbReview.setIsActive(false)
-
+        
         return NetworkResource.Success(Unit)
     }
 

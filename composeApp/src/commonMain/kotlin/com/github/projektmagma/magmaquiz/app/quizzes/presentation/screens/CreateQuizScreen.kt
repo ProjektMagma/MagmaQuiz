@@ -57,6 +57,7 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.UiEvent
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
+import com.github.projektmagma.magmaquiz.app.quizzes.domain.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.quizzes.domain.validators.toResId
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.CreateQuizViewModel
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuestionCard
@@ -64,12 +65,14 @@ import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.Que
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuizCoverImage
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuizDataTextField
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.QuizCommand
+import com.github.projektmagma.magmaquiz.shared.data.domain.QuizVisibility
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.add_question
 import magmaquiz.composeapp.generated.resources.add_tag
 import magmaquiz.composeapp.generated.resources.all_changes_remove
 import magmaquiz.composeapp.generated.resources.are_you_sure
 import magmaquiz.composeapp.generated.resources.description
+import magmaquiz.composeapp.generated.resources.friend_only
 import magmaquiz.composeapp.generated.resources.name
 import magmaquiz.composeapp.generated.resources.no
 import magmaquiz.composeapp.generated.resources.private
@@ -221,7 +224,7 @@ fun CreateQuizScreen(
                                 .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                                 .fillMaxWidth(),
                             readOnly = true,
-                            value = stringResource(if (quiz.isPublic) Res.string.public else Res.string.private),
+                            value = stringResource(quiz.visibility.toResId()),
                             onValueChange = {},
                             label = { Text(text = stringResource(Res.string.visibility)) },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
@@ -234,14 +237,21 @@ fun CreateQuizScreen(
                             DropdownMenuItem(
                                 text = { Text(text = stringResource(Res.string.public)) },
                                 onClick = {
-                                    createQuizViewModel.onCommand(QuizCommand.QuizProperties.VisibilityChanged(true))
+                                    createQuizViewModel.onCommand(QuizCommand.QuizProperties.VisibilityChanged(QuizVisibility.Public))
+                                    expanded = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(text = stringResource(Res.string.friend_only)) },
+                                onClick = {
+                                    createQuizViewModel.onCommand(QuizCommand.QuizProperties.VisibilityChanged(QuizVisibility.FriendsOnly))
                                     expanded = false
                                 }
                             )
                             DropdownMenuItem(
                                 text = { Text(text = stringResource(Res.string.private)) },
                                 onClick = {
-                                    createQuizViewModel.onCommand(QuizCommand.QuizProperties.VisibilityChanged(false))
+                                    createQuizViewModel.onCommand(QuizCommand.QuizProperties.VisibilityChanged(QuizVisibility.Private))
                                     expanded = false
                                 }
                             )

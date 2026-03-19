@@ -6,7 +6,7 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.User
 
 fun QuizReview.toModel(author: User? = null): QuizReviewModel{
     return QuizReviewModel(
-        author = author,
+        author = author ?: this.author,
         rating = this.rating,
         comment = this.comment,
     )

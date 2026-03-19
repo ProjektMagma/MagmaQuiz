@@ -1,5 +1,6 @@
 package com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create
 
+import com.github.projektmagma.magmaquiz.shared.data.domain.QuizVisibility
 import java.util.UUID
 
 sealed interface QuizCommand {
@@ -7,7 +8,7 @@ sealed interface QuizCommand {
         data class NameChanged(val name: String) : QuizProperties
         data class DescriptionChanged(val description: String) : QuizProperties
         data class ImageChanged(val image: ByteArray?) : QuizProperties
-        data class VisibilityChanged(val isPublic: Boolean) : QuizProperties
+        data class VisibilityChanged(val visibility: QuizVisibility) : QuizProperties
     }
     
     sealed interface QuestionEditor : QuizCommand {

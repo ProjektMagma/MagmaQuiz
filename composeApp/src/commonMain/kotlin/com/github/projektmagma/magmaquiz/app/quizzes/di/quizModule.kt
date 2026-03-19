@@ -17,7 +17,12 @@ val quizModule = module {
     viewModelOf(::QuizzesListViewModel)
     viewModelOf(::CreateQuizViewModel)
     viewModel { parameters ->
-        QuizReviewsViewModel(id = parameters.get(), quizRepository = get(), authRepository = get())
+        QuizReviewsViewModel(
+            id = parameters.get(), 
+            reviewed = parameters.get(), 
+            quizRepository = get(), 
+            authRepository = get()
+        )
     }
     viewModel { parameters ->
         QuizDetailsViewModel(id = parameters.get(), quizRepository = get())

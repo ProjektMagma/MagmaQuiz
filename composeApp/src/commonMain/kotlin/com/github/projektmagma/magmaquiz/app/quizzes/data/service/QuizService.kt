@@ -124,7 +124,7 @@ class QuizService(
         }
     }
     
-    suspend fun deleteQuizReview(uuid: UUID): Resource<Unit, NetworkError>{
+    suspend fun deleteQuizReview(uuid: UUID, rating: Int): Resource<Unit, NetworkError>{
         return safeCall<Unit> { 
             httpClient.delete("quiz/reviews/delete/$uuid")
         }

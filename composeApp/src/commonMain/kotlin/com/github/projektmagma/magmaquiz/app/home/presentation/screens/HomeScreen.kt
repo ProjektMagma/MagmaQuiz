@@ -35,7 +35,7 @@ import java.util.UUID
 fun HomeScreen(
     navigateToQuizDetails: (id: UUID) -> Unit,
     navigateToUserDetails: (id: UUID) -> Unit,
-    navigateToQuizReviews: (id: UUID) -> Unit
+    navigateToQuizReviews: (id: UUID, reviewed: Boolean) -> Unit
 ) {
 
     val viewModel = koinViewModel<HomeViewModel>()
@@ -83,7 +83,7 @@ fun HomeScreen(
                                 navigateToQuizDetails = navigateToQuizDetails,
                                 navigateToUserDetails = navigateToUserDetails,
                                 changeFavoriteStatus = { viewModel.changeFavoriteStatus(it.id!!) },
-                                navigateToQuizReviews = { navigateToQuizReviews(it.id!!) }
+                                navigateToQuizReviews = { navigateToQuizReviews(it.id!!, it.reviewedByYou) }
                             )
                         }
 
@@ -102,7 +102,7 @@ fun HomeScreen(
                                 navigateToQuizDetails = navigateToQuizDetails,
                                 navigateToUserDetails = navigateToUserDetails,
                                 changeFavoriteStatus = { viewModel.changeFavoriteStatus(it.id!!) },
-                                navigateToQuizReviews = { navigateToQuizReviews(it.id!!) }
+                                navigateToQuizReviews = { navigateToQuizReviews(it.id!!,it.reviewedByYou) }
                             )
                         }
 
@@ -138,7 +138,7 @@ fun HomeScreen(
                                 navigateToQuizDetails = navigateToQuizDetails,
                                 navigateToUserDetails = navigateToUserDetails,
                                 changeFavoriteStatus = { viewModel.changeFavoriteStatus(it.id!!) },
-                                navigateToQuizReviews = { navigateToQuizReviews(it.id!!) }
+                                navigateToQuizReviews = { navigateToQuizReviews(it.id!!, it.reviewedByYou) }
                             )
                         }
                     }

@@ -43,8 +43,8 @@ fun MainNavigation(
                         navigateToUserDetails = {
                             navigator.navigate(Route.Menus.Users.UserDetails(it))
                         },
-                        navigateToQuizReviews = {
-                            navigator.navigate(Route.Menus.Quizzes.QuizReviews(it))
+                        navigateToQuizReviews = { id, reviewed ->
+                            navigator.navigate(Route.Menus.Quizzes.QuizReviews(id, reviewed))
                         }
                     )
                 }
@@ -62,7 +62,7 @@ fun MainNavigation(
                             navigator.navigate(Route.Menus.Quizzes.QuizDetails(id))
                         },
                         quizzesListViewModel = quizzesListViewModel,
-                        navigateToQuizReviews = { navigator.navigate(Route.Menus.Quizzes.QuizReviews(it)) },
+                        navigateToQuizReviews = { id, reviewed -> navigator.navigate(Route.Menus.Quizzes.QuizReviews(id, reviewed)) },
                     )
                 }
                 entry<Route.Menus.Quizzes.QuizDetails> {
@@ -71,8 +71,8 @@ fun MainNavigation(
                         navigateToPlayScreen = {
                             navigateToGameScreen()
                         },
-                        navigateToReviewsScreen = { id ->
-                            navigator.navigate(Route.Menus.Quizzes.QuizReviews(id))
+                        navigateToReviewsScreen = { id, reviewed ->
+                            navigator.navigate(Route.Menus.Quizzes.QuizReviews(id, reviewed))
                         }
                     )
                 }
@@ -95,7 +95,7 @@ fun MainNavigation(
                     )
                 }
                 entry<Route.Menus.Quizzes.QuizReviews> {
-                    QuizReviewsScreen(it.id)
+                    QuizReviewsScreen(it.id, it.reviewed)
                 }
                 entry<Route.Menus.Users.UserDetails> { parameters ->
                     UserDetailsScreen(
@@ -105,7 +105,7 @@ fun MainNavigation(
                         navigateToQuizDetails = { navigator.navigate(Route.Menus.Quizzes.QuizDetails(it)) },
                         navigateToSettingsScreen = { navigator.navigate(Route.Menus.Settings) },
                         userDetailsViewModel = userDetailsViewModel,
-                        navigateToQuizReviews = { navigator.navigate(Route.Menus.Quizzes.QuizReviews(it)) }
+                        navigateToQuizReviews = { id, reviewed -> navigator.navigate(Route.Menus.Quizzes.QuizReviews(id, reviewed)) }
                     )
                 }
                 entry<Route.Menus.Users.Find> {

@@ -26,6 +26,7 @@
     <string name="save_quiz">Save quiz</string>
     <string name="save_icon">Save icon</string>
     <string name="public">Public</string>
+    <string name="friend_only">Friends only</string>
     <string name="private">Private</string>
     <string name="add_question">Add question</string>
     <string name="visibility">Visibility</string>
@@ -110,4 +111,5 @@
     <string name="play_single">Play</string>
     <string name="too_many_tag">Max 20 tags</string>
     <string name="duplicated_tags">Tags cannot be duplicated</string>
+    <string name="already_reviewed">You have already reviewed this quiz</string>
 </resources>

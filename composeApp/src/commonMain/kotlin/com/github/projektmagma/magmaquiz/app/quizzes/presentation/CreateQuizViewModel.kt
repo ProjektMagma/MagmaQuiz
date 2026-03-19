@@ -96,7 +96,7 @@ class CreateQuizViewModel(
                     is QuizCommand.QuizProperties.DescriptionChanged -> it.quizModel.copy(description = command.description)
                     is QuizCommand.QuizProperties.ImageChanged -> it.quizModel.copy(image = command.image)
                     is QuizCommand.QuizProperties.NameChanged -> it.quizModel.copy(name = command.name)
-                    is QuizCommand.QuizProperties.VisibilityChanged ->  it.quizModel.copy(isPublic = command.isPublic)
+                    is QuizCommand.QuizProperties.VisibilityChanged ->  it.quizModel.copy(visibility = command.visibility)
                 }
             )
         }
@@ -230,7 +230,7 @@ class CreateQuizViewModel(
                     id = _state.value.quizModel.id,
                     quizName = _state.value.quizModel.name,
                     quizDescription = _state.value.quizModel.description,
-                    isPublic = _state.value.quizModel.isPublic,
+                    visibility = _state.value.quizModel.visibility,
                     quizImage = _state.value.quizModel.image.compressImage(75),
                     questionList = _state.value.quizModel.questionList.map { question ->
                         Question(
@@ -282,7 +282,7 @@ class CreateQuizViewModel(
                                 name = quiz.quizName,
                                 description = quiz.quizDescription,
                                 image = quiz.quizImage,
-                                isPublic = quiz.isPublic,
+                                visibility = quiz.visibility,
                                 questionList = quiz.questionList.map { question ->
                                     question.toQuestionModel()
                                 },
