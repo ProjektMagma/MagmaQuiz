@@ -7,7 +7,9 @@ import com.github.projektmagma.magmaquiz.server.data.conversion.QuizConversionCo
 import com.github.projektmagma.magmaquiz.server.data.conversion.UserConversionCommand
 import com.github.projektmagma.magmaquiz.server.data.tables.*
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
+import com.github.projektmagma.magmaquiz.shared.data.domain.FriendshipStatus
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
+import com.github.projektmagma.magmaquiz.shared.data.domain.QuizVisibility
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.eq
@@ -29,12 +31,11 @@ class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable),
     var quizName by QuizzesTable.quizName
     var quizDescription by QuizzesTable.quizDescription
     var quizImage by QuizzesTable.quizImage
-    var isPublic by QuizzesTable.isPublic
+    var visibility by QuizzesTable.visibility
     var likesCount by QuizzesTable.likesCount
     var quizCreator by UserEntity referencedOn QuizzesTable.quizCreator
     private val questionList by QuizQuestionEntity referrersOn QuizzesQuestionsTable.quiz
     private val reviewList by QuizReviewEntity referrersOn QuizzesReviewsTable.quiz
-    private val favoritesList by UserFavoriteQuizzesEntity referrersOn UsersFavoriteQuizzesTable.quiz
     private val tagList by QuizTagEntity via QuizzesTagsMapTable
 
     override fun toDomain(command: QuizConversionCommand): Quiz {
@@ -49,15 +50,17 @@ class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable),
                         quizName = quizName,
                         quizDescription = quizDescription,
                         quizImage = quizImage,
-                        isPublic = isPublic,
+                        visibility = visibilityToDomain(),
                         quizCreator = quizCreator,
                         likesCount = likesCount,
                         createdAt = createdAt.epochSecond,
                         modifiedAt = modifiedAt.epochSecond,
                         questionList = questionList.map { it.toDomain(ConversionCommand.Default) },
                         likedByYou = isFavoriteByUser(command.caller),
+                        reviewCount = reviewList.count { it.isActive },
+                        reviewedByYou = isReviewedByUser(command.caller),
                         averageRating = getAverageRating(),
-                        tagList = tagList.map { it.toDomain(ConversionCommand.Default) }
+                        tagList = tagList.map { it.toDomain(ConversionCommand.Default) },
                     )
                 }
 
@@ -70,13 +73,15 @@ class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable),
                         quizName = quizName,
                         quizDescription = quizDescription,
                         quizImage = quizImage,
-                        isPublic = isPublic,
+                        visibility = visibilityToDomain(),
                         quizCreator = quizCreator,
                         likesCount = likesCount,
                         createdAt = createdAt.epochSecond,
                         modifiedAt = modifiedAt.epochSecond,
                         questionList = emptyList(),
                         likedByYou = isFavoriteByUser(command.caller),
+                        reviewCount = reviewList.count { it.isActive },
+                        reviewedByYou = isReviewedByUser(command.caller),
                         averageRating = getAverageRating(),
                         tagList = tagList.map { it.toDomain(ConversionCommand.Default) }
                     )
@@ -88,17 +93,23 @@ class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable),
                         quizName = quizName,
                         quizDescription = quizDescription,
                         quizImage = quizImage,
-                        isPublic = isPublic,
+                        visibility = visibilityToDomain(),
                         likesCount = likesCount,
                         createdAt = createdAt.epochSecond,
                         modifiedAt = modifiedAt.epochSecond,
                         questionList = emptyList(),
                         likedByYou = isFavoriteByUser(command.caller),
+                        reviewCount = reviewList.count { it.isActive },
+                        reviewedByYou = isReviewedByUser(command.caller),
                         averageRating = getAverageRating(),
                         tagList = tagList.map { it.toDomain(ConversionCommand.Default) }
                     )
             }
         }
+    }
+
+    private fun visibilityToDomain(): QuizVisibility {
+        return transaction { QuizVisibility.entries.first { it.numberInDatabase == visibility } }
     }
 
     private fun getAverageRating(): Float {
@@ -109,8 +120,13 @@ class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable),
     }
 
     private fun isFavoriteByUser(user: UserEntity): Boolean {
-        return transaction { favoritesList.any { it.user.id == user.id && it.isActive } }
+        return transaction { UserFavoriteQuizzesEntity.isFavoriteByUser(this@QuizEntity, user) }
     }
+
+    private fun isReviewedByUser(user: UserEntity): Boolean {
+        return transaction { QuizReviewEntity.isReviewedByUser(this@QuizEntity, user) }
+    }
+
 
     fun getQuestions(): List<QuizQuestionEntity> {
         return transaction { questionList.toList() }
@@ -145,6 +161,18 @@ class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable),
                         quiz = this@QuizEntity
                     }
                 }
+            }
+        }
+    }
+
+    fun isAccessibleByUser(thisUser: UserEntity): Boolean {
+        val visibilityStatus = visibilityToDomain()
+        return transaction {
+
+            when (visibilityStatus) {
+                QuizVisibility.Private -> isUserCreator(thisUser)
+                QuizVisibility.FriendsOnly -> thisUser.checkFriendship(this@QuizEntity.quizCreator) == FriendshipStatus.Friends
+                QuizVisibility.Public -> true
             }
         }
     }

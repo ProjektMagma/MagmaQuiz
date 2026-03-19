@@ -16,6 +16,14 @@ fun Application.reviewRoutes(quizDataController: QuizDataController) {
     routing {
         authenticate(AuthTypes.SessionAuth) {
             route("quiz/reviews") {
+
+                get("/yourReview/{quizId}") {
+                    val session = call.sessions.get<UserSession>()!!
+                    val quizId = UUID.fromString(call.parameters["quizId"]!!)
+
+                    call.respondToResource(quizDataController.quizYourReview(session, quizId))
+                }
+
                 get("/{quizId}") {
                     val quizId = UUID.fromString(call.parameters["quizId"]!!)
                     call.respondToResource(quizDataController.quizReviews(quizId))

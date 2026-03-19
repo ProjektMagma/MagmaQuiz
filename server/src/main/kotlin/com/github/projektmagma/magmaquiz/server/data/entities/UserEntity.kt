@@ -100,7 +100,7 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
 
     }
 
-    private fun checkFriendship(otherUser: UserEntity): FriendshipStatus {
+    fun checkFriendship(otherUser: UserEntity): FriendshipStatus {
         return transaction {
             val friendship = UserFriendshipEntity.find {
                 (UsersFriendshipsTable.userFrom eq otherUser.id and (UsersFriendshipsTable.userTo eq this@UserEntity.id)) or
@@ -129,7 +129,7 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
     fun favoriteQuizzes(caller: UserEntity, count: Int): List<QuizEntity> {
         return transaction {
             favoriteQuizzesList
-                .filter { it.isActive && it.isPublic || it.isUserCreator(caller) }
+                .filter { it.isActive && it.isAccessibleByUser(caller) }
                 .sortedBy { it.likesCount }
                 .toList()
                 .take(count)
@@ -139,7 +139,7 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
     fun getUserQuizzes(caller: UserEntity, count: Int): List<QuizEntity> {
         return transaction {
             quizList
-                .filter { it.isActive && it.isPublic || it.isUserCreator(caller) }
+                .filter { it.isActive && it.isAccessibleByUser(caller) }
                 .sortedBy { it.likesCount }
                 .toList()
                 .take(count)
@@ -153,7 +153,7 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
                 .sortedBy { it.createdAt }
                 .reversed()
                 .map { it.quiz }
-                .filter { it.isActive && it.isPublic || it.isUserCreator(caller) }
+                .filter { it.isActive && it.isAccessibleByUser(caller) }
                 .take(count)
         }
     }

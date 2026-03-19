@@ -7,6 +7,6 @@ object QuizzesTable : ExtUUIDTable("quizzes", "quiz_id") {
     val quizName = varchar("quiz_name", 255)
     val quizDescription = text("quiz_description")
     val quizImage = binary("quiz_image").nullable()
-    val isPublic = bool("is_public").default(false)
+    val visibility = integer("visibility").default(0)
     val likesCount = integer("likes_count").default(0)
 }

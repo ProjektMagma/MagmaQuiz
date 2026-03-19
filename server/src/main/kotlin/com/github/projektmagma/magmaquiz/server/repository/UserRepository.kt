@@ -10,7 +10,7 @@ import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.like
 import org.jetbrains.exposed.v1.core.lowerCase
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import java.util.UUID
+import java.util.*
 
 class UserRepository {
 
@@ -56,12 +56,5 @@ class UserRepository {
                 QuizzesReviewsTable.author eq userEntity.id
             }.toList()
         }
-    }
-
-    fun hasUserReviewForQuiz(userId: UUID, quizId: UUID): Boolean = transaction {
-        QuizReviewEntity.find {
-            (QuizzesReviewsTable.author eq userId) and
-                    (QuizzesReviewsTable.quiz eq quizId)
-        }.any()
     }
 }

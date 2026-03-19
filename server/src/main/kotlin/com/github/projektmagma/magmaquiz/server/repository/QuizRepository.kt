@@ -1,32 +1,13 @@
 package com.github.projektmagma.magmaquiz.server.repository
 
-import com.github.projektmagma.magmaquiz.server.data.entities.QuizEntity
-import com.github.projektmagma.magmaquiz.server.data.entities.QuizQuestionAnswerEntity
-import com.github.projektmagma.magmaquiz.server.data.entities.QuizQuestionEntity
-import com.github.projektmagma.magmaquiz.server.data.entities.QuizReviewEntity
-import com.github.projektmagma.magmaquiz.server.data.entities.QuizTagEntity
-import com.github.projektmagma.magmaquiz.server.data.entities.QuizTagMapEntity
-import com.github.projektmagma.magmaquiz.server.data.entities.UserEntity
-import com.github.projektmagma.magmaquiz.server.data.entities.UserFavoriteQuizzesEntity
-import com.github.projektmagma.magmaquiz.server.data.entities.UserGameHistoryEntity
-import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesQuestionsAnswersTable
-import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesQuestionsTable
-import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesReviewsTable
-import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesTable
-import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesTagsMapTable
-import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesTagsTable
-import com.github.projektmagma.magmaquiz.server.data.tables.UsersFavoriteQuizzesTable
+import com.github.projektmagma.magmaquiz.server.data.entities.*
+import com.github.projektmagma.magmaquiz.server.data.tables.*
 import com.github.projektmagma.magmaquiz.shared.data.domain.QuizReview
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
-import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
-import org.jetbrains.exposed.v1.core.eq
-import org.jetbrains.exposed.v1.core.inList
-import org.jetbrains.exposed.v1.core.like
-import org.jetbrains.exposed.v1.core.lowerCase
-import org.jetbrains.exposed.v1.core.notInList
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import java.util.UUID
+import java.util.*
 
 class QuizRepository {
 
@@ -37,7 +18,7 @@ class QuizRepository {
                 quizName = quizValue.quizName
                 quizDescription = quizValue.quizDescription
                 quizImage = quizValue.quizImage
-                isPublic = quizValue.isPublic
+                visibility = quizValue.visibility.numberInDatabase
             }
             quizValue.questionList.forEach { q ->
                 val innerQuestion = QuizQuestionEntity.new {
@@ -70,13 +51,13 @@ class QuizRepository {
         return transaction {
             if (quizName.isNullOrBlank())
                 QuizEntity.find {
-                    QuizzesTable.isActive and QuizzesTable.isPublic
+                    QuizzesTable.isActive eq true
                 }
                     .toList()
             else
                 QuizEntity.find {
                     QuizzesTable.quizName.lowerCase() like "%${quizName.lowercase()}%" and
-                            QuizzesTable.isActive and QuizzesTable.isPublic
+                            (QuizzesTable.isActive eq true)
                 }
                     .toList()
         }
@@ -123,7 +104,7 @@ class QuizRepository {
                 it.quizName = newData.quizName
                 it.quizDescription = newData.quizDescription
                 it.quizImage = newData.quizImage
-                it.isPublic = newData.isPublic
+                it.visibility = newData.visibility.numberInDatabase
             }
 
             val existingQuestions = mutableListOf<EntityID<UUID>>()
@@ -222,8 +203,16 @@ class QuizRepository {
     fun getQuizReviews(quizEntity: QuizEntity): List<QuizReviewEntity> {
         return transaction {
             QuizReviewEntity.find {
-                QuizzesReviewsTable.quiz eq quizEntity.id
+                QuizzesReviewsTable.quiz eq quizEntity.id and (QuizzesReviewsTable.isActive eq true)
             }.toList()
+        }
+    }
+
+    fun getUserQuizReview(quizEntity: QuizEntity, userEntity: UserEntity): QuizReviewEntity? {
+        return transaction {
+            QuizReviewEntity.find {
+                QuizzesReviewsTable.quiz eq quizEntity.id and (QuizzesReviewsTable.author eq userEntity.id) and (QuizzesReviewsTable.isActive eq true)
+            }.firstOrNull()
         }
     }
 

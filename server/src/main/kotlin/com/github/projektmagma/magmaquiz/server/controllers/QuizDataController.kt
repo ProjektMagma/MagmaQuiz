@@ -3,6 +3,7 @@ package com.github.projektmagma.magmaquiz.server.controllers
 import com.github.projektmagma.magmaquiz.server.data.conversion.ConversionCommand
 import com.github.projektmagma.magmaquiz.server.data.conversion.QuizConversionCommand
 import com.github.projektmagma.magmaquiz.server.data.entities.QuizEntity
+import com.github.projektmagma.magmaquiz.server.data.entities.QuizReviewEntity
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import com.github.projektmagma.magmaquiz.server.repository.FriendshipRepository
 import com.github.projektmagma.magmaquiz.server.repository.QuizRepository
@@ -12,9 +13,8 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.QuizReview
 import com.github.projektmagma.magmaquiz.shared.data.domain.Tag
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkResource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
-import io.ktor.http.HttpStatusCode
-import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import java.util.UUID
+import io.ktor.http.*
+import java.util.*
 
 
 class QuizDataController(
@@ -62,6 +62,7 @@ class QuizDataController(
         val thisUser = userRepository.getUserData(session)
 
         val quizzesList = quizRepository.getQuizzesByName(stringToSearch)
+            .filter { it.isAccessibleByUser(thisUser) }
             .sortedBy { it.createdAt }
             .reversed()
             .take(count)
@@ -80,7 +81,7 @@ class QuizDataController(
 
         val dbQuiz = quizRepository.getQuizData(quizId) ?: return NetworkResource.Error(HttpStatusCode.NotFound)
 
-        if (!dbQuiz.isPublic && !dbQuiz.isUserCreator(thisUser))
+        if (!dbQuiz.isAccessibleByUser(thisUser) && !dbQuiz.isUserCreator(thisUser))
             return NetworkResource.Error(HttpStatusCode.Forbidden)
 
 
@@ -93,7 +94,7 @@ class QuizDataController(
         val thisUser = userRepository.getUserData(session)
         val dbQuiz = quizRepository.getQuizData(quizId) ?: return NetworkResource.Error(HttpStatusCode.NotFound)
 
-        if (!dbQuiz.isPublic && !dbQuiz.isUserCreator(thisUser))
+        if (!dbQuiz.isAccessibleByUser(thisUser) && !dbQuiz.isUserCreator(thisUser))
             return NetworkResource.Error(HttpStatusCode.Forbidden)
 
 
@@ -213,7 +214,7 @@ class QuizDataController(
         val dbQuiz = quizRepository.getQuizData(quizId)
             ?: return NetworkResource.Error(HttpStatusCode.NotFound)
 
-        if (userRepository.hasUserReviewForQuiz(thisUser.id.value, dbQuiz.id.value))
+        if (QuizReviewEntity.isReviewedByUser(dbQuiz, thisUser))
             return NetworkResource.Error(HttpStatusCode.Conflict)
 
         quizRepository.createReview(review, dbQuiz, thisUser)
@@ -235,16 +236,27 @@ class QuizDataController(
         )
     }
 
-    fun quizDeleteReview(session: UserSession, quizId: UUID): NetworkResource<Unit> = transaction {
+    fun quizDeleteReview(session: UserSession, quizId: UUID): NetworkResource<Unit> {
         val thisUser = userRepository.getUserData(session)
         val dbQuiz = quizRepository.getQuizData(quizId)
-            ?: return@transaction NetworkResource.Error(HttpStatusCode.NotFound)
+            ?: return NetworkResource.Error(HttpStatusCode.NotFound)
 
         val dbReview = userRepository.getUserReviews(thisUser).firstOrNull { it.quiz.id == dbQuiz.id }
-            ?: return@transaction NetworkResource.Error(HttpStatusCode.NotFound)
+            ?: return NetworkResource.Error(HttpStatusCode.NotFound)
 
         dbReview.setIsActive(false)
 
-        return@transaction NetworkResource.Success(Unit)
+        return NetworkResource.Success(Unit)
+    }
+
+    fun quizYourReview(session: UserSession, quizId: UUID): NetworkResource<QuizReview> {
+        val thisUser = userRepository.getUserData(session)
+        val dbQuiz = quizRepository.getQuizData(quizId)
+            ?: return NetworkResource.Error(HttpStatusCode.NotFound)
+
+        val quizReview = quizRepository.getUserQuizReview(dbQuiz, thisUser)
+            ?: return NetworkResource.Error(HttpStatusCode.NotFound)
+
+        return NetworkResource.Success(quizReview.toDomain(ConversionCommand.Default))
     }
 }
