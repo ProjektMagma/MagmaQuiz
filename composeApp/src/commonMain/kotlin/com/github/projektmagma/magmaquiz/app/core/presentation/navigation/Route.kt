@@ -39,10 +39,13 @@ sealed interface Route : NavKey {
         @Serializable
         data object Settings : Route {
             @Serializable
-            data object Edit : Route
+            data object Options : Route
 
             @Serializable
-            data object Profile : Route
+            data object DetailsChange : Route
+            
+            @Serializable
+            data object LocationChange : Route
         }
 
         @Serializable

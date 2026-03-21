@@ -112,4 +112,13 @@
     <string name="too_many_tag">Max 20 tags</string>
     <string name="duplicated_tags">Tags cannot be duplicated</string>
     <string name="already_reviewed">You have already reviewed this quiz</string>
+    <string name="account_details_change">Change account details</string>
+    <string name="location_details_change">Change location details</string>
+    <string name="cant_save">Can't save new details</string>
+    <string name="your_location">Your location</string>
+    <string name="set_location">Set your city and country</string>
+    <string name="selected_country">Selected country</string>
+    <string name="no_country_selected">No cuntry selected yet</string>
+    <string name="town">Town</string>
+    <string name="country">Country</string>
 </resources>

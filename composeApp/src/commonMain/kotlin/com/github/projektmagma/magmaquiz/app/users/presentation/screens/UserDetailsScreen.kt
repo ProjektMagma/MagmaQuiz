@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -107,10 +108,29 @@ fun UserDetailsScreen(
                                     imageData = user?.userProfilePicture,
                                     size = 64.dp
                                 )
-                                Text(
-                                    text = user?.userName ?: "",
-                                    style = MaterialTheme.typography.titleMedium
-                                )
+                                Column {
+                                    Text(
+                                        text = user?.userName ?: "",
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.LocationOn,
+                                            contentDescription = null
+                                        )
+                                        Text(
+                                            modifier = Modifier.padding(end = 4.dp),
+                                            text = user?.userCountryCode ?: "",
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                        Text(
+                                            text = user?.userTown ?: "",
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                    }
+                                }
                             }
                             if (userDetailsViewModel.checkOwnership(id)) {
                                 IconButton(

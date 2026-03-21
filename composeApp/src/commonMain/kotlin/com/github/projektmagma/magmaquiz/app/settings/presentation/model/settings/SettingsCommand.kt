@@ -1,4 +1,4 @@
-package com.github.projektmagma.magmaquiz.app.settings.presentation.model
+package com.github.projektmagma.magmaquiz.app.settings.presentation.model.settings
 
 sealed interface SettingsCommand {
 

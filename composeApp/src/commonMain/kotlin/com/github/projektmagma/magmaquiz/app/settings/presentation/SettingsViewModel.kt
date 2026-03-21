@@ -9,8 +9,8 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.UiEvent
 import com.github.projektmagma.magmaquiz.app.core.util.compressImage
 import com.github.projektmagma.magmaquiz.app.settings.data.repository.SettingsRepository
-import com.github.projektmagma.magmaquiz.app.settings.presentation.model.SettingsCommand
-import com.github.projektmagma.magmaquiz.app.settings.presentation.model.SettingsState
+import com.github.projektmagma.magmaquiz.app.settings.presentation.model.settings.SettingsCommand
+import com.github.projektmagma.magmaquiz.app.settings.presentation.model.settings.SettingsState
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenError
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
 import kotlinx.coroutines.channels.Channel

@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -47,14 +49,16 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.Netw
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
 import com.github.projektmagma.magmaquiz.app.settings.presentation.SettingsViewModel
 import com.github.projektmagma.magmaquiz.app.settings.presentation.components.SettingsOption
-import com.github.projektmagma.magmaquiz.app.settings.presentation.model.SettingsCommand
+import com.github.projektmagma.magmaquiz.app.settings.presentation.model.settings.SettingsCommand
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.dialogs.FileKitMode
 import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.openFilePicker
 import kotlinx.coroutines.launch
 import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.account_details_change
 import magmaquiz.composeapp.generated.resources.change_profile_picture
+import magmaquiz.composeapp.generated.resources.location_details_change
 import magmaquiz.composeapp.generated.resources.log_out
 import magmaquiz.composeapp.generated.resources.no_image_provided_error
 import magmaquiz.composeapp.generated.resources.save
@@ -65,6 +69,8 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun SettingsScreen(
     navigateToAuth: () -> Unit,
+    navigateToChangeAccountDetailsScreen: () -> Unit,
+    navigateToChangeLocationDetailsScreen: () -> Unit
 ) {
     val authViewModel = koinViewModel<AuthViewModel>()
     val settingsViewModel = koinViewModel<SettingsViewModel>()
@@ -174,6 +180,17 @@ fun SettingsScreen(
                     }
                 }
             }
+        )
+        SettingsOption(
+            text = Res.string.account_details_change,
+            imageVector = Icons.Default.Person,
+            action = { navigateToChangeAccountDetailsScreen() }
+        )
+        
+        SettingsOption(
+            text = Res.string.location_details_change,
+            imageVector = Icons.Default.LocationOn,
+            action = { navigateToChangeLocationDetailsScreen() }
         )
     }
 }

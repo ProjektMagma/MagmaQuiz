@@ -116,8 +116,9 @@ val serializersConfig = SavedStateConfiguration {
             subclass(Route.Menus.Quizzes.QuizReviews::class, Route.Menus.Quizzes.QuizReviews.serializer())
             subclass(Route.Menus.Users.Find::class, Route.Menus.Users.Find.serializer())
             subclass(Route.Menus.Users.Friends::class, Route.Menus.Users.Friends.serializer())
-            subclass(Route.Menus.Settings.Profile::class, Route.Menus.Settings.Profile.serializer())
-            subclass(Route.Menus.Settings.Edit::class, Route.Menus.Settings.Edit.serializer())
+            subclass(Route.Menus.Settings.DetailsChange::class, Route.Menus.Settings.DetailsChange.serializer())
+            subclass(Route.Menus.Settings.LocationChange::class, Route.Menus.Settings.LocationChange.serializer())
+            subclass(Route.Menus.Settings.Options::class, Route.Menus.Settings.Options.serializer())
         }
     }
 }

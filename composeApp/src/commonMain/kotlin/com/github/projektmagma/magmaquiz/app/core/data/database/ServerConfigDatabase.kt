@@ -6,18 +6,19 @@ import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
 import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import com.github.projektmagma.magmaquiz.app.core.data.CountriesData
 import com.github.projektmagma.magmaquiz.app.core.domain.Protocols
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@Database(entities = [ServerConfigEntity::class], version = 1)
+@Database(entities = [ServerConfigEntity::class, CountryEntity::class], version = 1)
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class ServerConfigDatabase : RoomDatabase() {
-    abstract fun getDao() : ServerConfigDao
+    abstract fun getServerConfigDao() : ServerConfigDao
+    abstract fun getCountryDao() : CountryDao
 }
 
-@Suppress("KotlinNoActualForExpect")
 expect object AppDatabaseConstructor : RoomDatabaseConstructor<ServerConfigDatabase> {
     override fun initialize(): ServerConfigDatabase
 }
@@ -42,6 +43,7 @@ fun getRoomDatabase(
                             isSelected = true
                         )
                     )
+                    getCountryDao(database).insertAll(CountriesData.all)
                 }
             }
         })
@@ -50,5 +52,9 @@ fun getRoomDatabase(
 }
 
 fun getServerConfigDao(serverConfigDatabase: ServerConfigDatabase): ServerConfigDao{
-    return serverConfigDatabase.getDao()
+    return serverConfigDatabase.getServerConfigDao()
+}
+
+fun getCountryDao(serverConfigDatabase: ServerConfigDatabase): CountryDao{
+    return serverConfigDatabase.getCountryDao()
 }

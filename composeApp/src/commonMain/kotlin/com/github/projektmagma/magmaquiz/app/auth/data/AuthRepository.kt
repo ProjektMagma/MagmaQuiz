@@ -6,30 +6,28 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Resource
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenError
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 class AuthRepository(
     private val authService: AuthService
 ) {
 
-    private val _thisUser = MutableStateFlow<ThisUser?>(null)
-    val thisUser = _thisUser.asStateFlow()
+    val thisUser = MutableStateFlow<ThisUser?>(null)
 
     suspend fun registerUser(username: String, email: String, password: String): Resource<ThisUser, NetworkError> {
-        return authService.registerUser(username, email, password).whenSuccess { _thisUser.value = it.data }
+        return authService.registerUser(username, email, password).whenSuccess { thisUser.value = it.data }
     }
 
 
     suspend fun loginUser(email: String, password: String): Resource<ThisUser, NetworkError> {
-        return authService.loginUser(email, password).whenSuccess { _thisUser.value = it.data }
+        return authService.loginUser(email, password).whenSuccess { thisUser.value = it.data }
 
     }
 
     suspend fun whoAmI(): Resource<ThisUser, NetworkError> {
-        return authService.whoAmI().whenSuccess { _thisUser.value = it.data }
+        return authService.whoAmI().whenSuccess { thisUser.value = it.data }
     }
 
     suspend fun logoutUser(): Resource<Unit, NetworkError> {
-        return authService.logoutUser().whenError { _thisUser.value = null }
+        return authService.logoutUser().whenError { thisUser.value = null }
     }
 }

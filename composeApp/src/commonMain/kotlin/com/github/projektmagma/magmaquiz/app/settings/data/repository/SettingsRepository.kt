@@ -14,4 +14,12 @@ class SettingsRepository(
     ): Resource<Unit, NetworkError> {
         return settingsService.postChangeProfilePicture(profilePictureBig, profilePictureSmall)
     }
+    
+    suspend fun changeTown(town: String): Resource<Unit, NetworkError> {
+        return settingsService.changeTown(town)
+    }
+    
+    suspend fun changeCountryCode(countryCode: String): Resource<Unit, NetworkError> {
+        return settingsService.changeCountryCode(countryCode)  
+    }
 }

@@ -9,6 +9,7 @@ import com.github.projektmagma.magmaquiz.app.quizzes.data.repository.QuizReposit
 import com.github.projektmagma.magmaquiz.app.users.data.repository.UsersRepository
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenError
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -31,6 +32,8 @@ class UserDetailsViewModel(
     private val _selectedTabIndex = MutableStateFlow(0)
     val selectedTabIndex = _selectedTabIndex.asStateFlow()
     
+    private var quizzesJob: Job? = null
+    
     fun checkOwnership(id: UUID): Boolean{
         return id == authRepository.thisUser.value?.userId
     }
@@ -45,7 +48,8 @@ class UserDetailsViewModel(
     }
 
     fun getQuizzesByUserId(id: UUID) {
-        viewModelScope.launch {
+        quizzesJob?.cancel()
+        quizzesJob = viewModelScope.launch {
             _quizzes.value = null
             quizRepository.getQuizzesByUserId(id)
                 .whenSuccess {
@@ -56,7 +60,8 @@ class UserDetailsViewModel(
     }
     
     fun getUserHistory(){
-        viewModelScope.launch { 
+        quizzesJob?.cancel()
+        quizzesJob = viewModelScope.launch { 
             _quizzes.value = null
             quizRepository.getMyGameHistory()
                 .whenSuccess { _quizzes.value = it.data }
