@@ -1,10 +1,6 @@
 package com.github.projektmagma.magmaquiz.app.quizzes.presentation.components
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,12 +8,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.github.projektmagma.magmaquiz.app.core.presentation.components.CommentButton
-import com.github.projektmagma.magmaquiz.app.core.presentation.components.ContentImage
-import com.github.projektmagma.magmaquiz.app.core.presentation.components.FavoriteButton
-import com.github.projektmagma.magmaquiz.app.core.presentation.components.StarRating
-import com.github.projektmagma.magmaquiz.app.core.presentation.components.UniversalCardContainer
+import com.github.projektmagma.magmaquiz.app.core.presentation.components.*
 import com.github.projektmagma.magmaquiz.app.core.util.convertLongSecondsToString
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 import magmaquiz.composeapp.generated.resources.Res
@@ -25,7 +18,7 @@ import magmaquiz.composeapp.generated.resources.created_at
 import magmaquiz.composeapp.generated.resources.modified_at
 import magmaquiz.composeapp.generated.resources.no_description
 import org.jetbrains.compose.resources.stringResource
-import java.util.UUID
+import java.util.*
 
 @Composable
 actual fun QuizCard(
@@ -69,7 +62,7 @@ actual fun QuizCard(
                         navigateToQuizReviews = { navigateToQuizReviews() },
                         reviewCount = quiz.reviewCount
                     )
-                    
+
                     FavoriteButton(
                         likesCount = quiz.likesCount,
                         isLiked = quiz.likedByYou,
@@ -82,19 +75,23 @@ actual fun QuizCard(
                 text = quiz.quizName,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = quiz.quizDescription.ifBlank { stringResource(Res.string.no_description) },
                 style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis
             )
             ContentImage(quiz.quizImage)
 
             StarRating(
                 rating = quiz.averageRating
             )
-            
+
             TagList(quiz.tagList)
 
             Row(

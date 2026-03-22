@@ -4,11 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
+import com.github.projektmagma.magmaquiz.app.home.HomeScreenCommand
 import com.github.projektmagma.magmaquiz.app.quizzes.data.repository.QuizRepository
 import com.github.projektmagma.magmaquiz.app.users.data.repository.UsersRepository
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenError
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -19,9 +22,21 @@ class HomeViewModel(
     private val usersRepository: UsersRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
-    val uiState = _uiState.asStateFlow()
+    private val _recentQuizzesUiState = MutableStateFlow<UiState>(UiState.Loading)
+    val recentQuizzesUiState = _recentQuizzesUiState.asStateFlow()
 
+    private val _mostLikedQuizzesUiState = MutableStateFlow<UiState>(UiState.Loading)
+    val mostLikedQuizzesUiState = _mostLikedQuizzesUiState.asStateFlow()
+
+    private val _incomingFriendsUiState = MutableStateFlow<UiState>(UiState.Loading)
+    val incomingFriendsUiState = _incomingFriendsUiState.asStateFlow()
+
+    private val _friendsQuizzesUiState = MutableStateFlow<UiState>(UiState.Loading)
+    val friendsQuizzesUiState = _friendsQuizzesUiState.asStateFlow()
+
+
+    private val _changedFavoriteUiState = MutableStateFlow<UiState>(UiState.Success)
+    val changedFavoriteUiState = _changedFavoriteUiState.asStateFlow()
 
     private val _recentQuizzes = quizRepository.recentQuizzes
     val recentQuizzes = _recentQuizzes.asStateFlow()
@@ -34,34 +49,66 @@ class HomeViewModel(
     val incomingFriends = _incomingFriends.asStateFlow()
 
     init {
-        downloadAllData()
-    }
-
-    // TODO: to na komendy można przepisać, jeśli nam się chce... zzz...
-    fun downloadAllData() {
-        _uiState.value = UiState.Loading
         viewModelScope.launch {
-            quizRepository.getRecentlyAddedQuizzes(count = 10).whenSuccess {
-                _recentQuizzes.value = it.data
-            }
-            quizRepository.getMostLikedQuizzes(count = 10).whenSuccess {
-                _mostLikedQuizzes.value = it.data
-            }
-            quizRepository.getFriendsQuizzes(count = 10).whenSuccess {
-                _friendsQuizzes.value = it.data
-            }
-            usersRepository.getIncomingInvitations().whenSuccess {
-                _incomingFriends.value = it.data
-            }
-            _uiState.value = UiState.Success
+            awaitAll(
+                async { friendsQuizzes() },
+                async { incomingFriends() },
+                async { mostLikedQuizzes() },
+                async { recentlyAddedQuizzes() }
+            )
+
         }
     }
 
-    fun changeFavoriteStatus(id: UUID) {
+
+    fun onCommand(homeScreenCommand: HomeScreenCommand) {
+        viewModelScope.launch {
+            when (homeScreenCommand) {
+                HomeScreenCommand.FriendsQuizzes -> friendsQuizzes()
+                HomeScreenCommand.IncomingFriends -> incomingFriends()
+                HomeScreenCommand.MostLikedQuizzes -> mostLikedQuizzes()
+                HomeScreenCommand.RecentQuizzes -> recentlyAddedQuizzes()
+                is HomeScreenCommand.ChangeFavorite -> changeFavoriteStatus(homeScreenCommand.id)
+            }
+        }
+    }
+
+    private suspend fun recentlyAddedQuizzes() {
+        quizRepository.getRecentlyAddedQuizzes(count = 10).whenSuccess {
+            _recentQuizzes.value = it.data
+            _recentQuizzesUiState.value = UiState.Success
+        }
+
+    }
+
+    private suspend fun mostLikedQuizzes() {
+        quizRepository.getMostLikedQuizzes(count = 10).whenSuccess {
+            _mostLikedQuizzes.value = it.data
+            _mostLikedQuizzesUiState.value = UiState.Success
+        }
+    }
+
+    private suspend fun incomingFriends() {
+        usersRepository.getIncomingInvitations().whenSuccess {
+            _incomingFriends.value = it.data
+            _incomingFriendsUiState.value = UiState.Success
+        }
+    }
+
+
+    private suspend fun friendsQuizzes() {
+        quizRepository.getFriendsQuizzes(count = 10).whenSuccess {
+            _friendsQuizzes.value = it.data
+            _friendsQuizzesUiState.value = UiState.Success
+        }
+    }
+
+
+    private fun changeFavoriteStatus(id: UUID) {
         viewModelScope.launch {
             quizRepository.changeFavoriteStatus(id)
                 .whenError {
-                    _uiState.value = UiState.Error(it.error.toResId())
+                    _changedFavoriteUiState.value = UiState.Error(it.error.toResId())
                 }
         }
     }

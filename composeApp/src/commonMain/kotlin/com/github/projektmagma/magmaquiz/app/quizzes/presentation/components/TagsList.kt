@@ -13,10 +13,11 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.Tag
 @Composable
 fun TagList(
     tagList: List<Tag>,
-){
+) {
     FlowRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
+        maxLines = 2
     ) {
         tagList.forEach {
             InputChip(

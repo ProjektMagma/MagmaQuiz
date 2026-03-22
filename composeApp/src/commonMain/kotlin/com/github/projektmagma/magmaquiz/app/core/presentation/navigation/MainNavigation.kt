@@ -9,12 +9,7 @@ import androidx.navigation3.ui.NavDisplay
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.HomeScreen
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.CreateQuizViewModel
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.QuizzesListViewModel
-import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.CreateQuestionScreen
-import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.CreateQuizScreen
-import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.QuizDetailsScreen
-import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.QuizReviewsScreen
-import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.QuizzesScreen
-import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.AccountDetailsChangeScreen
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.*
 import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.LocationDetailsChangeScreen
 import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.SettingsScreen
 import com.github.projektmagma.magmaquiz.app.users.presentation.UserDetailsViewModel
@@ -63,7 +58,6 @@ fun MainNavigation(
                     )
                 }
                 entry<Route.Menus.Settings.DetailsChange> {
-                    AccountDetailsChangeScreen()
                 }
                 entry<Route.Menus.Quizzes.QuizList> {
                     QuizzesScreen(
