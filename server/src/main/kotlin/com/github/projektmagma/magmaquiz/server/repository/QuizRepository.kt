@@ -47,19 +47,55 @@ class QuizRepository {
         return transaction { QuizEntity.find { QuizzesTable.id eq quizId and QuizzesTable.isActive }.firstOrNull() }
     }
 
-    fun getQuizzesByName(quizName: String? = null): List<QuizEntity> {
+    fun getQuizzes(caller: UserEntity, count: Int, offset: Int, stringToSearch: String): List<QuizEntity> {
         return transaction {
-            if (quizName.isNullOrBlank())
-                QuizEntity.find {
-                    QuizzesTable.isActive eq true
-                }
-                    .toList()
-            else
-                QuizEntity.find {
-                    QuizzesTable.quizName.lowerCase() like "%${quizName.lowercase()}%" and
-                            (QuizzesTable.isActive eq true)
-                }
-                    .toList()
+            QuizEntity.find {
+                QuizzesTable.isActive eq true and (QuizzesTable.quizName.lowerCase() like "%${stringToSearch.lowercase()}%")
+            }
+                .offset(offset.toLong())
+                .limit(count)
+                .filter { it.isAccessibleByUser(caller) }
+        }
+    }
+
+    fun getUserFavoriteQuizzes(
+        caller: UserEntity,
+        count: Int,
+        offset: Int,
+        stringToSearch: String
+    ): List<QuizEntity> {
+        return transaction {
+            val userFavoritesIds = UserFavoriteQuizzesEntity.find {
+                UsersFavoriteQuizzesTable.isActive eq true and
+                        UsersFavoriteQuizzesTable.user.eq(caller.id)
+            }.map { it.quiz.id }
+
+            QuizEntity.find {
+                QuizzesTable.isActive eq true and (QuizzesTable.id inList (userFavoritesIds)) and (QuizzesTable.quizName.lowerCase() like
+                        "%${stringToSearch.lowercase()}%")
+            }
+                .offset(offset.toLong())
+                .limit(count)
+                .filter { it.isAccessibleByUser(caller) }
+        }
+    }
+
+    fun getUserFriendsQuizzes(
+        caller: UserEntity,
+        callerFriends: List<UserEntity>,
+        count: Int,
+        offset: Int,
+        stringToSearch: String
+    ): List<QuizEntity> {
+        return transaction {
+            QuizEntity.find {
+                QuizzesTable.isActive eq true and
+                        (QuizzesTable.quizName.lowerCase() like "%${stringToSearch.lowercase()}%") and
+                        (QuizzesTable.quizCreator inList (callerFriends.map { it.id }))
+            }
+                .offset(offset.toLong())
+                .limit(count)
+                .filter { it.isAccessibleByUser(caller) }
         }
     }
 
@@ -227,17 +263,11 @@ class QuizRepository {
         }
     }
 
-    fun getExistingTags(count: Int, stringToSearch: String?): List<QuizTagEntity> {
+    fun getExistingTags(count: Int, stringToSearch: String): List<QuizTagEntity> {
         return transaction {
-            if (stringToSearch.isNullOrBlank())
-                QuizTagEntity.all()
-                    .sortedBy { it.getQuizzesListCount() }
-                    .reversed()
-                    .take(count)
-                    .toList()
-            else
-                QuizTagEntity.find { QuizzesTagsTable.tagName.lowerCase() like "%${stringToSearch.lowercase()}%" }
-                    .toList()
+            QuizTagEntity.find { QuizzesTagsTable.tagName.lowerCase() like "%${stringToSearch.lowercase()}%" }
+                .limit(count)
+                .sortedByDescending { it.getQuizzesListCount() }
         }
     }
 }

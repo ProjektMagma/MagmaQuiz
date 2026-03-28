@@ -13,8 +13,8 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.QuizReview
 import com.github.projektmagma.magmaquiz.shared.data.domain.Tag
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkResource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
-import io.ktor.http.HttpStatusCode
-import java.util.UUID
+import io.ktor.http.*
+import java.util.*
 
 
 class QuizDataController(
@@ -58,14 +58,17 @@ class QuizDataController(
         return NetworkResource.Success(Unit)
     }
 
-    fun quizFindByName(session: UserSession, count: Int, stringToSearch: String?): NetworkResource<List<Quiz>> {
+    fun quizFindByName(
+        session: UserSession,
+        count: Int,
+        offset: Int,
+        stringToSearch: String
+    ): NetworkResource<List<Quiz>> {
         val thisUser = userRepository.getUserData(session)
 
-        val quizzesList = quizRepository.getQuizzesByName(stringToSearch)
-            .filter { it.isAccessibleByUser(thisUser) }
-            .sortedBy { it.createdAt }
-            .reversed()
-            .take(count)
+        val quizzesList = quizRepository
+            .getQuizzes(thisUser, count, offset, stringToSearch)
+            .sortedByDescending { it.createdAt }
             .map {
                 it.toDomain(QuizConversionCommand.WithUserNoQuestions(thisUser))
             }
@@ -102,18 +105,23 @@ class QuizDataController(
         return NetworkResource.Success(Unit)
     }
 
-    fun quizMyFavorites(session: UserSession, count: Int, stringToSearch: String?): NetworkResource<List<Quiz>> {
+    fun quizMyFavorites(
+        session: UserSession,
+        count: Int,
+        offset: Int,
+        stringToSearch: String
+    ): NetworkResource<List<Quiz>> {
         val thisUser = userRepository.getUserData(session)
 
-        val quizzesList =
-            thisUser.favoriteQuizzes(thisUser, count)
-                .filter { stringToSearch.isNullOrBlank() || it.quizName.equals(stringToSearch, true) }
-                .map { it.toDomain(QuizConversionCommand.WithUserNoQuestions(thisUser)) }
+        val quizzesList = quizRepository.getUserFavoriteQuizzes(thisUser, count, offset, stringToSearch)
+            .map {
+                it.toDomain(QuizConversionCommand.WithUserNoQuestions(thisUser))
+            }
 
         return NetworkResource.Success(quizzesList)
     }
 
-    fun quizFindByUserId(session: UserSession, count: Int, userId: UUID): NetworkResource<List<Quiz>> {
+    fun quizFindByUserId(session: UserSession, count: Int, offset: Int, userId: UUID): NetworkResource<List<Quiz>> {
         val thisUser = userRepository.getUserData(session)
 
         val profileUser = userRepository.getUserData(userId)
@@ -121,9 +129,10 @@ class QuizDataController(
 
 
         val quizList =
-            profileUser.getUserQuizzes(thisUser, count).map {
-                it.toDomain(QuizConversionCommand.WithUserNoQuestions(thisUser))
-            }
+            profileUser.getUserQuizzes(thisUser, count, offset)
+                .map {
+                    it.toDomain(QuizConversionCommand.WithUserNoQuestions(thisUser))
+                }
 
         return NetworkResource.Success(quizList)
     }
@@ -141,50 +150,50 @@ class QuizDataController(
         return NetworkResource.Success(Unit, HttpStatusCode.OK)
     }
 
-    fun quizNewest(session: UserSession, count: Int, stringToSearch: String?): NetworkResource<List<Quiz>> {
+    fun quizNewest(
+        session: UserSession,
+        count: Int,
+        offset: Int,
+        stringToSearch: String
+    ): NetworkResource<List<Quiz>> {
 
         val thisUser = userRepository.getUserData(session)
 
-        val quizList = quizRepository.getQuizzesByName(stringToSearch)
-            .sortedBy { it.createdAt }
-            .reversed()
-            .take(count)
+        val quizList = quizRepository.getQuizzes(thisUser, count, offset, stringToSearch)
+            .sortedByDescending { it.createdAt }
             .map { it.toDomain(QuizConversionCommand.WithUserNoQuestions(thisUser)) }
 
         return NetworkResource.Success(quizList, HttpStatusCode.PartialContent)
     }
 
-    fun quizMostLiked(session: UserSession, count: Int, stringToSearch: String?): NetworkResource<List<Quiz>> {
+    fun quizMostLiked(
+        session: UserSession,
+        count: Int,
+        offset: Int,
+        stringToSearch: String
+    ): NetworkResource<List<Quiz>> {
         val thisUser = userRepository.getUserData(session)
 
-        val quizList = quizRepository.getQuizzesByName(stringToSearch)
-            .sortedBy { it.likesCount }
-            .reversed()
-            .take(count)
+        val quizList = quizRepository.getQuizzes(thisUser, count, offset, stringToSearch)
+            .sortedByDescending { it.likesCount }
             .map { it.toDomain(QuizConversionCommand.WithUserNoQuestions(thisUser)) }
-
 
         return NetworkResource.Success(quizList, HttpStatusCode.PartialContent)
     }
 
 
-    fun quizFriendsQuizzes(session: UserSession, count: Int, stringToSearch: String?): NetworkResource<List<Quiz>> {
+    fun quizFriendsQuizzes(
+        session: UserSession,
+        count: Int,
+        offset: Int,
+        stringToSearch: String
+    ): NetworkResource<List<Quiz>> {
         val thisUser = userRepository.getUserData(session)
-        val quizzesList = friendshipRepository.userFriendList(thisUser)
-            .map {
-                it.getUserQuizzes(thisUser, Int.MAX_VALUE)
-                    .filter { quiz ->
-                        stringToSearch.isNullOrBlank() || quiz.quizName.equals(stringToSearch, true)
-                    }
-            }.reduceOrNull { arr1, arr2 -> arr1.plus(arr2) }
-            ?: return NetworkResource.Success(emptyList())
-        // Nic nie było, a reduce zwrócił null, czyli poprawnie, ale pusto
+        val userFriends = friendshipRepository.userFriendList(thisUser, Int.MAX_VALUE, Int.MAX_VALUE, "")
+        val quizzesList = quizRepository.getUserFriendsQuizzes(thisUser, userFriends, count, offset, stringToSearch)
 
         return NetworkResource.Success(
             quizzesList
-                .sortedBy { it.likesCount }
-                .reversed()
-                .take(count)
                 .map {
                     it.toDomain(QuizConversionCommand.WithUserNoQuestions(thisUser))
                 }, HttpStatusCode.PartialContent
@@ -201,10 +210,10 @@ class QuizDataController(
         return NetworkResource.Success(Unit)
     }
 
-    fun quizMyGameHistory(session: UserSession, count: Int): NetworkResource<List<Quiz>> {
+    fun quizMyGameHistory(session: UserSession, count: Int, offset: Int): NetworkResource<List<Quiz>> {
         val thisUser = userRepository.getUserData(session)
 
-        return NetworkResource.Success(thisUser.getLastPlayedQuizzes(thisUser, count).map {
+        return NetworkResource.Success(thisUser.getLastPlayedQuizzes(thisUser, count, offset).map {
             it.toDomain(QuizConversionCommand.WithUserNoQuestions(thisUser))
         })
     }
@@ -229,7 +238,7 @@ class QuizDataController(
             quizRepository.getQuizReviews(dbQuiz).map { it.toDomain(ConversionCommand.Default) })
     }
 
-    fun quizGetPossibleTags(count: Int, stringToSearch: String?): NetworkResource<List<Tag>> {
+    fun quizGetPossibleTags(count: Int, stringToSearch: String): NetworkResource<List<Tag>> {
         return NetworkResource.Success(
             quizRepository.getExistingTags(count, stringToSearch).map { it.toDomain(ConversionCommand.Default) },
             HttpStatusCode.PartialContent
@@ -245,7 +254,7 @@ class QuizDataController(
             ?: return NetworkResource.Error(HttpStatusCode.NotFound)
 
         dbReview.setIsActive(false)
-        
+
         return NetworkResource.Success(Unit)
     }
 

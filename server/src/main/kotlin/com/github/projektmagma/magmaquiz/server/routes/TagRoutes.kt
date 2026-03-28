@@ -14,11 +14,11 @@ fun Application.tagRoutes(quizDataController: QuizDataController) {
                 get("/{count}/") {
                     val count = call.parameters["count"]!!.toInt()
 
-                    call.respondToResource(quizDataController.quizGetPossibleTags(count, null))
+                    call.respondToResource(quizDataController.quizGetPossibleTags(count, ""))
                 }
 
                 get("/{count}/{stringToSearch}") {
-                    val stringToSearch = call.parameters["stringToSearch"]
+                    val stringToSearch = call.parameters["stringToSearch"]!!
                     val count = call.parameters["count"]!!.toInt()
 
                     call.respondToResource(quizDataController.quizGetPossibleTags(count, stringToSearch))

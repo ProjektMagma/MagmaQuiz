@@ -18,39 +18,42 @@ class FriendshipRepository {
         }
     }
 
-    fun userFriendList(user: UserEntity): List<UserEntity> {
+    fun userFriendList(user: UserEntity, count: Int, offset: Int, stringToSearch: String): List<UserEntity> {
         return transaction {
             UserFriendshipEntity.find {
-                UsersFriendshipsTable.userFrom eq user.id or (UsersFriendshipsTable.userTo eq user.id) and UsersFriendshipsTable.isActive and UsersFriendshipsTable.wasAccepted.eq(
-                    true
-                )
+                UsersFriendshipsTable.userFrom eq user.id or (UsersFriendshipsTable.userTo eq user.id) and
+                        UsersFriendshipsTable.isActive and UsersFriendshipsTable.wasAccepted
             }
+                .offset(offset.toLong())
+                .limit(count)
                 .map {
                     if (it.userTo.id == user.id) it.userFrom
                     else it.userTo
                 }
                 .filterNot { it.id == user.id }
+                .filter { it.userName.contains(stringToSearch, true) }
         }
     }
 
-    fun userInvitations(user: UserEntity, incoming: Boolean): List<UserEntity> {
+    fun userInvitations(
+        user: UserEntity,
+        count: Int,
+        offset: Int,
+        incoming: Boolean,
+        stringToSearch: String
+    ): List<UserEntity> {
         return transaction {
-            if (incoming)
-                UserFriendshipEntity.find {
-                    UsersFriendshipsTable.userTo eq user.id and
-                            UsersFriendshipsTable.isActive.eq(true)
-                }.filter { !it.wasAccepted }
-                    .map {
-                        it.userFrom
-                    }
-            else
-                UserFriendshipEntity.find {
-                    UsersFriendshipsTable.userFrom eq user.id and
-                            UsersFriendshipsTable.isActive.eq(true)
-                }.filter { !it.wasAccepted }
-                    .map {
-                        it.userTo
-                    }
+            val searchBy = if (incoming) UsersFriendshipsTable.userFrom else UsersFriendshipsTable.userTo
+
+            UserFriendshipEntity.find {
+                searchBy eq user.id and
+                        UsersFriendshipsTable.isActive and UsersFriendshipsTable.wasAccepted.eq(false)
+            }
+                .offset(offset.toLong())
+                .limit(count)
+                .map { if (incoming) it.userFrom else it.userTo }
+                .filter { it.userName.contains(stringToSearch, true) }
+
         }
     }
 }

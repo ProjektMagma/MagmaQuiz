@@ -23,19 +23,21 @@ fun Application.quizRoutes(quizDataController: QuizDataController) {
 
                 }
 
-                get("/find/{count}/") {
+                get("/find/{count}/{offset}") {
                     val session = call.sessions.get<UserSession>()!!
                     val count = call.parameters["count"]!!.toInt()
+                    val offset = call.parameters["offset"]!!.toInt()
 
-                    call.respondToResource(quizDataController.quizFindByName(session, count, null))
+                    call.respondToResource(quizDataController.quizFindByName(session, count, offset, ""))
                 }
 
-                get("/find/{count}/{stringToSearch}") {
+                get("/find/{count}/{offset}/{stringToSearch}") {
                     val session = call.sessions.get<UserSession>()!!
-                    val stringToSearch = call.parameters["stringToSearch"]
+                    val stringToSearch = call.parameters["stringToSearch"]!!
                     val count = call.parameters["count"]!!.toInt()
+                    val offset = call.parameters["offset"]!!.toInt()
 
-                    call.respondToResource(quizDataController.quizFindByName(session, count, stringToSearch))
+                    call.respondToResource(quizDataController.quizFindByName(session, count, offset, stringToSearch))
                 }
 
                 post("/create") {
@@ -69,11 +71,12 @@ fun Application.quizRoutes(quizDataController: QuizDataController) {
                     call.respondToResource(quizDataController.quizChangeFavoriteStatus(quizId, session))
                 }
 
-                get("/MyGameHistory/{count}") {
+                get("/MyGameHistory/{count}/{offset}") {
                     val session = call.sessions.get<UserSession>()!!
                     val count = call.parameters["count"]!!.toInt()
+                    val offset = call.parameters["offset"]!!.toInt()
 
-                    call.respondToResource(quizDataController.quizMyGameHistory(session, count))
+                    call.respondToResource(quizDataController.quizMyGameHistory(session, count, offset))
                 }
 
                 get("/markAsPlayed/{quizId}") {
@@ -82,12 +85,13 @@ fun Application.quizRoutes(quizDataController: QuizDataController) {
                     call.respondToResource(quizDataController.quizMarkAsPlayed(session, quizId))
                 }
 
-                get("/findByUser/{count}/{userId}") {
+                get("/findByUser/{count}/{offset}/{userId}") {
                     val session = call.sessions.get<UserSession>()!!
                     val count = call.parameters["count"]!!.toInt()
+                    val offset = call.parameters["offset"]!!.toInt()
                     val userId = UUID.fromString(call.parameters["userId"]!!)
 
-                    call.respondToResource(quizDataController.quizFindByUserId(session, count, userId))
+                    call.respondToResource(quizDataController.quizFindByUserId(session, count, offset, userId))
                 }
 
                 delete("/{quizId}") {
@@ -98,66 +102,94 @@ fun Application.quizRoutes(quizDataController: QuizDataController) {
 
                 route("/myFavorites")
                 {
-                    get("/{count}/") {
+                    get("/{count}/{offset}/") {
                         val session = call.sessions.get<UserSession>()!!
                         val count = call.parameters["count"]!!.toInt()
+                        val offset = call.parameters["offset"]!!.toInt()
 
-                        call.respondToResource(quizDataController.quizMyFavorites(session, count, null))
+                        call.respondToResource(quizDataController.quizMyFavorites(session, count, offset, ""))
                     }
 
-                    get("/{count}/{stringToSearch}") {
+                    get("/{count}/{offset}/{stringToSearch}") {
                         val session = call.sessions.get<UserSession>()!!
-                        val stringToSearch = call.parameters["stringToSearch"]
+                        val stringToSearch = call.parameters["stringToSearch"]!!
                         val count = call.parameters["count"]!!.toInt()
+                        val offset = call.parameters["offset"]!!.toInt()
 
-                        call.respondToResource(quizDataController.quizMyFavorites(session, count, stringToSearch))
+                        call.respondToResource(
+                            quizDataController.quizMyFavorites(
+                                session,
+                                count,
+                                offset,
+                                stringToSearch
+                            )
+                        )
                     }
                 }
 
                 route("/newest") {
-                    get("/{count}/") {
+                    get("/{count}/{offset}/") {
                         val session = call.sessions.get<UserSession>()!!
                         val count = call.parameters["count"]!!.toInt()
-                        call.respondToResource(quizDataController.quizNewest(session, count, null))
+                        val offset = call.parameters["offset"]!!.toInt()
+
+                        call.respondToResource(quizDataController.quizNewest(session, count, offset, ""))
                     }
 
 
-                    get("/{count}/{stringToSearch}") {
+                    get("/{count}/{offset}/{stringToSearch}") {
                         val session = call.sessions.get<UserSession>()!!
-                        val stringToSearch = call.parameters["stringToSearch"]
+                        val stringToSearch = call.parameters["stringToSearch"]!!
                         val count = call.parameters["count"]!!.toInt()
-                        call.respondToResource(quizDataController.quizNewest(session, count, stringToSearch))
+                        val offset = call.parameters["offset"]!!.toInt()
+
+                        call.respondToResource(quizDataController.quizNewest(session, count, offset, stringToSearch))
                     }
                 }
 
                 route("/mostLiked")
                 {
-                    get("/{count}/") {
+                    get("/{count}/{offset}/") {
                         val session = call.sessions.get<UserSession>()!!
                         val count = call.parameters["count"]!!.toInt()
-                        call.respondToResource(quizDataController.quizMostLiked(session, count, null))
+                        val offset = call.parameters["offset"]!!.toInt()
+
+                        call.respondToResource(quizDataController.quizMostLiked(session, count, offset, ""))
                     }
 
-                    get("/mostLiked/{count}/{stringToSearch}") {
+                    get("/mostLiked/{count}/{offset}/{stringToSearch}") {
                         val session = call.sessions.get<UserSession>()!!
-                        val stringToSearch = call.parameters["stringToSearch"]
+                        val stringToSearch = call.parameters["stringToSearch"]!!
                         val count = call.parameters["count"]!!.toInt()
-                        call.respondToResource(quizDataController.quizMostLiked(session, count, stringToSearch))
+                        val offset = call.parameters["offset"]!!.toInt()
+
+                        call.respondToResource(quizDataController.quizMostLiked(session, count, offset, stringToSearch))
                     }
                 }
 
                 route("/friendsQuizzes") {
-                    get("/{count}/") {
+                    get("/{count}/{offset}/") {
                         val session = call.sessions.get<UserSession>()!!
                         val count = call.parameters["count"]!!.toInt()
-                        call.respondToResource(quizDataController.quizFriendsQuizzes(session, count, null))
+                        val offset = call.parameters["offset"]!!.toInt()
+
+                        call.respondToResource(quizDataController.quizFriendsQuizzes(session, count, offset, ""))
                     }
 
-                    get("/{count}/{stringToSearch}") {
+                    get("/{count}/{offset}/{stringToSearch}") {
                         val session = call.sessions.get<UserSession>()!!
-                        val stringToSearch = call.parameters["stringToSearch"]
+                        val stringToSearch = call.parameters["stringToSearch"]!!
                         val count = call.parameters["count"]!!.toInt()
-                        call.respondToResource(quizDataController.quizFriendsQuizzes(session, count, stringToSearch))
+                        val offset = call.parameters["offset"]!!.toInt()
+
+                        call.respondToResource(
+                            quizDataController.quizFriendsQuizzes(
+                                session,
+                                count,
+                                offset,
+                                stringToSearch
+                            )
+                        )
                     }
                 }
             }

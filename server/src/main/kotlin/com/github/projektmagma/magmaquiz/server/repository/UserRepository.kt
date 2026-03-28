@@ -25,19 +25,14 @@ class UserRepository {
 
     fun getUserData(session: UserSession) = getUserData(session.userId)!!
 
-    fun getUsersByName(count: Int, stringToSearch: String?): List<UserEntity> {
+    fun getUsersByName(count: Int, offset: Int, stringToSearch: String): List<UserEntity> {
         return transaction {
-            if (stringToSearch.isNullOrBlank())
-                UserEntity.find {
-                    UsersTable.isActive eq true
-                }
-                    .sortedBy { it.lastActivity }
-                    .reversed()
-                    .take(count)
-                    .toList()
-            else
-                UserEntity.find { UsersTable.userName.lowerCase() like "%${stringToSearch.lowercase()}%" and UsersTable.isActive }
-                    .toList()
+            UserEntity.find {
+                UsersTable.isActive eq true and (UsersTable.userName.lowerCase() like "%${stringToSearch.lowercase()}%")
+            }
+                .offset(offset.toLong())
+                .limit(count)
+                .sortedByDescending { it.lastActivity }
         }
     }
 

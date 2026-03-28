@@ -33,80 +33,88 @@ fun Application.usersRoutes(usersDataController: UsersDataController) {
                         )
                     }
 
-                    get("/friendList/{count}/") {
+                    get("/friendList/{count}/{offset}/") {
                         val session = call.sessions.get<UserSession>()!!
                         val count = call.parameters["count"]!!.toInt()
+                        val offset = call.parameters["offset"]!!.toInt()
 
                         call.respondToResource(
-                            usersDataController.usersFriendshipFriendList(session, count, null)
-                        )
-                    }
-                    
-                    get("/friendList/{count}/{stringToSearch}") {
-                        val session = call.sessions.get<UserSession>()!!
-                        val stringToSearch = call.parameters["stringToSearch"]
-                        val count = call.parameters["count"]!!.toInt()
-
-                        call.respondToResource(
-                            usersDataController.usersFriendshipFriendList(session, count, stringToSearch)
+                            usersDataController.usersFriendshipFriendList(session, count, offset, "")
                         )
                     }
 
-                    get("/incoming/{count}/") {
+                    get("/friendList/{count}/{offset}/{stringToSearch}") {
                         val session = call.sessions.get<UserSession>()!!
+                        val stringToSearch = call.parameters["stringToSearch"]!!
                         val count = call.parameters["count"]!!.toInt()
+                        val offset = call.parameters["offset"]!!.toInt()
 
                         call.respondToResource(
-                            usersDataController.usersFriendshipIncoming(session, count, null)
-                        )
-                    }
-                    
-                    get("/incoming/{count}/{stringToSearch}") {
-                        val session = call.sessions.get<UserSession>()!!
-                        val stringToSearch = call.parameters["stringToSearch"]
-                        val count = call.parameters["count"]!!.toInt()
-
-                        call.respondToResource(
-                            usersDataController.usersFriendshipIncoming(session, count, stringToSearch)
+                            usersDataController.usersFriendshipFriendList(session, count, offset, stringToSearch)
                         )
                     }
 
-                    get("/outgoing/{count}/") {
+                    get("/incoming/{count}/{offset}/") {
                         val session = call.sessions.get<UserSession>()!!
                         val count = call.parameters["count"]!!.toInt()
+                        val offset = call.parameters["offset"]!!.toInt()
 
                         call.respondToResource(
-                            usersDataController.usersFriendshipOutgoing(session, count, null)
+                            usersDataController.usersFriendshipIncoming(session, count, offset, "")
                         )
                     }
-                    
-                    get("/outgoing/{count}/{stringToSearch}") {
+
+                    get("/incoming/{count}/{offset}/{stringToSearch}") {
                         val session = call.sessions.get<UserSession>()!!
-                        val stringToSearch = call.parameters["stringToSearch"]
+                        val stringToSearch = call.parameters["stringToSearch"]!!
                         val count = call.parameters["count"]!!.toInt()
+                        val offset = call.parameters["offset"]!!.toInt()
 
                         call.respondToResource(
-                            usersDataController.usersFriendshipOutgoing(session, count, stringToSearch)
+                            usersDataController.usersFriendshipIncoming(session, count, offset, stringToSearch)
+                        )
+                    }
+
+                    get("/outgoing/{count}/{offset}/") {
+                        val session = call.sessions.get<UserSession>()!!
+                        val count = call.parameters["count"]!!.toInt()
+                        val offset = call.parameters["offset"]!!.toInt()
+
+                        call.respondToResource(
+                            usersDataController.usersFriendshipOutgoing(session, count, offset, "")
+                        )
+                    }
+
+                    get("/outgoing/{count}/{offset}/{stringToSearch}") {
+                        val session = call.sessions.get<UserSession>()!!
+                        val stringToSearch = call.parameters["stringToSearch"]!!
+                        val count = call.parameters["count"]!!.toInt()
+                        val offset = call.parameters["offset"]!!.toInt()
+
+                        call.respondToResource(
+                            usersDataController.usersFriendshipOutgoing(session, count, offset, stringToSearch)
                         )
                     }
                 }
 
-                get("/find/{count}/") {
+                get("/find/{count}/{offset}/") {
                     val session = call.sessions.get<UserSession>()!!
                     val count = call.parameters["count"]!!.toInt()
+                    val offset = call.parameters["offset"]!!.toInt()
 
                     call.respondToResource(
-                        usersDataController.usersFindByUserName(session, count, null)
+                        usersDataController.usersFindByUserName(session, count, offset, "")
                     )
                 }
 
-                get("/find/{count}/{stringToSearch}") {
+                get("/find/{count}/{offset}/{stringToSearch}") {
                     val session = call.sessions.get<UserSession>()!!
                     val count = call.parameters["count"]!!.toInt()
-                    val stringToSearch = call.parameters["stringToSearch"]
+                    val offset = call.parameters["offset"]!!.toInt()
+                    val stringToSearch = call.parameters["stringToSearch"]!!
 
                     call.respondToResource(
-                        usersDataController.usersFindByUserName(session, count, stringToSearch)
+                        usersDataController.usersFindByUserName(session, count, offset, stringToSearch)
                     )
                 }
 

@@ -126,35 +126,25 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
     }
 
 
-    fun favoriteQuizzes(caller: UserEntity, count: Int): List<QuizEntity> {
-        return transaction {
-            favoriteQuizzesList
-                .filter { it.isActive && it.isAccessibleByUser(caller) }
-                .sortedBy { it.likesCount }
-                .toList()
-                .take(count)
-        }
-    }
-
-    fun getUserQuizzes(caller: UserEntity, count: Int): List<QuizEntity> {
+    fun getUserQuizzes(caller: UserEntity, count: Int, offset: Int): List<QuizEntity> {
         return transaction {
             quizList
-                .filter { it.isActive && it.isAccessibleByUser(caller) }
-                .sortedBy { it.likesCount }
-                .toList()
+                .offset(offset.toLong())
                 .take(count)
+                .filter { it.isActive && it.isAccessibleByUser(caller) }
+                .sortedByDescending { it.likesCount }
+                .toList()
         }
     }
 
-    fun getLastPlayedQuizzes(caller: UserEntity, count: Int): List<QuizEntity> {
-        // TODO: Sprawdzić dobrze czy działa
+    fun getLastPlayedQuizzes(caller: UserEntity, count: Int, offset: Int): List<QuizEntity> {
         return transaction {
             playHistoryList
-                .sortedBy { it.createdAt }
-                .reversed()
+                .offset(offset.toLong())
+                .take(count)
+                .sortedByDescending { it.createdAt }
                 .map { it.quiz }
                 .filter { it.isActive && it.isAccessibleByUser(caller) }
-                .take(count)
         }
     }
 }

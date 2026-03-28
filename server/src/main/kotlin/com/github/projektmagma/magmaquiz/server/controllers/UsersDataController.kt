@@ -7,9 +7,9 @@ import com.github.projektmagma.magmaquiz.server.repository.FriendshipRepository
 import com.github.projektmagma.magmaquiz.server.repository.UserRepository
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkResource
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.User
-import io.ktor.http.HttpStatusCode
+import io.ktor.http.*
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import java.util.UUID
+import java.util.*
 
 class UsersDataController(
     private val userRepository: UserRepository,
@@ -23,9 +23,14 @@ class UsersDataController(
      * @return NetworkResource z listą użytkowników spełniających kryteria
      * (`206 Partial Content` jeśli lista jest ograniczona, `200 OK` w pozostałych przypadkach)
      */
-    fun usersFindByUserName(session: UserSession, count: Int, stringToSearch: String?): NetworkResource<List<User>> {
+    fun usersFindByUserName(
+        session: UserSession,
+        count: Int,
+        offset: Int,
+        stringToSearch: String
+    ): NetworkResource<List<User>> {
         val thisUser = userRepository.getUserData(session)
-        val userList = userRepository.getUsersByName(count, stringToSearch)
+        val userList = userRepository.getUsersByName(count, offset, stringToSearch)
         val usersMapped =
             userList.filter { it.id != thisUser.id }
                 .map { it.toDomain(UserConversionCommand.ForeignUser(thisUser)) }
@@ -127,13 +132,12 @@ class UsersDataController(
     fun usersFriendshipFriendList(
         session: UserSession,
         count: Int,
-        stringToSearch: String?
+        offset: Int,
+        stringToSearch: String
     ): NetworkResource<List<User>> {
         val thisUser = userRepository.getUserData(session)
 
-        val friendList = friendshipRepository.userFriendList(thisUser)
-            .filter { stringToSearch == null || it.userName == stringToSearch  }
-            .take(count)
+        val friendList = friendshipRepository.userFriendList(thisUser, count, offset, stringToSearch)
             .map {
                 it.toDomain(UserConversionCommand.ForeignUser(thisUser))
             }
@@ -150,13 +154,12 @@ class UsersDataController(
     fun usersFriendshipIncoming(
         session: UserSession,
         count: Int,
-        stringToSearch: String?
+        offset: Int,
+        stringToSearch: String
     ): NetworkResource<List<User>> {
         val thisUser = userRepository.getUserData(session)
 
-        val friendList = friendshipRepository.userInvitations(thisUser, true)
-            .filter { stringToSearch == null || it.userName == stringToSearch }
-            .take(count)
+        val friendList = friendshipRepository.userInvitations(thisUser, count, offset, true, stringToSearch)
             .map {
                 it.toDomain(UserConversionCommand.ForeignUser(thisUser))
             }
@@ -174,13 +177,12 @@ class UsersDataController(
     fun usersFriendshipOutgoing(
         session: UserSession,
         count: Int,
-        stringToSearch: String?
+        offset: Int,
+        stringToSearch: String
     ): NetworkResource<List<User>> {
         val thisUser = userRepository.getUserData(session)
 
-        val friendList = friendshipRepository.userInvitations(thisUser, false)
-            .filter { stringToSearch == null || it.userName == stringToSearch }
-            .take(count)
+        val friendList = friendshipRepository.userInvitations(thisUser, count, offset, false, stringToSearch)
             .map {
                 it.toDomain(UserConversionCommand.ForeignUser(thisUser))
             }
