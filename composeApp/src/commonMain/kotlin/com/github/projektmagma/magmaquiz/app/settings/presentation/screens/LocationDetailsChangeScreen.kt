@@ -36,7 +36,7 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.Loca
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
 import com.github.projektmagma.magmaquiz.app.settings.domain.model.Country
 import com.github.projektmagma.magmaquiz.app.settings.presentation.LocationDetailsChangeViewModel
-import com.github.projektmagma.magmaquiz.app.settings.presentation.model.country.LocationDetailsChangeCommand
+import com.github.projektmagma.magmaquiz.app.settings.presentation.model.location.LocationDetailsChangeCommand
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.cant_save
 import magmaquiz.composeapp.generated.resources.country

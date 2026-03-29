@@ -16,18 +16,27 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import com.github.projektmagma.magmaquiz.app.auth.domain.validator.UsernameError
 import com.github.projektmagma.magmaquiz.app.auth.domain.validator.toResId
+import com.github.projektmagma.magmaquiz.app.core.domain.NetworkError
+import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Error
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.username
+import magmaquiz.composeapp.generated.resources.username_taken
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun UsernameTextField(
     usernameText: String,
-    usernameError: UsernameError?,
+    error: Error?,
     imeAction: ImeAction = ImeAction.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     onValueChange: (String) -> Unit,
 ) {
+    val errorMessage = when (error) {
+        is NetworkError -> Res.string.username_taken
+        is UsernameError -> error.toResId()
+        else -> null
+    }
+    
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
         value = usernameText,
@@ -45,10 +54,10 @@ fun UsernameTextField(
             )
         },
         singleLine = true,
-        isError = usernameError != null,
+        isError = errorMessage != null,
         supportingText = {
             Text(
-                text = if (usernameError != null) stringResource(usernameError.toResId()) else "",
+                text = if (errorMessage != null) stringResource(errorMessage) else "",
                 color = MaterialTheme.colorScheme.error,
             )
         },

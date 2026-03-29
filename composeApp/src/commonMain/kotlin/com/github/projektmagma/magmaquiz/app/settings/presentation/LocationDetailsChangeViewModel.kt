@@ -6,8 +6,8 @@ import com.github.projektmagma.magmaquiz.app.auth.data.AuthRepository
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.LocalEvent
 import com.github.projektmagma.magmaquiz.app.settings.data.repository.CountriesRepository
 import com.github.projektmagma.magmaquiz.app.settings.data.repository.SettingsRepository
-import com.github.projektmagma.magmaquiz.app.settings.presentation.model.country.CountryChangeState
-import com.github.projektmagma.magmaquiz.app.settings.presentation.model.country.LocationDetailsChangeCommand
+import com.github.projektmagma.magmaquiz.app.settings.presentation.model.location.LocationChangeState
+import com.github.projektmagma.magmaquiz.app.settings.presentation.model.location.LocationDetailsChangeCommand
 import com.github.projektmagma.magmaquiz.app.users.data.repository.UsersRepository
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Resource
 import kotlinx.coroutines.channels.Channel
@@ -23,8 +23,9 @@ class LocationDetailsChangeViewModel(
     private val usersRepository: UsersRepository,
     private val authRepository: AuthRepository
 ): ViewModel() {
-    private val _state = MutableStateFlow(CountryChangeState(
-        userTown = authRepository.thisUser.value?.userTown ?: "",
+    val user = authRepository.thisUser.value
+    private val _state = MutableStateFlow(LocationChangeState(
+        userTown = user?.userTown ?: "",
     ))
     val state = _state.asStateFlow()
     
@@ -33,11 +34,20 @@ class LocationDetailsChangeViewModel(
     
     init {
         viewModelScope.launch {
-            val country = countriesRepository.getCountryByCode(authRepository.thisUser.value?.userCountryCode ?: "")
-            _state.update { it.copy(
-                countriesList = countriesRepository.getAllCountries(),
-                selectedCountry = country
-            ) }
+            val code = user?.userCountryCode
+            
+            val country = if (!code.isNullOrEmpty()) {
+                countriesRepository.getCountryByCode(code)
+            } else null
+
+            val allCountries = countriesRepository.getAllCountries()
+            
+            _state.update {
+                it.copy(
+                    selectedCountry = country ?: it.selectedCountry,
+                    countriesList = allCountries
+                )
+            }
         }
     }
     
@@ -85,7 +95,7 @@ class LocationDetailsChangeViewModel(
                         userCountryCode = countryCode
                     ) 
                 }
-                usersRepository.user.value = authRepository.thisUser.value
+                usersRepository.user.value = user
                 _event.send(LocalEvent.Success)
             } else {
                 _event.send(LocalEvent.Failure)

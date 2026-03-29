@@ -5,87 +5,98 @@ import androidx.lifecycle.viewModelScope
 import com.github.projektmagma.magmaquiz.app.auth.data.AuthRepository
 import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
+import com.github.projektmagma.magmaquiz.app.core.util.Paginator
 import com.github.projektmagma.magmaquiz.app.quizzes.data.repository.QuizRepository
 import com.github.projektmagma.magmaquiz.app.users.data.repository.UsersRepository
+import com.github.projektmagma.magmaquiz.app.users.presentation.model.details.UserDetailsCommand
+import com.github.projektmagma.magmaquiz.app.users.presentation.model.details.UserDetailsState
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenError
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
 
 class UserDetailsViewModel(
+    private val id: UUID,
     private val quizRepository: QuizRepository,
     private val usersRepository: UsersRepository,
     private val authRepository: AuthRepository,
 ): ViewModel() {
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState = _uiState.asStateFlow()
-
-    private val _quizzes = quizRepository.userDetailsQuizList
-    val quizzes = _quizzes.asStateFlow()
     
-    private val _user = usersRepository.user
-    val user = _user.asStateFlow()
-
-    private val _selectedTabIndex = MutableStateFlow(0)
-    val selectedTabIndex = _selectedTabIndex.asStateFlow()
+    private val _state = MutableStateFlow(UserDetailsState())
+    val state = _state.asStateFlow()
+    
+    val paginator = Paginator(
+        initialKey = 0,
+        onLoadUpdated = { isLoading ->  _state.update { it.copy(isLoadingMore = isLoading) } },
+        onRequest = { currentPage ->
+            if (_state.value.selectedTabIndex == 0) {
+                quizRepository.getQuizzesByUserId(id, offset = currentPage)
+            } else {
+                quizRepository.getMyGameHistory(offset = currentPage)
+            } 
+        },
+        getNextKey = { key, _ -> key + 1 },
+        onError = { networkError -> _uiState.value = UiState.Error(networkError.toResId()) },
+        onSuccess = { item, _ -> _state.update { it.copy(quizzes = it.quizzes?.plus(item)) } },
+        endReached = { _, item -> item.isEmpty() }
+    )
     
     private var quizzesJob: Job? = null
+
+    fun onCommand(command: UserDetailsCommand) {
+        when (command) {
+            is UserDetailsCommand.SelectedTabIndexChanged ->  _state.update { it.copy(selectedTabIndex = command.newIndex) }
+            is UserDetailsCommand.LoadNextItems -> loadNextItems()
+            is UserDetailsCommand.LoadData -> {
+                loadNextItems()
+                getUserData()
+            }
+            is UserDetailsCommand.LoadQuizzesOrHistory -> {
+                paginator.reset()
+                _state.update { it.copy(quizzes = emptyList()) }
+                loadNextItems()
+            }
+            is UserDetailsCommand.GetUserData -> getUserData()
+            is UserDetailsCommand.ChangeFavoriteStatus -> changeFavoriteStatus(command.id)
+            is UserDetailsCommand.DeleteQuiz -> deleteQuiz(command.id)
+        }
+    }
+    
+    private fun loadNextItems(){
+        quizzesJob?.cancel()
+        quizzesJob = viewModelScope.launch { 
+            paginator.loadNextItems()
+        }
+    }
     
     fun checkOwnership(id: UUID): Boolean{
         return id == authRepository.thisUser.value?.userId
     }
     
-    fun loadData(id: UUID){
-        getQuizzesByUserId(id)
-        getUserData(id)
-    }
-    
-    fun changeSelectedTabIndex(index: Int){
-        _selectedTabIndex.value = index
-    }
-
-    fun getQuizzesByUserId(id: UUID) {
-        quizzesJob?.cancel()
-        quizzesJob = viewModelScope.launch {
-            _quizzes.value = null
-            quizRepository.getQuizzesByUserId(id)
-                .whenSuccess {
-                    _quizzes.value = it.data
-                }
-                .whenError { _uiState.value = UiState.Error(it.error.toResId()) }
-        }
-    }
-    
-    fun getUserHistory(){
-        quizzesJob?.cancel()
-        quizzesJob = viewModelScope.launch { 
-            _quizzes.value = null
-            quizRepository.getMyGameHistory()
-                .whenSuccess { _quizzes.value = it.data }
-        }
-    }
-    
-    private fun getUserData(id: UUID) {
+    private fun getUserData() {
         viewModelScope.launch {
             _uiState.value = UiState.Loading
             if (checkOwnership(id)) {
-                _user.value = authRepository.thisUser.value
+                _state.update { it.copy(user = authRepository.thisUser.value) }
                 _uiState.value = UiState.Success
             } else {
                 usersRepository.getUserDataById(id)
-                    .whenSuccess {
+                    .whenSuccess { result ->
                         _uiState.value = UiState.Success
-                        _user.value = it.data
+                        _state.update { it.copy(user = result.data) }
                     }
                     .whenError { _uiState.value = UiState.Error(it.error.toResId()) }
             }
         }
     }
 
-    fun changeFavoriteStatus(id: UUID) {
+    private fun changeFavoriteStatus(id: UUID) {
         viewModelScope.launch {
             quizRepository.changeFavoriteStatus(id)
                 .whenSuccess {
@@ -97,7 +108,7 @@ class UserDetailsViewModel(
         }
     }
     
-    fun deleteQuiz(id: UUID){
+    private fun deleteQuiz(id: UUID){
         viewModelScope.launch { 
             quizRepository.deleteQuiz(id)
                 .whenSuccess {

@@ -1,10 +1,8 @@
 package com.github.projektmagma.magmaquiz.app.quizzes.data.repository
 
 import com.github.projektmagma.magmaquiz.app.core.domain.NetworkError
-import com.github.projektmagma.magmaquiz.app.game.presentation.model.GameState
 import com.github.projektmagma.magmaquiz.app.quizzes.data.service.QuizService
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.QuizListState
-import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.CreateQuizState
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 import com.github.projektmagma.magmaquiz.shared.data.domain.QuizReview
 import com.github.projektmagma.magmaquiz.shared.data.domain.Tag
@@ -18,11 +16,8 @@ class QuizRepository(
     private val quizService: QuizService
 ) {
     val quiz = MutableStateFlow<Quiz?>(null)
-
-    val gameState = MutableStateFlow(GameState())
+    
     val quizListState = MutableStateFlow(QuizListState())
-
-    val createQuizState = MutableStateFlow(CreateQuizState())
     
     val userDetailsQuizList = MutableStateFlow<List<Quiz>?>(emptyList())
 
@@ -35,8 +30,8 @@ class QuizRepository(
         return quizService.getQuizById(id)
     }
     
-    suspend fun getQuiz(name: String = "", count: Int = 10): Resource<List<Quiz>, NetworkError> {
-        return quizService.getQuizByName(name, count)
+    suspend fun getQuiz(name: String = "", count: Int = 5, offset: Int): Resource<List<Quiz>, NetworkError> {
+        return quizService.getQuizByName(name, count, offset * count)
     }
 
     suspend fun createQuiz(quiz: CreateOrModifyQuizValue): Resource<Unit, NetworkError> {
@@ -57,12 +52,12 @@ class QuizRepository(
         return quizService.changeFavoriteStatus(id)
     }
     
-    suspend fun getMyGameHistory(): Resource<List<Quiz>, NetworkError>{
-        return quizService.getMyGameHistory()
+    suspend fun getMyGameHistory(count: Int = 10, offset: Int): Resource<List<Quiz>, NetworkError>{
+        return quizService.getMyGameHistory(count, offset * count)
     }
 
-    suspend fun getQuizzesByUserId(id: UUID): Resource<List<Quiz>, NetworkError> {
-        return quizService.getQuizzesByUserId(id)
+    suspend fun getQuizzesByUserId(id: UUID, count: Int = 10, offset: Int): Resource<List<Quiz>, NetworkError> {
+        return quizService.getQuizzesByUserId(id, count, offset * count)
     }
 
     suspend fun deleteQuiz(id: UUID): Resource<Unit, NetworkError> {
@@ -75,20 +70,20 @@ class QuizRepository(
         }
     }
 
-    suspend fun getMyFavorites(name: String, count: Int = 10): Resource<List<Quiz>, NetworkError> {
-        return quizService.getMyFavoritesByName(name, count)
+    suspend fun getMyFavorites(name: String, count: Int = 5, offset: Int): Resource<List<Quiz>, NetworkError> {
+        return quizService.getMyFavoritesByName(name, count, offset * count)
     }
     
-    suspend fun getRecentlyAddedQuizzes(name: String = "", count: Long = 100): Resource<List<Quiz>, NetworkError> {
-        return quizService.getRecentlyAddedQuizzesByName(name, count)
+    suspend fun getRecentlyAddedQuizzes(name: String = "", count: Int = 5, offset: Int): Resource<List<Quiz>, NetworkError> {
+        return quizService.getRecentlyAddedQuizzesByName(name, count, offset * count)
     }
 
-    suspend fun getMostLikedQuizzes(name: String = "", count: Long = 100): Resource<List<Quiz>, NetworkError> {
-        return quizService.getMostLikedQuizzesByName(name, count)
+    suspend fun getMostLikedQuizzes(name: String = "", count: Int = 5, offset: Int): Resource<List<Quiz>, NetworkError> {
+        return quizService.getMostLikedQuizzesByName(name, count, offset * count)
     }
 
-    suspend fun getFriendsQuizzes(name: String = "", count: Long = 100): Resource<List<Quiz>, NetworkError> {
-        return quizService.getFriendsQuizzesByName(name, count)
+    suspend fun getFriendsQuizzes(name: String = "", count: Int = 5, offset: Int): Resource<List<Quiz>, NetworkError> {
+        return quizService.getFriendsQuizzesByName(name, count, offset * count)
     }
     
     suspend fun markQuizAsPlayed(uuid: UUID): Resource<Unit, NetworkError>{

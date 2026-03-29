@@ -5,11 +5,17 @@ import com.github.projektmagma.magmaquiz.server.data.util.AuthTypes
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import com.github.projektmagma.magmaquiz.server.data.util.respondToResource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangeProfilePictureValue
-import io.ktor.server.application.*
-import io.ktor.server.auth.*
-import io.ktor.server.request.*
-import io.ktor.server.routing.*
-import io.ktor.server.sessions.*
+import io.ktor.server.application.Application
+import io.ktor.server.auth.authenticate
+import io.ktor.server.request.receive
+import io.ktor.server.routing.delete
+import io.ktor.server.routing.get
+import io.ktor.server.routing.post
+import io.ktor.server.routing.route
+import io.ktor.server.routing.routing
+import io.ktor.server.sessions.clear
+import io.ktor.server.sessions.get
+import io.ktor.server.sessions.sessions
 
 
 fun Application.settingsRoutes(settingsDataController: SettingsDataController) {
@@ -32,7 +38,7 @@ fun Application.settingsRoutes(settingsDataController: SettingsDataController) {
 
                     get("/email/{newEmail}") {
                         val session = call.sessions.get<UserSession>()!!
-                        val newEmail = call.parameters["newUserName"]!!
+                        val newEmail = call.parameters["newEmail"]!!
 
                         call.respondToResource(
                             settingsDataController.settingsChangeEmail(

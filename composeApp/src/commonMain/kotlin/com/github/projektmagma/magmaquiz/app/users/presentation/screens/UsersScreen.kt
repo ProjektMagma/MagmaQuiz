@@ -11,8 +11,9 @@ import com.github.projektmagma.magmaquiz.app.users.presentation.UsersListViewMod
 import com.github.projektmagma.magmaquiz.app.users.presentation.UsersSharedViewModel
 import com.github.projektmagma.magmaquiz.app.users.presentation.components.UserCard
 import com.github.projektmagma.magmaquiz.app.users.presentation.components.UserSearchFieldAndFilters
+import com.github.projektmagma.magmaquiz.app.users.presentation.model.list.UsersCommand
 import org.koin.compose.viewmodel.koinViewModel
-import java.util.*
+import java.util.UUID
 
 @Composable
 fun UsersScreen(
@@ -30,8 +31,10 @@ fun UsersScreen(
             itemList = state.usersList,
             key = { it.userId!! },
             uiState = uiState,
+            isLoadingMore = state.isLoadingMore,
+            onLoadMore = { usersListViewModel.onCommand(UsersCommand.LoadMore) },
             stickyHeader = {
-                UserSearchFieldAndFilters(it)
+                UserSearchFieldAndFilters(it, usersListViewModel)
             },
             content = { user ->
                 UserCard(
@@ -43,4 +46,3 @@ fun UsersScreen(
         )
     }
 }
-

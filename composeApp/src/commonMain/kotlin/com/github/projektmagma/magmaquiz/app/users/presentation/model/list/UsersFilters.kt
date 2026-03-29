@@ -1,6 +1,6 @@
 package com.github.projektmagma.magmaquiz.app.users.presentation.model.list
 
-interface UsersFilters {
+sealed interface UsersFilters {
     data object None: UsersFilters
     data object Friends: UsersFilters
     data object SentInvitations: UsersFilters

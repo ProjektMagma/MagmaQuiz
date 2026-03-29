@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.projektmagma.magmaquiz.app.game.presentation.model.AnswerState
 import com.github.projektmagma.magmaquiz.app.game.presentation.model.GameCommand
+import com.github.projektmagma.magmaquiz.app.game.presentation.model.GameState
 import com.github.projektmagma.magmaquiz.app.quizzes.data.repository.QuizRepository
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -13,8 +15,7 @@ import kotlinx.coroutines.launch
 class GameQuizViewModel(
     quizRepository: QuizRepository
 ) : ViewModel() {
-
-    private val _gameState = quizRepository.gameState
+    private val _gameState = MutableStateFlow(GameState())
     val gameState = _gameState.asStateFlow()
     
     private val _quiz = quizRepository.quiz

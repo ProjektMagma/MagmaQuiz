@@ -5,12 +5,17 @@ import com.github.projektmagma.magmaquiz.server.data.util.AuthTypes
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import com.github.projektmagma.magmaquiz.server.data.util.respondToResource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
-import io.ktor.server.application.*
-import io.ktor.server.auth.*
-import io.ktor.server.request.*
-import io.ktor.server.routing.*
-import io.ktor.server.sessions.*
-import java.util.*
+import io.ktor.server.application.Application
+import io.ktor.server.auth.authenticate
+import io.ktor.server.request.receive
+import io.ktor.server.routing.delete
+import io.ktor.server.routing.get
+import io.ktor.server.routing.post
+import io.ktor.server.routing.route
+import io.ktor.server.routing.routing
+import io.ktor.server.sessions.get
+import io.ktor.server.sessions.sessions
+import java.util.UUID
 
 fun Application.quizRoutes(quizDataController: QuizDataController) {
     routing {
@@ -23,7 +28,7 @@ fun Application.quizRoutes(quizDataController: QuizDataController) {
 
                 }
 
-                get("/find/{count}/{offset}") {
+                get("/find/{count}/{offset}/") {
                     val session = call.sessions.get<UserSession>()!!
                     val count = call.parameters["count"]!!.toInt()
                     val offset = call.parameters["offset"]!!.toInt()
@@ -157,7 +162,7 @@ fun Application.quizRoutes(quizDataController: QuizDataController) {
                         call.respondToResource(quizDataController.quizMostLiked(session, count, offset, ""))
                     }
 
-                    get("/mostLiked/{count}/{offset}/{stringToSearch}") {
+                    get("/{count}/{offset}/{stringToSearch}") {
                         val session = call.sessions.get<UserSession>()!!
                         val stringToSearch = call.parameters["stringToSearch"]!!
                         val count = call.parameters["count"]!!.toInt()

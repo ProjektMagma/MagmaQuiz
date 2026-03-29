@@ -16,18 +16,27 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import com.github.projektmagma.magmaquiz.app.auth.domain.validator.EmailError
 import com.github.projektmagma.magmaquiz.app.auth.domain.validator.toResId
+import com.github.projektmagma.magmaquiz.app.core.domain.NetworkError
+import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Error
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.email
+import magmaquiz.composeapp.generated.resources.email_taken
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun EmailTextField(
     emailText: String,
-    emailError: EmailError?,
+    error: Error?,
     imeAction: ImeAction = ImeAction.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     onValueChange: (String) -> Unit,
 ) {
+    val errorMessage = when (error){
+        is NetworkError -> Res.string.email_taken
+        is EmailError -> error.toResId()
+        else -> null
+    }
+    
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
         value = emailText,
@@ -45,10 +54,10 @@ fun EmailTextField(
             )
         },
         singleLine = true,
-        isError = emailError != null,
+        isError = errorMessage != null,
         supportingText = {
             Text(
-                text = if (emailError != null) stringResource(emailError.toResId()) else "",
+                text = if (errorMessage != null) stringResource(errorMessage) else "",
                 color = MaterialTheme.colorScheme.error,
             )
         },

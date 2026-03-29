@@ -1,5 +1,6 @@
 package com.github.projektmagma.magmaquiz.app.quizzes.presentation.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,7 +41,8 @@ fun CommentCard(
     review: QuizReviewModel,
     showOptions: Boolean,
     modifier: Modifier = Modifier,
-    deleteReview: () -> Unit
+    deleteReview: () -> Unit,
+    navigateToUserDetails: () -> Unit
 ) {
     var dropDownVisible by remember { mutableStateOf(false) }
     
@@ -58,7 +60,11 @@ fun CommentCard(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = {
+                        navigateToUserDetails()
+                    }),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {

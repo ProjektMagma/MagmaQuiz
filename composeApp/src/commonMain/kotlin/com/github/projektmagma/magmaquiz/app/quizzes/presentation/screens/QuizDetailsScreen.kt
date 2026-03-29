@@ -154,6 +154,7 @@ fun QuizDetailsScreen(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
                     navigateToPlayScreen()
+                    quizDetailsViewModel.setupQuizForGame()
                     quizDetailsViewModel.addQuizToMyHistory(id)
                 }
             ) {

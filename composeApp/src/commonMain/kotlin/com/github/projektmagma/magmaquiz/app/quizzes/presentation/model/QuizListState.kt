@@ -6,5 +6,5 @@ data class QuizListState(
     val quizName: String = "",
     val quizzes: List<Quiz> = emptyList(),
     val quizFilter: QuizFilters = QuizFilters.None,
-    val isLoaded: Boolean = false
+    val isLoadingMore: Boolean = false
 )

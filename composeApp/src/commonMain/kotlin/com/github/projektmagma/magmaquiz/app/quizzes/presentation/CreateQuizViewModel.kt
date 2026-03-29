@@ -24,6 +24,7 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSucc
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -33,8 +34,8 @@ import java.util.UUID
 class CreateQuizViewModel(
     private val quizRepository: QuizRepository
 ) : ViewModel() {
-    private val _state = quizRepository.createQuizState
-    val state = _state.asStateFlow()
+    private val _createQuizState = MutableStateFlow(CreateQuizState())
+    val state =_createQuizState.asStateFlow()
     
     private val _quizChannel = Channel<NetworkEvent>() 
     val quizChannel = _quizChannel.receiveAsFlow()
@@ -47,12 +48,12 @@ class CreateQuizViewModel(
             is QuizCommand.QuestionEditor -> questionOptions(quizCommand)
             is QuizCommand.QuizProperties -> quizOptions(quizCommand)
             QuizCommand.CreateQuiz -> {
-                _state.update {
+                _createQuizState.update {
                     it.copy(quizError = validateQuiz(it.quizModel))
                 }
-                if (_state.value.quizError != null) {
+                if (_createQuizState.value.quizError != null) {
                     viewModelScope.launch { 
-                        _uiChannel.send(ShowSnackbar(_state.value.quizError?.toResId()))
+                        _uiChannel.send(ShowSnackbar(_createQuizState.value.quizError?.toResId()))
                     }
                     return
                 }
@@ -63,7 +64,7 @@ class CreateQuizViewModel(
             is QuizCommand.TagNameChanged -> {
                 val name = quizCommand.name
                 val trimmed = name.trim()
-                _state.update { it.copy(tagName = trimmed) }
+                _createQuizState.update { it.copy(tagName = trimmed) }
 
                 if (name.lastOrNull() == ' ') {
                     addNewTag(trimmed)
@@ -76,7 +77,7 @@ class CreateQuizViewModel(
                 addNewTag(quizCommand.tagName)
             }
 
-            is QuizCommand.RemoveTag -> _state.update {
+            is QuizCommand.RemoveTag -> _createQuizState.update {
                 it.copy(
                     quizModel = it.quizModel.copy(
                         tagList = it.quizModel.tagList.filter { name -> name != quizCommand.name }
@@ -90,7 +91,7 @@ class CreateQuizViewModel(
     }
     
     private fun quizOptions(command: QuizCommand.QuizProperties) {
-        _state.update { 
+        _createQuizState.update { 
             it.copy(quizModel =
                 when (command) {
                     is QuizCommand.QuizProperties.DescriptionChanged -> it.quizModel.copy(description = command.description)
@@ -106,10 +107,10 @@ class CreateQuizViewModel(
         when (command) {
             is QuizCommand.QuestionEditor.AnswerContentChanged -> updateAnswer(index = command.index) { it.copy(content = command.content) }
             is QuizCommand.QuestionEditor.AnswerCorrectnessChanged -> updateAnswer(index = command.index) { it.copy(isCorrect = command.isCorrect) }
-            is QuizCommand.QuestionEditor.ContentChanged -> _state.update { it.copy(questionModel = it.questionModel.copy(content = command.content)) }
-            is QuizCommand.QuestionEditor.ImageChanged -> _state.update { it.copy(questionModel = it.questionModel.copy(image = command.byteArray)) }
+            is QuizCommand.QuestionEditor.ContentChanged -> _createQuizState.update { it.copy(questionModel = it.questionModel.copy(content = command.content)) }
+            is QuizCommand.QuestionEditor.ImageChanged -> _createQuizState.update { it.copy(questionModel = it.questionModel.copy(image = command.byteArray)) }
             is QuizCommand.QuestionEditor.Init -> {
-                val nextNumber = _state.value.quizModel.questionList.size + 1
+                val nextNumber = _createQuizState.value.quizModel.questionList.size + 1
                 val newQuestionModel = if (command.isMultiple) {
                     QuestionModel(
                         number = nextNumber,
@@ -121,17 +122,17 @@ class CreateQuizViewModel(
                         answerList = listOf(AnswerModel(isCorrect = true))
                     )
                 }
-                _state.update { it.copy(questionModel = newQuestionModel) }
+                _createQuizState.update { it.copy(questionModel = newQuestionModel) }
             }
             is QuizCommand.QuestionEditor.SaveQuestion -> {
-                _state.update { it.copy(questionError = validateQuestion(command.questionModel)) }
-                if (_state.value.questionError != null) {
-                    _uiChannel.trySend(ShowSnackbar(_state.value.questionError?.toResId()))
+                _createQuizState.update { it.copy(questionError = validateQuestion(command.questionModel)) }
+                if (_createQuizState.value.questionError != null) {
+                    _uiChannel.trySend(ShowSnackbar(_createQuizState.value.questionError?.toResId()))
                     return
                 }
                 
-                val existingQuestionIndex = _state.value.quizModel.questionList.indexOfFirst { it.number == command.questionModel.number }
-                _state.update {
+                val existingQuestionIndex = _createQuizState.value.quizModel.questionList.indexOfFirst { it.number == command.questionModel.number }
+                _createQuizState.update {
                     if (existingQuestionIndex != -1){
                         it.copy(
                             quizModel = it.quizModel.copy(
@@ -151,7 +152,7 @@ class CreateQuizViewModel(
                 _uiChannel.trySend(UiEvent.NavigateBack)
             }
             is QuizCommand.QuestionEditor.RemoveAnswer -> {
-                _state.update {
+                _createQuizState.update {
                     it.copy(
                         questionModel = it.questionModel.copy(
                             answerList = it.questionModel.answerList.filterIndexed { index, _ -> index != command.index }
@@ -160,7 +161,7 @@ class CreateQuizViewModel(
                 }
             }
             QuizCommand.QuestionEditor.AddAnswer -> {
-                _state.update {
+                _createQuizState.update {
                     it.copy(
                         questionModel = it.questionModel.copy(
                             answerList = it.questionModel.answerList + AnswerModel()
@@ -168,24 +169,24 @@ class CreateQuizViewModel(
                     )
                 }
             }
-            is QuizCommand.QuestionEditor.SetForEditing -> _state.update { it.copy(questionModel = command.questionModel) }
+            is QuizCommand.QuestionEditor.SetForEditing -> _createQuizState.update { it.copy(questionModel = command.questionModel) }
         }
     }
     
     private fun addNewTag(tagName: String){
         if (tagName.isNotEmpty()) {
-            _state.update {
+            _createQuizState.update {
                 it.copy(tagError = validateTag(
                     tagName,
-                    _state.value.quizModel.tagList)
+                    _createQuizState.value.quizModel.tagList)
                 )
             }
 
-            if (_state.value.tagError == null){
-                _state.update {
+            if (_createQuizState.value.tagError == null){
+                _createQuizState.update {
                     it.copy(
                         quizModel = it.quizModel.copy(
-                            tagList = _state.value.quizModel.tagList.plus(tagName)
+                            tagList = _createQuizState.value.quizModel.tagList.plus(tagName)
                         ),
                         tagName = "",
                         tagList = emptyList()
@@ -200,10 +201,10 @@ class CreateQuizViewModel(
     private fun getTags(){
         viewModelScope.launch {
             withSearchDelay(true, 100) {
-                quizRepository.getTags(_state.value.tagName)
+                quizRepository.getTags(_createQuizState.value.tagName)
                     .whenSuccess { result ->
-                        val newList = result.data.filter { it.tagName !in _state.value.quizModel.tagList }
-                        _state.update {
+                        val newList = result.data.filter { it.tagName !in _createQuizState.value.quizModel.tagList }
+                        _createQuizState.update {
                             it.copy(tagList = newList)
                         }
                     }
@@ -212,7 +213,7 @@ class CreateQuizViewModel(
     }
     
     private inline fun updateAnswer(index: Int, transform: (AnswerModel) -> AnswerModel) {
-        _state.update {
+        _createQuizState.update {
             it.copy(
                 questionModel = it.questionModel.copy(
                     answerList = it.questionModel.answerList.mapIndexed { i, a ->
@@ -227,12 +228,12 @@ class CreateQuizViewModel(
         viewModelScope.launch {
             val value =
                 CreateOrModifyQuizValue(
-                    id = _state.value.quizModel.id,
-                    quizName = _state.value.quizModel.name,
-                    quizDescription = _state.value.quizModel.description,
-                    visibility = _state.value.quizModel.visibility,
-                    quizImage = _state.value.quizModel.image.compressImage(75),
-                    questionList = _state.value.quizModel.questionList.map { question ->
+                    id = _createQuizState.value.quizModel.id,
+                    quizName = _createQuizState.value.quizModel.name,
+                    quizDescription = _createQuizState.value.quizModel.description,
+                    visibility = _createQuizState.value.quizModel.visibility,
+                    quizImage = _createQuizState.value.quizModel.image.compressImage(75),
+                    questionList = _createQuizState.value.quizModel.questionList.map { question ->
                         Question(
                             id = question.id,
                             questionNumber = question.number,
@@ -247,7 +248,7 @@ class CreateQuizViewModel(
                             }
                         )
                     },
-                    tagList = _state.value.quizModel.tagList
+                    tagList = _createQuizState.value.quizModel.tagList
                 )
             
             val result = if (state.value.isEditing) {
@@ -269,13 +270,13 @@ class CreateQuizViewModel(
     }
 
     private fun getQuizForEdit(id: UUID) {
-        _state.value = CreateQuizState(isLoading = true)
+        _createQuizState.value = CreateQuizState(isLoading = true)
         viewModelScope.launch {
             when (val result = quizRepository.getQuizById(id)) {
                 is Resource.Error -> { _quizChannel.send(NetworkEvent.Failure(result.error)) }
                 is Resource.Success -> {
                     val quiz = result.data
-                    _state.update {
+                    _createQuizState.update {
                         it.copy(
                             quizModel = it.quizModel.copy(
                                 id = quiz.id,
@@ -298,6 +299,6 @@ class CreateQuizViewModel(
     }
     
     private fun resetState() {
-        _state.value = CreateQuizState()
+        _createQuizState.value = CreateQuizState()
     }
 }

@@ -4,6 +4,7 @@ import com.github.projektmagma.magmaquiz.app.core.data.database.getCountryDao
 import com.github.projektmagma.magmaquiz.app.settings.data.repository.CountriesRepository
 import com.github.projektmagma.magmaquiz.app.settings.data.repository.SettingsRepository
 import com.github.projektmagma.magmaquiz.app.settings.data.service.SettingsService
+import com.github.projektmagma.magmaquiz.app.settings.presentation.AccountDetailsChangeViewModel
 import com.github.projektmagma.magmaquiz.app.settings.presentation.LocationDetailsChangeViewModel
 import com.github.projektmagma.magmaquiz.app.settings.presentation.SettingsViewModel
 import org.koin.core.module.dsl.singleOf
@@ -18,4 +19,5 @@ val settingsModule = module {
     
     viewModelOf(::SettingsViewModel)
     viewModelOf(::LocationDetailsChangeViewModel)
+    viewModelOf(::AccountDetailsChangeViewModel)
 }

@@ -38,4 +38,22 @@ class SettingsService(
             httpClient.get("settings/change/town/$town")
         }
     }
+
+    suspend fun changeEmail(email: String): Resource<Unit, NetworkError>{
+        return safeCall<Unit> { 
+            httpClient.get("settings/change/email/$email")
+        }
+    }
+
+    suspend fun changeBio(bio: String): Resource<Unit, NetworkError>{
+        return safeCall<Unit> {
+            httpClient.get("settings/change/bio/$bio")
+        }
+    }
+
+    suspend fun changeUsername(username: String): Resource<Unit, NetworkError>{
+        return safeCall<Unit> {
+            httpClient.get("settings/change/userName/$username")
+        }
+    }
 }

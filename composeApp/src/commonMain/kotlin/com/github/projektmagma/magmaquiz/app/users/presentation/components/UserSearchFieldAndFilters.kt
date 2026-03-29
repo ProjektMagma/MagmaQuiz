@@ -19,13 +19,15 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.components.Search
 import com.github.projektmagma.magmaquiz.app.users.presentation.UsersListViewModel
 import com.github.projektmagma.magmaquiz.app.users.presentation.model.list.UsersCommand
 import com.github.projektmagma.magmaquiz.app.users.presentation.model.list.UsersFilters
-import magmaquiz.composeapp.generated.resources.*
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.friends
+import magmaquiz.composeapp.generated.resources.incoming
+import magmaquiz.composeapp.generated.resources.outgoing
+import magmaquiz.composeapp.generated.resources.username
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun UserSearchFieldAndFilters(modifier: Modifier) {
-    val usersListViewModel: UsersListViewModel = koinViewModel()
+fun UserSearchFieldAndFilters(modifier: Modifier, usersListViewModel: UsersListViewModel) {
     val state by usersListViewModel.state.collectAsStateWithLifecycle()
 
     Column(modifier = modifier.fillMaxWidth()) {
@@ -34,11 +36,11 @@ fun UserSearchFieldAndFilters(modifier: Modifier) {
             searchedText = state.username,
             labelText = stringResource(Res.string.username),
             onSearch = {
-                usersListViewModel.onCommand(UsersCommand.UserList(false))
+                usersListViewModel.onCommand(UsersCommand.GetUserList(false))
             },
             onValueChange = {
                 usersListViewModel.onCommand(UsersCommand.UsernameChanged(it))
-                usersListViewModel.onCommand(UsersCommand.UserList(true))
+                usersListViewModel.onCommand(UsersCommand.GetUserList(true))
             }
         )
 

@@ -23,20 +23,20 @@ class UsersRepository(
         return usersService.getAcceptFriendInvite(uuid)
     }
 
-    suspend fun getFriendList(name: String, count: Int = 10): Resource<List<ForeignUser>, NetworkError> {
-        return usersService.getFriendList(name, count)
+    suspend fun getFriendList(name: String, count: Int = 10, offset: Int): Resource<List<ForeignUser>, NetworkError> {
+        return usersService.getFriendList(name, count, offset * count)
     }
 
-    suspend fun getIncomingInvitations(name: String = "", count: Int = 10): Resource<List<ForeignUser>, NetworkError> {
-        return usersService.getIncomingInvitations(name, count)
+    suspend fun getIncomingInvitations(name: String = "", count: Int = 10, offset: Int): Resource<List<ForeignUser>, NetworkError> {
+        return usersService.getIncomingInvitations(name, count, offset * count)
     }
 
-    suspend fun getOutgoingInvitations(name: String, count: Int = 10): Resource<List<ForeignUser>, NetworkError> {
-        return usersService.getOutgoingInvitations(name, count)
+    suspend fun getOutgoingInvitations(name: String, count: Int = 10, offset: Int): Resource<List<ForeignUser>, NetworkError> {
+        return usersService.getOutgoingInvitations(name, count, offset * count)
     }
     
-    suspend fun getFindUsers(name: String = "", count: Int = 10): Resource<List<ForeignUser>, NetworkError> {
-        return usersService.getFindUsers(name, count)
+    suspend fun getFindUsers(name: String = "", count: Int = 5, offset: Int): Resource<List<ForeignUser>, NetworkError> {
+        return usersService.getFindUsers(name, count, offset * count)
     }
 
     suspend fun getUserDataById(uuid: UUID): Resource<ForeignUser, NetworkError> {

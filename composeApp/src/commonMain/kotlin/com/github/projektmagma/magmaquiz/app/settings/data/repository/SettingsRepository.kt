@@ -22,4 +22,16 @@ class SettingsRepository(
     suspend fun changeCountryCode(countryCode: String): Resource<Unit, NetworkError> {
         return settingsService.changeCountryCode(countryCode)  
     }
+    
+    suspend fun changeEmail(email: String): Resource<Unit, NetworkError>{
+        return settingsService.changeEmail(email)   
+    }
+    
+    suspend fun changeBio(bio: String): Resource<Unit, NetworkError>{
+        return settingsService.changeBio(bio)
+    }
+    
+    suspend fun changeUsername(username: String): Resource<Unit, NetworkError>{
+        return settingsService.changeUsername(username)
+    }
 }

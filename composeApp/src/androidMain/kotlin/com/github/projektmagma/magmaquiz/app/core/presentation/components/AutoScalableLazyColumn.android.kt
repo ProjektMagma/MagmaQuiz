@@ -3,15 +3,23 @@ package com.github.projektmagma.magmaquiz.app.core.presentation.components
 import androidx.compose.animation.core.EaseOut
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,6 +27,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
 actual fun <T> AutoScalableLazyColumn(
@@ -26,6 +35,8 @@ actual fun <T> AutoScalableLazyColumn(
     key: ((T) -> Any)?,
     contentEmptyMessage: String,
     uiState: UiState,
+    isLoadingMore: Boolean,
+    onLoadMore: () -> Unit,
     stickyHeader: @Composable (modifier: Modifier) -> Unit,
     content: @Composable ((T) -> Unit)
 ) {
@@ -42,6 +53,16 @@ actual fun <T> AutoScalableLazyColumn(
         keyboardController?.hide()
     }
 
+    LaunchedEffect(itemList) {
+        snapshotFlow { state.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
+            .distinctUntilChanged()
+            .collect { lastVisibleIndex ->
+                if (lastVisibleIndex == itemList.lastIndex) {
+                    onLoadMore()
+                }
+            }
+    }
+
     LazyColumn(
         modifier = Modifier
             .clip(MaterialTheme.shapes.large)
@@ -54,16 +75,23 @@ actual fun <T> AutoScalableLazyColumn(
             stickyHeader(Modifier.offset(y = yHeaderOffset.dp))
         }
 
-        if (uiState == UiState.Success)
-            items(itemList, key = key) {
-                content(it)
+        if (uiState == UiState.Success) {
+            items(items = itemList, key = key) { item ->
+                content(item)
             }
-
+            if (isLoadingMore) {
+                item {
+                    Box(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    }
+                }
+            }
+        }
     }
 
     when (uiState) {
         UiState.Success -> {
-            if (itemList.isEmpty()) {
+            if (itemList.isEmpty() && !isLoadingMore) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()

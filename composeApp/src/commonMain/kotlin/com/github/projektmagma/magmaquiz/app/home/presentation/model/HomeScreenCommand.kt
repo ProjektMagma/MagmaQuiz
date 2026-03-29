@@ -1,6 +1,6 @@
-package com.github.projektmagma.magmaquiz.app.home
+package com.github.projektmagma.magmaquiz.app.home.presentation.model
 
-import java.util.*
+import java.util.UUID
 
 sealed interface HomeScreenCommand {
     data object RecentQuizzes : HomeScreenCommand

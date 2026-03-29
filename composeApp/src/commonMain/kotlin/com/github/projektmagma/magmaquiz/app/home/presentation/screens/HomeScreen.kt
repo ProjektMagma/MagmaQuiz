@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -13,19 +14,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.AutoScalableLazyRow
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
-import com.github.projektmagma.magmaquiz.app.home.HomeScreenCommand
 import com.github.projektmagma.magmaquiz.app.home.presentation.HomeViewModel
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.RowLoadingIndicator
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.RowRetryButton
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.HomeScreenCommand
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuizCardSmall
 import com.github.projektmagma.magmaquiz.app.users.presentation.components.UserCardSmall
-import magmaquiz.composeapp.generated.resources.*
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.good_to_see_you
+import magmaquiz.composeapp.generated.resources.new_quizzes_from_your_friends
+import magmaquiz.composeapp.generated.resources.pepole_who_whant_know_you
+import magmaquiz.composeapp.generated.resources.recently_added_quizzes
+import magmaquiz.composeapp.generated.resources.the_most_liked_quizzes
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-import java.util.*
+import java.util.UUID
 
 @Composable
 fun HomeScreen(
@@ -41,10 +48,7 @@ fun HomeScreen(
     val incomingFriendsUiState by viewModel.incomingFriendsUiState.collectAsStateWithLifecycle()
     val friendsQuizzesUiState by viewModel.friendsQuizzesUiState.collectAsStateWithLifecycle()
 
-    val recentQuizzes by viewModel.recentQuizzes.collectAsStateWithLifecycle()
-    val mostLikedQuizzes by viewModel.mostLikedQuizzes.collectAsStateWithLifecycle()
-    val friendsQuizzes by viewModel.friendsQuizzes.collectAsStateWithLifecycle()
-    val incomingFriends by viewModel.incomingFriends.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -60,7 +64,6 @@ fun HomeScreen(
                     style = MaterialTheme.typography.titleMedium,
                     textAlign = TextAlign.Center
                 )
-
 
                 Text(
                     text = stringResource(Res.string.the_most_liked_quizzes),
@@ -81,8 +84,11 @@ fun HomeScreen(
 
                     UiState.Success -> {
                         AutoScalableLazyRow(
-                            itemList = mostLikedQuizzes,
-                            key = { it.id!! }
+                            itemList = state.mostLikedQuizzes,
+                            modifier = Modifier.height(300.dp),
+                            key = { it.id!! },
+                            isLoadingMore = state.isLoadingMoreLiked,
+                            onLoadMore = { viewModel.onCommand(HomeScreenCommand.MostLikedQuizzes) }
                         ) {
                             QuizCardSmall(
                                 it,
@@ -118,8 +124,11 @@ fun HomeScreen(
                     UiState.Success -> {
 
                         AutoScalableLazyRow(
-                            itemList = recentQuizzes,
-                            key = { it.id!! }
+                            itemList = state.recentQuizzes,
+                            modifier = Modifier.height(300.dp),
+                            key = { it.id!! },
+                            isLoadingMore = state.isLoadingMoreRecent,
+                            onLoadMore = { viewModel.onCommand(HomeScreenCommand.RecentQuizzes) }
                         ) {
                             QuizCardSmall(
                                 it,
@@ -151,8 +160,11 @@ fun HomeScreen(
 
                     UiState.Success -> {
                         AutoScalableLazyRow(
-                            itemList = incomingFriends,
-                            key = { it.userId!! }
+                            itemList = state.incomingFriends,
+                            modifier = Modifier.height(170.dp),
+                            key = { it.userId!! },
+                            isLoadingMore = state.isLoadingMoreFriends,
+                            onLoadMore = { viewModel.onCommand(HomeScreenCommand.IncomingFriends) }
                         ) {
                             UserCardSmall(
                                 it,
@@ -183,8 +195,11 @@ fun HomeScreen(
 
                     UiState.Success -> {
                         AutoScalableLazyRow(
-                            itemList = friendsQuizzes,
-                            key = { it.id!! }
+                            itemList = state.friendsQuizzes,
+                            modifier = Modifier.height(300.dp),
+                            key = { it.id!! },
+                            isLoadingMore = state.isLoadingMoreFriendsQuizzes,
+                            onLoadMore = { viewModel.onCommand(HomeScreenCommand.FriendsQuizzes) }
                         ) {
                             QuizCardSmall(
                                 it,

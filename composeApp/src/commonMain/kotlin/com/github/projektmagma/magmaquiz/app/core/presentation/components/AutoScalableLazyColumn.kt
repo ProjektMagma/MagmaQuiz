@@ -13,6 +13,8 @@ expect fun <T> AutoScalableLazyColumn(
     key: ((T) -> Any)? = null,
     contentEmptyMessage: String = stringResource(Res.string.empty_content),
     uiState: UiState,
+    isLoadingMore: Boolean = false,
+    onLoadMore: () -> Unit = {},
     stickyHeader: @Composable (modifier: Modifier) -> Unit,
     content: @Composable (T) -> Unit
-) 
+)

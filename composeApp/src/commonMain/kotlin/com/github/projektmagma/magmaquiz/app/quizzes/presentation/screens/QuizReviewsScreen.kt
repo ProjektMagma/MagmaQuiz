@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -44,7 +43,8 @@ import java.util.UUID
 @Composable
 fun QuizReviewsScreen(
     id: UUID,
-    reviewed: Boolean
+    reviewed: Boolean,
+    navigateToQuizDetails: (id: UUID) -> Unit
 ) {
     val quizReviewsViewModel: QuizReviewsViewModel = koinViewModel { parametersOf(id, reviewed) }
     val state by quizReviewsViewModel.state.collectAsStateWithLifecycle()
@@ -55,7 +55,6 @@ fun QuizReviewsScreen(
             .widthIn(max = 1000.dp)
             .fillMaxSize()
             .padding(bottom = 8.dp)
-            .imePadding() 
     ) {
         LazyColumn(
             modifier = Modifier
@@ -70,7 +69,8 @@ fun QuizReviewsScreen(
                         CommentCard(
                             review = it,
                             showOptions = quizReviewsViewModel.checkOwnership(it.author?.userId!!),
-                            deleteReview = { quizReviewsViewModel.onCommand(QuizReviewCommand.DeleteReview(id, it.rating)) }
+                            deleteReview = { quizReviewsViewModel.onCommand(QuizReviewCommand.DeleteReview(id, it.rating)) },
+                            navigateToUserDetails = { navigateToQuizDetails(it.author.userId!!) }
                         )
                     }
                 }

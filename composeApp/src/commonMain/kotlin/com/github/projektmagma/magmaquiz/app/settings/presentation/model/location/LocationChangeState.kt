@@ -1,8 +1,8 @@
-package com.github.projektmagma.magmaquiz.app.settings.presentation.model.country
+package com.github.projektmagma.magmaquiz.app.settings.presentation.model.location
 
 import com.github.projektmagma.magmaquiz.app.settings.domain.model.Country
 
-data class CountryChangeState(
+data class LocationChangeState(
     val userTown: String = "",
     val countryName: String = "",
     val countriesList: List<Country> = emptyList(),

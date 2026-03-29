@@ -9,10 +9,14 @@ import androidx.navigation3.ui.NavDisplay
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.HomeScreen
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.CreateQuizViewModel
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.QuizzesListViewModel
-import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.*
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.CreateQuestionScreen
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.CreateQuizScreen
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.QuizDetailsScreen
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.QuizReviewsScreen
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.QuizzesScreen
+import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.AccountDetailsChangeScreen
 import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.LocationDetailsChangeScreen
 import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.SettingsScreen
-import com.github.projektmagma.magmaquiz.app.users.presentation.UserDetailsViewModel
 import com.github.projektmagma.magmaquiz.app.users.presentation.screens.UserDetailsScreen
 import com.github.projektmagma.magmaquiz.app.users.presentation.screens.UsersScreen
 import org.koin.compose.viewmodel.koinViewModel
@@ -22,11 +26,10 @@ fun MainNavigation(
     navigator: Navigator,
     navigationState: NavigationState,
     navigateToAuth: () -> Unit,
-    navigateToGameScreen: () -> Unit
+    navigateToGameScreen: () -> Unit,
 ) {
     val quizzesListViewModel: QuizzesListViewModel = koinViewModel()
     val createQuizViewModel: CreateQuizViewModel = koinViewModel()
-    val userDetailsViewModel: UserDetailsViewModel = koinViewModel()
 
     NavDisplay(
         onBack = navigator::goBack,
@@ -58,6 +61,9 @@ fun MainNavigation(
                     )
                 }
                 entry<Route.Menus.Settings.DetailsChange> {
+                    AccountDetailsChangeScreen(
+                        goBack = { navigator.goBack() }
+                    )
                 }
                 entry<Route.Menus.Quizzes.QuizList> {
                     QuizzesScreen(
@@ -100,8 +106,14 @@ fun MainNavigation(
                         navigateBack = { navigator.goBack() }
                     )
                 }
-                entry<Route.Menus.Quizzes.QuizReviews> {
-                    QuizReviewsScreen(it.id, it.reviewed)
+                entry<Route.Menus.Quizzes.QuizReviews> { parameters ->
+                    QuizReviewsScreen(
+                        parameters.id, 
+                        parameters.reviewed,
+                        navigateToQuizDetails = {
+                            navigator.navigate(Route.Menus.Users.UserDetails(it))
+                        }
+                    )
                 }
                 entry<Route.Menus.Users.UserDetails> { parameters ->
                     UserDetailsScreen(
@@ -110,7 +122,6 @@ fun MainNavigation(
                         navigateToEditScreen = { navigator.navigate(Route.Menus.Quizzes.CreateQuiz) },
                         navigateToQuizDetails = { navigator.navigate(Route.Menus.Quizzes.QuizDetails(it)) },
                         navigateToSettingsScreen = { navigator.navigate(Route.Menus.Settings.Options) },
-                        userDetailsViewModel = userDetailsViewModel,
                         navigateToQuizReviews = { id, reviewed -> navigator.navigate(Route.Menus.Quizzes.QuizReviews(id, reviewed)) }
                     )
                 }

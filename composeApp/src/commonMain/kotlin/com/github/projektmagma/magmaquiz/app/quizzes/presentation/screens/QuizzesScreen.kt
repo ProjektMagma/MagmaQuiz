@@ -3,7 +3,6 @@ package com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -25,10 +24,6 @@ fun QuizzesScreen(
     val state by quizzesListViewModel.quizListState.collectAsStateWithLifecycle()
     val uiState by quizzesListViewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(state.quizFilter) {
-        if (!state.isLoaded) quizzesListViewModel.onCommand(QuizListCommand.LoadByFilter)
-    }
-
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -36,6 +31,8 @@ fun QuizzesScreen(
             itemList = state.quizzes,
             key = { it.id!! },
             uiState = uiState,
+            isLoadingMore = state.isLoadingMore,
+            onLoadMore = { quizzesListViewModel.onCommand(QuizListCommand.LoadMore) },
             stickyHeader = {
                 QuizSearchFieldAndFilters(it)
             },
@@ -57,4 +54,3 @@ fun QuizzesScreen(
         )
     }
 }
-

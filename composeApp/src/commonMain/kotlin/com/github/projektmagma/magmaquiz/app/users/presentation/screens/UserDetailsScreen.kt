@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -39,12 +42,15 @@ import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.Qui
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.QuizCommand
 import com.github.projektmagma.magmaquiz.app.users.presentation.UserDetailsViewModel
 import com.github.projektmagma.magmaquiz.app.users.presentation.UsersSharedViewModel
+import com.github.projektmagma.magmaquiz.app.users.presentation.model.details.UserDetailsCommand
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
+import kotlinx.coroutines.flow.distinctUntilChanged
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.game_history
 import magmaquiz.composeapp.generated.resources.quizzes
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 import java.util.UUID
 
 @Composable
@@ -54,19 +60,29 @@ fun UserDetailsScreen(
     navigateToQuizDetails: (id: UUID) -> Unit,
     navigateToQuizReviews: (id: UUID, reviewed: Boolean) -> Unit,
     navigateToSettingsScreen: () -> Unit,
-    userDetailsViewModel: UserDetailsViewModel,
     createQuizViewModel: CreateQuizViewModel = koinViewModel(),
     usersSharedViewModel: UsersSharedViewModel = koinViewModel()
 ) {
-    val quizzes by userDetailsViewModel.quizzes.collectAsStateWithLifecycle()
-    val user by userDetailsViewModel.user.collectAsStateWithLifecycle()
+    val userDetailsViewModel: UserDetailsViewModel = koinViewModel { parametersOf(id) }
+    
     val uiState by userDetailsViewModel.uiState.collectAsStateWithLifecycle()
     
-    val selectedTabIndex by userDetailsViewModel.selectedTabIndex.collectAsStateWithLifecycle()
-
+    val state by userDetailsViewModel.state.collectAsStateWithLifecycle()
+    
+    val lazyListState = rememberLazyListState()
+    LaunchedEffect(state.quizzes){
+        snapshotFlow { lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
+            .distinctUntilChanged()
+            .collect { lastVisibleIndex ->
+                if (lastVisibleIndex == state.quizzes?.lastIndex) {
+                    userDetailsViewModel.onCommand(UserDetailsCommand.LoadNextItems)
+                }
+            }
+    }
+    
     LaunchedEffect(Unit) {
-        if (user?.userId != id) {
-            userDetailsViewModel.loadData(id)
+        if (state.user?.userId != id) {
+            userDetailsViewModel.onCommand(UserDetailsCommand.LoadData)
         }
     }
 
@@ -74,7 +90,7 @@ fun UserDetailsScreen(
         is UiState.Error -> FullSizeErrorIndicator(
             message = (uiState as UiState.Error).errorMessage,
             onRetry = {
-                userDetailsViewModel.loadData(id)
+                userDetailsViewModel.onCommand(UserDetailsCommand.LoadData)
             }
         )
 
@@ -92,7 +108,6 @@ fun UserDetailsScreen(
                             .fillMaxWidth()
                             .background(MaterialTheme.colorScheme.surface)
                             .padding(bottom = 16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Row(
                             modifier = Modifier
@@ -105,30 +120,32 @@ fun UserDetailsScreen(
                                 horizontalArrangement = Arrangement.spacedBy(16.dp)
                             ) {
                                 ProfilePictureIcon(
-                                    imageData = user?.userProfilePicture,
+                                    imageData = state.user?.userProfilePicture,
                                     size = 64.dp
                                 )
                                 Column {
                                     Text(
-                                        text = user?.userName ?: "",
+                                        text = state.user?.userName ?: "",
                                         style = MaterialTheme.typography.titleMedium
                                     )
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.LocationOn,
-                                            contentDescription = null
-                                        )
-                                        Text(
-                                            modifier = Modifier.padding(end = 4.dp),
-                                            text = user?.userCountryCode ?: "",
-                                            style = MaterialTheme.typography.bodyMedium
-                                        )
-                                        Text(
-                                            text = user?.userTown ?: "",
-                                            style = MaterialTheme.typography.bodyMedium
-                                        )
+                                    if (state.user?.userTown?.isNotEmpty() == true || state.user?.userCountryCode?.isNotEmpty() == true){
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.LocationOn,
+                                                contentDescription = null
+                                            )
+                                            Text(
+                                                modifier = Modifier.padding(end = 4.dp),
+                                                text = state.user?.userCountryCode ?: "",
+                                                style = MaterialTheme.typography.bodyMedium
+                                            )
+                                            Text(
+                                                text = state.user?.userTown ?: "",
+                                                style = MaterialTheme.typography.bodyMedium
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -144,7 +161,13 @@ fun UserDetailsScreen(
                             }
                         }
 
-                        val foreignUser = user as? ForeignUser
+                        Text(
+                            modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
+                            text = state.user?.userBio ?: "",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+
+                        val foreignUser = state.user as? ForeignUser
 
                         if (foreignUser != null) {
                             FriendshipButtons(
@@ -155,23 +178,23 @@ fun UserDetailsScreen(
 
                         if (foreignUser == null){
                             SecondaryTabRow(
-                                selectedTabIndex = selectedTabIndex,
+                                selectedTabIndex = state.selectedTabIndex,
                                 divider = { HorizontalDivider() },
                             ) {
                                 Tab(
-                                    selected = selectedTabIndex == 0,
+                                    selected = state.selectedTabIndex == 0,
                                     onClick = {
-                                        userDetailsViewModel.changeSelectedTabIndex(0)
-                                        userDetailsViewModel.getQuizzesByUserId(id)
+                                        userDetailsViewModel.onCommand(UserDetailsCommand.SelectedTabIndexChanged(0))
+                                        userDetailsViewModel.onCommand(UserDetailsCommand.LoadQuizzesOrHistory)
                                     },
                                 ) {
                                     Text(stringResource(Res.string.quizzes))
                                 }
                                 Tab(
-                                    selected = selectedTabIndex == 1,
+                                    selected = state.selectedTabIndex == 1,
                                     onClick = {
-                                        userDetailsViewModel.changeSelectedTabIndex(1)
-                                        userDetailsViewModel.getUserHistory()
+                                        userDetailsViewModel.onCommand(UserDetailsCommand.SelectedTabIndexChanged(1))
+                                        userDetailsViewModel.onCommand(UserDetailsCommand.LoadQuizzesOrHistory)
                                     },
                                 ) {
                                     Text(stringResource(Res.string.game_history))
@@ -181,25 +204,29 @@ fun UserDetailsScreen(
                     }
                 }
 
-                if (quizzes != null) {
-                    items(quizzes!!) { quiz ->
+                if (state.quizzes != null) {
+                    items(state.quizzes!!) { quiz ->
                         QuizCardSmall(
                             quiz = quiz,
                             showUserButton = false,
                             navigateToQuizDetails = { navigateToQuizDetails(quiz.id!!) },
-                            changeFavoriteStatus = { userDetailsViewModel.changeFavoriteStatus(quiz.id!!) },
+                            changeFavoriteStatus = { userDetailsViewModel.onCommand(UserDetailsCommand.ChangeFavoriteStatus(quiz.id!!)) },
                             navigateToEditScreen = { navigateToEditScreen(quiz.id!!) },
                             canEdit = userDetailsViewModel.checkOwnership(quiz.quizCreator?.userId!!),
-                            onDeleteClick = { userDetailsViewModel.deleteQuiz(quiz.id!!) },
+                            onDeleteClick = { userDetailsViewModel.onCommand(UserDetailsCommand.DeleteQuiz(quiz.id!!)) },
                             onEditClick = { createQuizViewModel.onCommand(QuizCommand.SetForEdit(quiz.id!!)) },
                             navigateToQuizReviews = { navigateToQuizReviews(quiz.id!!, quiz.reviewedByYou) },
                         )
 
                         Spacer(modifier = Modifier.height(8.dp))
                     }
-                } else {
+                }
+
+                if (state.isLoadingMore){
                     item {
-                        FullSizeCircularProgressIndicator()
+                        Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                            CircularProgressIndicator()
+                        }
                     }
                 }
             }

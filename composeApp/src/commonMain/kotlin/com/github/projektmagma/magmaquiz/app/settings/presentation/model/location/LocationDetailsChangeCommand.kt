@@ -1,4 +1,4 @@
-package com.github.projektmagma.magmaquiz.app.settings.presentation.model.country
+package com.github.projektmagma.magmaquiz.app.settings.presentation.model.location
 
 import com.github.projektmagma.magmaquiz.app.settings.domain.model.Country
 

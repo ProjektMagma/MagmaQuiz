@@ -38,7 +38,6 @@ class QuizDetailsViewModel(
             _quiz.value = null
             quizRepository.getQuizById(id).whenSuccess { 
                 _quiz.value = it.data
-                quizRepository.quiz.value = it.data
             }
         }
     }
@@ -53,8 +52,12 @@ class QuizDetailsViewModel(
     }
     
     fun addQuizToMyHistory(id: UUID){
-        viewModelScope.launch { 
+        viewModelScope.launch {
             quizRepository.markQuizAsPlayed(id)
         }
+    }
+    
+    fun setupQuizForGame(){
+        quizRepository.quiz.value = _quiz.value
     }
 }

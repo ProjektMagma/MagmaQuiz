@@ -117,4 +117,9 @@
     <string name="no_country_selected">Jeszcze nie wybrano żadnego kraju</string>
     <string name="town">Miasto</string>
     <string name="country">Kraj</string>
+    <string name="email_taken">Email zajęty</string>
+    <string name="username_taken">Nazwa użytkownika zajęta</string>
+    <string name="bio">Biogram</string>
+    <string name="passwords_dont_match">Hasła się różnią</string>
+    <string name="invalid_code">Niepoprawny kod</string>
 </resources>

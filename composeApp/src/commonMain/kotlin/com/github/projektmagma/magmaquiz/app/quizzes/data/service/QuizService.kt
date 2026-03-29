@@ -25,15 +25,9 @@ class QuizService(
         }
     }
     
-    suspend fun getQuizzes(count: Int): Resource<List<Quiz>, NetworkError> {
-        return safeCall<List<Quiz>> { 
-            httpClient.get("quiz/find/$count")
-        }
-    }
-    
-    suspend fun getQuizByName(name: String, count: Int): Resource<List<Quiz>, NetworkError> {
+    suspend fun getQuizByName(name: String, count: Int, offset: Int): Resource<List<Quiz>, NetworkError> {
         return safeCall<List<Quiz>> {
-            httpClient.get("quiz/find/$count/$name")
+            httpClient.get("quiz/find/$count/$offset/$name")
         }
     }
 
@@ -61,15 +55,15 @@ class QuizService(
         }
     }
 
-    suspend fun getMyGameHistory(count: Int = 100): Resource<List<Quiz>, NetworkError> {
+    suspend fun getMyGameHistory(count: Int, offset: Int): Resource<List<Quiz>, NetworkError> {
         return safeCall<List<Quiz>> {
-            httpClient.get("quiz/MyGameHistory/$count")
+            httpClient.get("quiz/MyGameHistory/$count/$offset")
         }
     }
 
-    suspend fun getQuizzesByUserId(id: UUID, count: Int = 100): Resource<List<Quiz>, NetworkError> {
+    suspend fun getQuizzesByUserId(id: UUID, count: Int, offset: Int): Resource<List<Quiz>, NetworkError> {
         return safeCall<List<Quiz>> {
-            httpClient.get("quiz/findByUser/$count/$id")
+            httpClient.get("quiz/findByUser/$count/$offset/$id")
         }
     }
 
@@ -79,27 +73,27 @@ class QuizService(
         }
     }
 
-    suspend fun getMyFavoritesByName(name: String, count: Int): Resource<List<Quiz>, NetworkError> {
+    suspend fun getMyFavoritesByName(name: String, count: Int, offset: Int): Resource<List<Quiz>, NetworkError> {
         return safeCall<List<Quiz>> {
-            httpClient.get("quiz/myFavorites/$count/$name")
+            httpClient.get("quiz/myFavorites/$count/$offset/$name")
         }
     }
 
-    suspend fun getRecentlyAddedQuizzesByName(name: String, count: Long): Resource<List<Quiz>, NetworkError> {
+    suspend fun getRecentlyAddedQuizzesByName(name: String, count: Int, offset: Int): Resource<List<Quiz>, NetworkError> {
         return safeCall<List<Quiz>> {
-            httpClient.get("quiz/newest/$count/$name")
+            httpClient.get("quiz/newest/$count/$offset/$name")
         }
     }
 
-    suspend fun getMostLikedQuizzesByName(name: String, count: Long): Resource<List<Quiz>, NetworkError> {
+    suspend fun getMostLikedQuizzesByName(name: String, count: Int, offset: Int): Resource<List<Quiz>, NetworkError> {
         return safeCall<List<Quiz>> {
-            httpClient.get("quiz/mostLiked/$count/$name")
+            httpClient.get("quiz/mostLiked/$count/$offset/$name")
         }
     }
 
-    suspend fun getFriendsQuizzesByName(name: String, count: Long): Resource<List<Quiz>, NetworkError> {
+    suspend fun getFriendsQuizzesByName(name: String, count: Int, offset: Int): Resource<List<Quiz>, NetworkError> {
         return safeCall<List<Quiz>> {
-            httpClient.get("quiz/friendsQuizzes/$count/$name")
+            httpClient.get("quiz/friendsQuizzes/$count/$offset/$name")
         }
     }
     

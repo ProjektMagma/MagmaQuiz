@@ -121,4 +121,9 @@
     <string name="no_country_selected">No cuntry selected yet</string>
     <string name="town">Town</string>
     <string name="country">Country</string>
+    <string name="email_taken">Email taken</string>
+    <string name="username_taken">Username taken</string>
+    <string name="bio">Bio</string>
+    <string name="passwords_dont_match">Passwords don't match</string>
+    <string name="invalid_code">Invalid code</string>
 </resources>

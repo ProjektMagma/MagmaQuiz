@@ -23,27 +23,27 @@ class UsersService(
         }
     }
 
-    suspend fun getFriendList(username: String, count: Int): Resource<List<ForeignUser>, NetworkError> {
+    suspend fun getFriendList(username: String, count: Int, offset: Int): Resource<List<ForeignUser>, NetworkError> {
         return safeCall<List<ForeignUser>> {
-            httpClient.get("users/friendship/friendList/$count/$username")
+            httpClient.get("users/friendship/friendList/$count/$offset/$username")
         }
     }
 
-    suspend fun getIncomingInvitations(username: String, count: Int): Resource<List<ForeignUser>, NetworkError> {
+    suspend fun getIncomingInvitations(username: String, count: Int, offset: Int): Resource<List<ForeignUser>, NetworkError> {
         return safeCall<List<ForeignUser>> {
-            httpClient.get("users/friendship/incoming/$count/$username")
+            httpClient.get("users/friendship/incoming/$count/$offset/$username")
         }
     }
 
-    suspend fun getOutgoingInvitations(username: String, count: Int): Resource<List<ForeignUser>, NetworkError> {
+    suspend fun getOutgoingInvitations(username: String, count: Int, offset: Int): Resource<List<ForeignUser>, NetworkError> {
         return safeCall<List<ForeignUser>> {
-            httpClient.get("users/friendship/outgoing/$count/$username")
+            httpClient.get("users/friendship/outgoing/$count/$offset/$username")
         }
     }
     
-    suspend fun getFindUsers(name: String, count: Int): Resource<List<ForeignUser>, NetworkError> {
+    suspend fun getFindUsers(name: String, count: Int, offset: Int): Resource<List<ForeignUser>, NetworkError> {
         return safeCall<List<ForeignUser>> {
-            httpClient.get("users/find/$count/$name")
+            httpClient.get("users/find/$count/$offset/$name")
         }
     }
 
