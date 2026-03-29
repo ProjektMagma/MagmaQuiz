@@ -187,6 +187,7 @@ fun UserDetailsScreen(
                                         userDetailsViewModel.onCommand(UserDetailsCommand.SelectedTabIndexChanged(0))
                                         userDetailsViewModel.onCommand(UserDetailsCommand.LoadQuizzesOrHistory)
                                     },
+                                    enabled = !state.isLoadingMore
                                 ) {
                                     Text(stringResource(Res.string.quizzes))
                                 }
@@ -196,6 +197,7 @@ fun UserDetailsScreen(
                                         userDetailsViewModel.onCommand(UserDetailsCommand.SelectedTabIndexChanged(1))
                                         userDetailsViewModel.onCommand(UserDetailsCommand.LoadQuizzesOrHistory)
                                     },
+                                    enabled = !state.isLoadingMore
                                 ) {
                                     Text(stringResource(Res.string.game_history))
                                 }

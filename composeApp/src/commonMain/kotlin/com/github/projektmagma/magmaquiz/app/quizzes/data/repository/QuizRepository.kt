@@ -1,8 +1,10 @@
 package com.github.projektmagma.magmaquiz.app.quizzes.data.repository
 
 import com.github.projektmagma.magmaquiz.app.core.domain.NetworkError
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.HomeScreenState
 import com.github.projektmagma.magmaquiz.app.quizzes.data.service.QuizService
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.QuizListState
+import com.github.projektmagma.magmaquiz.app.users.presentation.model.details.UserDetailsState
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 import com.github.projektmagma.magmaquiz.shared.data.domain.QuizReview
 import com.github.projektmagma.magmaquiz.shared.data.domain.Tag
@@ -19,13 +21,9 @@ class QuizRepository(
     
     val quizListState = MutableStateFlow(QuizListState())
     
-    val userDetailsQuizList = MutableStateFlow<List<Quiz>?>(emptyList())
-
-
-    val recentQuizzes = MutableStateFlow<List<Quiz>>(emptyList())
-    val mostLikedQuizzes = MutableStateFlow<List<Quiz>>(emptyList())
-    val friendsQuizzes = MutableStateFlow<List<Quiz>>(emptyList())
-
+    val userDetailsState = MutableStateFlow(UserDetailsState())
+    val homeState = MutableStateFlow(HomeScreenState())
+    
     suspend fun getQuizById(id: UUID): Resource<Quiz, NetworkError> {
         return quizService.getQuizById(id)
     }
@@ -117,16 +115,13 @@ class QuizRepository(
     }
     
     fun updateAllLists(transform: (List<Quiz>) -> List<Quiz>){
-        quizListState.update {
-            it.copy(
-                quizzes = transform(it.quizzes)
-            )
-        }
-
-        userDetailsQuizList.update { quizzes -> quizzes?.let(transform) }
-        recentQuizzes.update(transform)
-        mostLikedQuizzes.update(transform)
-        friendsQuizzes.update(transform)
+        userDetailsState.update { it.copy(quizzes = transform(it.quizzes!!)) }
+        quizListState.update { it.copy(quizzes = transform(it.quizzes)) }
+        homeState.update { it.copy(
+            recentQuizzes = transform(it.recentQuizzes),
+            mostLikedQuizzes = transform(it.mostLikedQuizzes),
+            friendsQuizzes = transform(it.friendsQuizzes)
+        ) }
     }
 
     fun List<Quiz>.changeLikeStatusInList(id: UUID): List<Quiz>{

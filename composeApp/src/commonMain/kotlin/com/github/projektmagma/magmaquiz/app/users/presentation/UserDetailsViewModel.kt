@@ -9,7 +9,6 @@ import com.github.projektmagma.magmaquiz.app.core.util.Paginator
 import com.github.projektmagma.magmaquiz.app.quizzes.data.repository.QuizRepository
 import com.github.projektmagma.magmaquiz.app.users.data.repository.UsersRepository
 import com.github.projektmagma.magmaquiz.app.users.presentation.model.details.UserDetailsCommand
-import com.github.projektmagma.magmaquiz.app.users.presentation.model.details.UserDetailsState
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenError
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
 import kotlinx.coroutines.Job
@@ -28,7 +27,7 @@ class UserDetailsViewModel(
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState = _uiState.asStateFlow()
     
-    private val _state = MutableStateFlow(UserDetailsState())
+    private val _state = quizRepository.userDetailsState
     val state = _state.asStateFlow()
     
     val paginator = Paginator(
@@ -69,7 +68,6 @@ class UserDetailsViewModel(
     }
     
     private fun loadNextItems(){
-        quizzesJob?.cancel()
         quizzesJob = viewModelScope.launch { 
             paginator.loadNextItems()
         }

@@ -6,7 +6,6 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
 import com.github.projektmagma.magmaquiz.app.core.util.Paginator
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.HomeScreenCommand
-import com.github.projektmagma.magmaquiz.app.home.presentation.model.HomeScreenState
 import com.github.projektmagma.magmaquiz.app.quizzes.data.repository.QuizRepository
 import com.github.projektmagma.magmaquiz.app.users.data.repository.UsersRepository
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenError
@@ -38,8 +37,8 @@ class HomeViewModel(
 
     private val _changedFavoriteUiState = MutableStateFlow<UiState>(UiState.Success)
     val changedFavoriteUiState = _changedFavoriteUiState.asStateFlow()
-
-    private val _state = MutableStateFlow(HomeScreenState())
+    
+    private val _state = quizRepository.homeState
     val state = _state.asStateFlow()
     
     val paginatorLikedQuizzes = Paginator(

@@ -1,6 +1,12 @@
 package com.github.projektmagma.magmaquiz.app.auth.presentation.screens
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -62,7 +68,7 @@ fun LoginScreen(
 
         EmailTextField(
             emailText = state.email,
-            emailError = state.emailError,
+            error = state.emailError,
             imeAction = ImeAction.Next
         ) {
             viewModel.onCommand(AuthCommand.EmailChanged(it))
