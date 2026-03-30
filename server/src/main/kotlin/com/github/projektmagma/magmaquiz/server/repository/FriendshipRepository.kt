@@ -43,7 +43,7 @@ class FriendshipRepository {
         stringToSearch: String
     ): List<UserEntity> {
         return transaction {
-            val searchBy = if (incoming) UsersFriendshipsTable.userFrom else UsersFriendshipsTable.userTo
+            val searchBy = if (incoming) UsersFriendshipsTable.userTo else UsersFriendshipsTable.userFrom
 
             UserFriendshipEntity.find {
                 searchBy eq user.id and
