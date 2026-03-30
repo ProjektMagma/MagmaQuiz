@@ -35,7 +35,7 @@ class UsersRepository(
         return usersService.getOutgoingInvitations(name, count, offset * count)
     }
     
-    suspend fun getFindUsers(name: String = "", count: Int = 5, offset: Int): Resource<List<ForeignUser>, NetworkError> {
+    suspend fun getFindUsers(name: String = "", count: Int = 10, offset: Int): Resource<List<ForeignUser>, NetworkError> {
         return usersService.getFindUsers(name, count, offset * count)
     }
 

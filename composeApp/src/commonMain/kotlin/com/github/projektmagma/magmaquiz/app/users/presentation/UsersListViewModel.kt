@@ -46,7 +46,7 @@ class UsersListViewModel(
         onSuccess = { items, _ ->
             _state.update { state ->
                 state.copy(
-                    usersList = state.usersList + items
+                    usersList = (state.usersList + items).distinctBy { it.userId }
                 )
             }
             _uiState.value = UiState.Success
