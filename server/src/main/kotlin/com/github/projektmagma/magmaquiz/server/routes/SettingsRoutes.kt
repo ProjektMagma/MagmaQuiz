@@ -4,24 +4,29 @@ import com.github.projektmagma.magmaquiz.server.controllers.SettingsDataControll
 import com.github.projektmagma.magmaquiz.server.data.util.AuthTypes
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import com.github.projektmagma.magmaquiz.server.data.util.respondToResource
+import com.github.projektmagma.magmaquiz.server.storage.ExposedSessionStorage
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangeProfilePictureValue
-import io.ktor.server.application.Application
-import io.ktor.server.auth.authenticate
-import io.ktor.server.request.receive
-import io.ktor.server.routing.delete
-import io.ktor.server.routing.get
-import io.ktor.server.routing.post
-import io.ktor.server.routing.route
-import io.ktor.server.routing.routing
-import io.ktor.server.sessions.clear
-import io.ktor.server.sessions.get
-import io.ktor.server.sessions.sessions
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.request.*
+import io.ktor.server.routing.*
+import io.ktor.server.sessions.*
 
 
-fun Application.settingsRoutes(settingsDataController: SettingsDataController) {
+fun Application.settingsRoutes(
+    settingsDataController: SettingsDataController,
+    exposedSessionStorage: ExposedSessionStorage
+) {
     routing {
         authenticate(AuthTypes.SessionAuth) {
             route("/settings") {
+
+                get("/verificationCode") {
+                    val session = call.sessions.get<UserSession>()!!
+                    call.respondToResource(
+                        settingsDataController.settingsVerificationCode(session)
+                    )
+                }
 
                 route("/change") {
 
@@ -36,24 +41,26 @@ fun Application.settingsRoutes(settingsDataController: SettingsDataController) {
                         )
                     }
 
-                    get("/email/{newEmail}") {
+                    get("/email/{newEmail}/{verificationCode}") {
                         val session = call.sessions.get<UserSession>()!!
                         val newEmail = call.parameters["newEmail"]!!
+                        val verificationCode = call.parameters["verificationCode"]!!
 
                         call.respondToResource(
                             settingsDataController.settingsChangeEmail(
-                                session, newEmail
+                                session, newEmail, verificationCode
                             )
                         )
                     }
 
-                    get("/password/{newPassword}") {
+                    get("/password/{newPassword}/{verificationCode}") {
                         val session = call.sessions.get<UserSession>()!!
                         val newPassword = call.parameters["newPassword"]!!
+                        val verificationCode = call.parameters["verificationCode"]!!
 
                         call.respondToResource(
                             settingsDataController.settingsChangePassword(
-                                session, newPassword
+                                session, newPassword, verificationCode
                             )
                         )
                     }
@@ -105,6 +112,7 @@ fun Application.settingsRoutes(settingsDataController: SettingsDataController) {
                 delete("/deleteAccount") {
                     val session = call.sessions.get<UserSession>()!!
                     call.sessions.clear<UserSession>()
+                    exposedSessionStorage.clearAllUserSessions(session.userId)
                     call.respondToResource(settingsDataController.settingsDelete(session, false))
                 }
             }

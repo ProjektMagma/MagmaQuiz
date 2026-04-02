@@ -9,7 +9,7 @@ import java.util.*
 class UserSessionEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersSessionsTable) {
     companion object : UUIDEntityClass<UserSessionEntity>(UsersSessionsTable)
 
-    var sessionId by UsersSessionsTable.sessionKey
+    var sessionKey by UsersSessionsTable.sessionKey
     var sessionValue by UsersSessionsTable.sessionValue
     var sessionOwner by UserEntity referencedOn UsersSessionsTable.sessionOwner
 }

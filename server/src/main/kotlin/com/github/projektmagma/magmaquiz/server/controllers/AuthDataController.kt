@@ -3,6 +3,8 @@ package com.github.projektmagma.magmaquiz.server.controllers
 import com.github.projektmagma.magmaquiz.server.data.conversion.UserConversionCommand
 import com.github.projektmagma.magmaquiz.server.data.entities.UserEntity
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
+import com.github.projektmagma.magmaquiz.server.mailer.MailTemplates
+import com.github.projektmagma.magmaquiz.server.mailer.MailerService
 import com.github.projektmagma.magmaquiz.server.repository.UserRepository
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkResource
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.User
@@ -43,6 +45,11 @@ class AuthDataController(private val userRepository: UserRepository) {
         }
 
         dbUser.setHashedPassword(createUserValue.userPassword)
+
+        MailerService.sendMail(
+            createUserValue.userEmail, MailTemplates.AccountCreated,
+            Pair("username", dbUser.userName)
+        )
 
         return NetworkResource.Success(dbUser.toDomain(UserConversionCommand.ThisUser), HttpStatusCode.Created)
     }

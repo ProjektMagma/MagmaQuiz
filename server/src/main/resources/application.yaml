@@ -12,3 +12,12 @@ database:
   user: "$DB_USER:postgres"
   password: "$DB_PASSWORD:"
   database: "$DB_DATABASE:"
+
+mailer:
+  displayed_name: "$MAILER_DISPLAYED_NAME"
+  email: "$MAILER_EMAIL"
+  support_email: "$MAILER_SUPPORT_EMAIL"
+  host: "$MAILER_HOST"
+  port: "$MAILER_PORT"
+  password: "$MAILER_PASSWORD"
+  language: "pl"

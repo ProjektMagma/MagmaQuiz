@@ -5,6 +5,9 @@ import com.github.projektmagma.magmaquiz.server.data.entities.UserSessionEntity
 import com.github.projektmagma.magmaquiz.server.data.tables.UsersSessionsTable
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import io.ktor.server.sessions.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -15,7 +18,7 @@ class ExposedSessionStorage : SessionStorage {
         val userSession = Json.decodeFromString<UserSession>(value)
         transaction {
             UserSessionEntity.new {
-                sessionId = id
+                sessionKey = id
                 sessionValue = value
                 sessionOwner = UserEntity.findById(userSession.userId)!!
             }
@@ -24,7 +27,11 @@ class ExposedSessionStorage : SessionStorage {
 
     override suspend fun invalidate(id: String) {
         transaction {
-            UserSessionEntity.find { UsersSessionsTable.sessionKey eq id }.firstOrNull()?.delete()
+            val session =
+                UserSessionEntity.find { UsersSessionsTable.sessionKey eq id }
+                    .firstOrNull()
+
+            session?.delete()
         }
     }
 
@@ -46,7 +53,15 @@ class ExposedSessionStorage : SessionStorage {
 
     fun clearAllUserSessions(userId: UUID) {
         transaction {
-            UserSessionEntity.find { UsersSessionsTable.sessionOwner eq userId }.forEach { it.delete() }
+            UserSessionEntity.find { UsersSessionsTable.sessionOwner eq userId }
+                .forEach {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        try {
+                            invalidate(it.sessionKey)
+                        } catch (_: NoSuchElementException) {
+                        }
+                    }
+                }
         }
     }
 }

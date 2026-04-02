@@ -36,6 +36,7 @@ dependencies {
     implementation(libs.exposed.migration.jdbc)
     implementation(libs.postgresql)
     implementation(libs.jbcrypt)
+    implementation(libs.simple.java.mail)
     testImplementation(libs.ktor.serverTestHost)
     testImplementation(libs.kotlin.testJunit)
 }
