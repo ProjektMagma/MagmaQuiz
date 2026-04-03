@@ -9,11 +9,12 @@ import com.github.projektmagma.magmaquiz.app.core.util.Paginator
 import com.github.projektmagma.magmaquiz.app.quizzes.data.repository.QuizRepository
 import com.github.projektmagma.magmaquiz.app.users.data.repository.UsersRepository
 import com.github.projektmagma.magmaquiz.app.users.presentation.model.details.UserDetailsCommand
+import com.github.projektmagma.magmaquiz.app.users.presentation.model.details.UserDetailsState
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenError
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -27,8 +28,20 @@ class UserDetailsViewModel(
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState = _uiState.asStateFlow()
     
-    private val _state = quizRepository.userDetailsState
-    val state = _state.asStateFlow()
+    private val _state = MutableStateFlow(UserDetailsState())
+    private val _quizzes = quizRepository.userDetailsStateQuizzes
+
+    val state = combine(
+        _state,
+        _quizzes
+    ) { state, quizzes ->
+        UserDetailsState(
+            selectedTabIndex = state.selectedTabIndex,
+            quizzes = quizzes,
+            user = state.user,
+            isLoadingMore = state.isLoadingMore
+        )
+    }
     
     val paginator = Paginator(
         initialKey = 0,
@@ -42,11 +55,9 @@ class UserDetailsViewModel(
         },
         getNextKey = { key, _ -> key + 1 },
         onError = { networkError -> _uiState.value = UiState.Error(networkError.toResId()) },
-        onSuccess = { item, _ -> _state.update { it.copy(quizzes = it.quizzes?.plus(item)) } },
+        onSuccess = { item, _ -> _quizzes.value += item },
         endReached = { _, item -> item.isEmpty() }
     )
-    
-    private var quizzesJob: Job? = null
 
     fun onCommand(command: UserDetailsCommand) {
         when (command) {
@@ -67,8 +78,14 @@ class UserDetailsViewModel(
         }
     }
     
+    init {
+        _quizzes.value = emptyList()
+        loadNextItems()
+        getUserData()
+    }
+    
     private fun loadNextItems(){
-        quizzesJob = viewModelScope.launch { 
+        viewModelScope.launch { 
             paginator.loadNextItems()
         }
     }

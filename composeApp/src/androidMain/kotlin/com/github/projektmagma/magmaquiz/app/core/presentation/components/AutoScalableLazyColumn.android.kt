@@ -57,7 +57,7 @@ actual fun <T> AutoScalableLazyColumn(
         snapshotFlow { state.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
             .distinctUntilChanged()
             .collect { lastVisibleIndex ->
-                if (lastVisibleIndex == itemList.lastIndex) {
+                if (lastVisibleIndex == itemList.lastIndex + 1) {
                     onLoadMore()
                 }
             }

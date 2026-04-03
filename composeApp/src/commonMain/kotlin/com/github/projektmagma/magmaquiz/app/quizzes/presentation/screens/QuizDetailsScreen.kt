@@ -8,30 +8,36 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.projektmagma.magmaquiz.app.core.presentation.components.CommentButton
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.ContentImage
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.FullSizeCircularProgressIndicator
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.ProfilePictureIcon
 import com.github.projektmagma.magmaquiz.app.core.presentation.ui.theme.favoritePink
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.QuizDetailsViewModel
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuestionNumber
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuizVisibilityIcon
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.TagList
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.play_single
@@ -59,8 +65,9 @@ fun QuizDetailsScreen(
         Column(
             modifier = Modifier
                 .widthIn(max = 1000.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+                .fillMaxSize()
+                .padding(horizontal = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             LazyColumn(
                 modifier = Modifier
@@ -68,20 +75,24 @@ fun QuizDetailsScreen(
                     .fillMaxWidth()
             ) {
                 item {
+                    Spacer(modifier = Modifier.height(16.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalAlignment = Alignment.Top
                     ) {
                         ContentImage(
                             imageData = quiz!!.quizImage,
                             imageSize = 128.dp,
                         )
                         Column(
+                            modifier = Modifier.weight(1f),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Text(
                                 text = quiz!!.quizName,
-                                style = MaterialTheme.typography.titleMedium
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold
                             )
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -91,16 +102,23 @@ fun QuizDetailsScreen(
                                     imageData = quiz!!.quizCreator!!.userProfilePicture,
                                     size = 32.dp
                                 )
-                                Text(text = quiz!!.quizCreator!!.userName)
+                                Text(
+                                    text = quiz!!.quizCreator!!.userName,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                             }
+                            QuizVisibilityIcon(
+                                quizVisibility = quiz!!.visibility
+                            )
                         }
                         Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(2.dp)
                         ) {
                             IconButton(
-                                onClick = {
-                                    quizDetailsViewModel.changeFavoriteStatus(id)
-                                }
+                                onClick = { quizDetailsViewModel.changeFavoriteStatus(id) },
+                                modifier = Modifier.size(36.dp)
                             ) {
                                 Icon(
                                     imageVector = if (currentQuiz?.likedByYou == true)
@@ -109,49 +127,101 @@ fun QuizDetailsScreen(
                                     contentDescription = "FavoriteButton"
                                 )
                             }
-                            Text(text = "${currentQuiz?.likesCount ?: 0}")
+                            Text(
+                                text = "${currentQuiz?.likesCount ?: 0}",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                IconButton(
+                                    onClick = {
+                                        navigateToReviewsScreen(quiz?.id!!, quiz!!.reviewedByYou)
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.Comment,
+                                        contentDescription = null
+                                    )
+                                }
+                                Text(
+                                    text = quiz!!.reviewCount.toString(),
+                                    style = MaterialTheme.typography.labelMedium,
+                                )
+                            }
                         }
                     }
 
-                    Text(
-                        modifier = Modifier.padding(vertical = 16.dp),
-                        text = quiz!!.quizDescription,
-                        style = MaterialTheme.typography.labelMedium
-                    )
-
-                    CommentButton(
-                        navigateToQuizReviews = { navigateToReviewsScreen(
-                            quiz?.id!!, 
-                            quiz!!.reviewedByYou
-                        ) },
-                        reviewCount = quiz!!.reviewCount
-                    )
+                    Spacer(modifier = Modifier.height(16.dp))
                     
-                    TagList(
-                        tagList = quiz!!.tagList
+                    Text(
+                        text = quiz!!.quizDescription,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                }
 
-                items(quiz!!.questionList) { question ->
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        ContentImage(
-                            imageData = question.questionImage,
-                            imageSize = 96.dp
+                        TagList(
+                            tagList = quiz!!.tagList,
                         )
-                        Column {
-                            QuestionNumber(question.questionNumber)
-                            Text(text = question.questionContent)
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+                        thickness = 0.5.dp
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+                
+                items(quiz!!.questionList) { question ->
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        tonalElevation = 1.dp,
+                        color = MaterialTheme.colorScheme.surface
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(10.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            ContentImage(
+                                imageData = question.questionImage,
+                                imageSize = 72.dp
+                            )
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                QuestionNumber(question.questionNumber)
+                                Text(
+                                    text = question.questionContent,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
                         }
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                 }
             }
 
             Button(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
                 onClick = {
                     navigateToPlayScreen()
                     quizDetailsViewModel.setupQuizForGame()
@@ -160,30 +230,6 @@ fun QuizDetailsScreen(
             ) {
                 Text(text = stringResource(Res.string.play_single))
             }
-//            Row(
-//                modifier = Modifier.fillMaxWidth(),
-//                horizontalArrangement = Arrangement.spacedBy(8.dp)
-//            ) {
-//                Button(
-//                    modifier = Modifier.weight(0.5f),
-//                    onClick = {
-//                        navigateToPlayScreen()
-//                        quizDetailsViewModel.addQuizToMyHistory(id)
-//                    }
-//                ) {
-//                    Text(text = "Graj")
-//                }
-//                Button(
-//                    modifier = Modifier.weight(0.5f),
-//                    onClick = {
-//                        navigateToPlayScreen()
-//                    }
-//                ) {
-//                    Text(text = "Graj multi")
-//                }
-//            }
-
         }
     }
 }
-

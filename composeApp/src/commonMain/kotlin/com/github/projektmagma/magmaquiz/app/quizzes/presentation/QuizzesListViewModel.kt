@@ -48,7 +48,7 @@ class QuizzesListViewModel(
         },
         onSuccess = { items, _ ->
             _quizListState.update { state ->
-                state.copy(quizzes = state.quizzes + items)
+                state.copy(quizzes = (state.quizzes + items).distinctBy { it.id })
             }
             _uiState.value = UiState.Success
         },
