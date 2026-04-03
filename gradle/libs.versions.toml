@@ -36,6 +36,8 @@ postgresql = "42.7.9"
 jbcrypt = "0.4"
 slf4j = "1.7.36"
 
+simple-java-mail = "8.12.6"
+
 filekit = "0.12.0"
 krop = "0.3.0-alpha01"
 
@@ -147,6 +149,7 @@ ktor-serverNetty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "kt
 ktor-serverTestHost = { module = "io.ktor:ktor-server-test-host-jvm", version.ref = "ktor" }
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 jbcrypt = { module = "org.mindrot:jbcrypt", version.ref = "jbcrypt" }
+simple-java-mail = { module = "org.simplejavamail:simple-java-mail", version.ref = "simple-java-mail" }
 
 
 # EXPOSED / DATABASE
