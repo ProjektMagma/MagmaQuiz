@@ -1,6 +1,6 @@
 package com.github.projektmagma.magmaquiz.server.mailer
 
-import io.ktor.server.application.*
+import io.ktor.server.application.ApplicationEnvironment
 import org.simplejavamail.api.email.ContentTransferEncoding
 import org.simplejavamail.api.email.Recipient
 import org.simplejavamail.api.mailer.Mailer
@@ -37,7 +37,6 @@ object MailerService {
             .withSessionTimeout(TIMEOUT_IN_MILLIS)
             .withDebugLogging(true)
             .withThreadPoolSize(THREAD_POOL_SIZE)
-            .async()
             .buildMailer()
 
         _emailTemplatesFolder = File("./email_templates/${environment.config.property("mailer.language").getString()}")

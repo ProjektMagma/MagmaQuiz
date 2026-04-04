@@ -8,7 +8,7 @@ import com.github.projektmagma.magmaquiz.server.mailer.MailerService
 import com.github.projektmagma.magmaquiz.server.repository.UserRepository
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkResource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangeProfilePictureValue
-import io.ktor.http.*
+import io.ktor.http.HttpStatusCode
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 class SettingsDataController(private val userRepository: UserRepository) {
@@ -76,32 +76,45 @@ class SettingsDataController(private val userRepository: UserRepository) {
         return NetworkResource.Success(Unit)
     }
 
-    fun settingsChangeEmail(
+    fun checkIsEmailTaken(
+        session: UserSession,
+        newEmail: String
+    ): NetworkResource<Unit> {
+        val thisUser = userRepository.getUserData(session)
+
+        if (UserEntity.isEmailTaken(newEmail)) {
+            return NetworkResource.Error(HttpStatusCode.Conflict)
+        }
+
+        return NetworkResource.Success(Unit)
+    }
+
+    fun settingsConfirmEmailChange(
         session: UserSession,
         newEmail: String,
         verificationCode: String
     ): NetworkResource<Unit> {
         val thisUser = userRepository.getUserData(session)
 
-        val oldEmail = thisUser.userEmail
-
-        if (UserEntity.isEmailTaken(newEmail))
+        if (UserEntity.isEmailTaken(newEmail)) {
             return NetworkResource.Error(HttpStatusCode.Conflict)
+        }
 
+        val codeEntity = VerificationCodeEntity.tryFindCodeByUser(thisUser)
+            ?: return NetworkResource.Error(HttpStatusCode.BadRequest)
 
-        val codeEntity =
-            VerificationCodeEntity.tryFindCodeByUser(thisUser)
-                ?: return NetworkResource.Error(HttpStatusCode.BadRequest)
+        if (!codeEntity.compareCode(verificationCode)) {
+            return NetworkResource.Error(HttpStatusCode.Forbidden)
+        }
 
-        if (!codeEntity.compareCode(verificationCode))
-            return NetworkResource.Error(HttpStatusCode.BadRequest)
+        val oldEmail = thisUser.userEmail
 
         transaction {
             thisUser.userEmail = newEmail
+            codeEntity.delete()
         }
 
         MailerService.sendMail(oldEmail, MailTemplates.EmailChanged, Pair("username", thisUser.userName))
-
         MailerService.sendMail(newEmail, MailTemplates.EmailChanged, Pair("username", thisUser.userName))
 
         return NetworkResource.Success(Unit)
@@ -137,7 +150,7 @@ class SettingsDataController(private val userRepository: UserRepository) {
         return NetworkResource.Success(Unit)
     }
 
-    fun settingsVerificationCode(session: UserSession): NetworkResource<Unit> {
+    fun settingsVerificationCode(session: UserSession, email: String): NetworkResource<Unit> {
         val thisUser = userRepository.getUserData(session)
 
         val verificationCode = VerificationCodeEntity.tryFindCodeByUser(thisUser)
@@ -146,7 +159,7 @@ class SettingsDataController(private val userRepository: UserRepository) {
         val generatedCode = verificationCode.generateCode()
 
         MailerService.sendMail(
-            thisUser.userEmail,
+            email,
             MailTemplates.VerificationCode,
             Pair("username", thisUser.userName),
             Pair("verification_code", generatedCode)

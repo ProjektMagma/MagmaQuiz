@@ -6,11 +6,18 @@ import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import com.github.projektmagma.magmaquiz.server.data.util.respondToResource
 import com.github.projektmagma.magmaquiz.server.storage.ExposedSessionStorage
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangeProfilePictureValue
-import io.ktor.server.application.*
-import io.ktor.server.auth.*
-import io.ktor.server.request.*
-import io.ktor.server.routing.*
-import io.ktor.server.sessions.*
+import com.github.projektmagma.magmaquiz.shared.data.rest.values.ConfirmEmailChangeValue
+import io.ktor.server.application.Application
+import io.ktor.server.auth.authenticate
+import io.ktor.server.request.receive
+import io.ktor.server.routing.delete
+import io.ktor.server.routing.get
+import io.ktor.server.routing.post
+import io.ktor.server.routing.route
+import io.ktor.server.routing.routing
+import io.ktor.server.sessions.clear
+import io.ktor.server.sessions.get
+import io.ktor.server.sessions.sessions
 
 
 fun Application.settingsRoutes(
@@ -21,10 +28,11 @@ fun Application.settingsRoutes(
         authenticate(AuthTypes.SessionAuth) {
             route("/settings") {
 
-                get("/verificationCode") {
+                get("/verificationCode/{email}") {
                     val session = call.sessions.get<UserSession>()!!
+                    val email = call.parameters["email"]!!
                     call.respondToResource(
-                        settingsDataController.settingsVerificationCode(session)
+                        settingsDataController.settingsVerificationCode(session, email)
                     )
                 }
 
@@ -41,14 +49,27 @@ fun Application.settingsRoutes(
                         )
                     }
 
-                    get("/email/{newEmail}/{verificationCode}") {
+                    get("/email/checkIsTaken/{email}") {
                         val session = call.sessions.get<UserSession>()!!
-                        val newEmail = call.parameters["newEmail"]!!
-                        val verificationCode = call.parameters["verificationCode"]!!
+                        val email = call.parameters["email"]!!
 
                         call.respondToResource(
-                            settingsDataController.settingsChangeEmail(
-                                session, newEmail, verificationCode
+                            settingsDataController.checkIsEmailTaken(
+                                session, 
+                                email
+                            )
+                        )
+                    }
+                    
+                    get("/email/confirm") {
+                        val session = call.sessions.get<UserSession>()!!
+                        val body = call.receive<ConfirmEmailChangeValue>()
+
+                        call.respondToResource(
+                            settingsDataController.settingsConfirmEmailChange(
+                                session,
+                                body.email,
+                                body.verificationCode
                             )
                         )
                     }
