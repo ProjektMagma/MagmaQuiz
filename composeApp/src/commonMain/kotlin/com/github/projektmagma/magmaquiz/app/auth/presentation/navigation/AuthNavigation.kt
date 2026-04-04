@@ -25,7 +25,8 @@ import kotlinx.serialization.modules.polymorphic
 
 @Composable
 fun AuthNavigation(
-    navigateToMain: () -> Unit
+    navigateToMain: () -> Unit,
+    navigateToPasswordChange: (forgot: Boolean) -> Unit
 ) {
     val authBackStack = rememberNavBackStack(
         configuration = SavedStateConfiguration {
@@ -65,7 +66,10 @@ fun AuthNavigation(
                         },
                         navigateToHome = {
                             navigateToMain()
-                        }
+                        },
+                        navigateToChangePassword = {
+                            navigateToPasswordChange(it)
+                        },
                     )
                 }
                 entry<Route.Auth.Register> {

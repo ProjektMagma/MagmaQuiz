@@ -126,4 +126,17 @@
     <string name="bio">Bio</string>
     <string name="passwords_dont_match">Passwords don't match</string>
     <string name="invalid_code">Invalid code</string>
+    <string name="change_email">Change email</string>
+    <string name="change_password">Change password</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="current_email">Current email</string>
+    <string name="new_email">New email</string>
+    <string name="successful_email_change">Successful email changed</string>
+    <string name="email_verification">Email verification</string>
+    <string name="code_we_sent">Enter the code we sent to your email.</string>
+    <string name="verification_code">Kod weryfikacyjny</string>
+    <string name="example_code">eg. A1B2C3</string>
+    <string name="confirm">Confirm</string>
+    <string name="resend_code">Resend code</string>
+    <string name="send_again_in">You can resend the code in %1$d seconds</string>
 </resources>

@@ -3,7 +3,6 @@ package com.github.projektmagma.magmaquiz.app.settings.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.projektmagma.magmaquiz.app.auth.data.AuthRepository
-import com.github.projektmagma.magmaquiz.app.auth.domain.validator.validateEmail
 import com.github.projektmagma.magmaquiz.app.auth.domain.validator.validateUsername
 import com.github.projektmagma.magmaquiz.app.core.domain.NetworkError
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.LocalEvent
@@ -36,7 +35,6 @@ class AccountDetailsChangeViewModel(
     fun onCommand(command: AccountDetailsChangeCommand){
         when (command) {
             is AccountDetailsChangeCommand.BioChanged -> _state.update { it.copy(bio = command.newBio) }
-            is AccountDetailsChangeCommand.EmailChanged -> _state.update { it.copy(email = command.newEmail, emailError = null) }
             is AccountDetailsChangeCommand.UsernameChanged -> _state.update { it.copy(username = command.newUsername, usernameError = null) }
             AccountDetailsChangeCommand.Save -> { save() }
         }
@@ -46,7 +44,6 @@ class AccountDetailsChangeViewModel(
         _state.update { 
             it.copy(
                 username = user?.userName!!,
-                email = user.userEmail,
                 bio = user.userBio
             )
         }
@@ -54,30 +51,16 @@ class AccountDetailsChangeViewModel(
     
     private fun save(){
         viewModelScope.launch {
-            val email = _state.value.email
             val username = _state.value.username
             val bio = _state.value.bio
             
             _state.update { 
-                it.copy(
-                    emailError = validateEmail(email),
-                    usernameError = validateUsername(username)
-                )
+                it.copy(usernameError = validateUsername(username))
             }
             
-            val ifError = listOf(
-                _state.value.emailError,
-                _state.value.usernameError
-            ).any { it != null }
-            
-            if (ifError) {
-                return@launch 
-            }
+            if (_state.value.usernameError != null) {return@launch}
 
             val success = buildList {
-                if (user?.userEmail != email) add(settingsRepository.changeEmail(email).whenError { result ->
-                    if (result.error == NetworkError.CONFLICT) _state.update { it.copy(emailError = result.error) }
-                })
                 if (user?.userName != username) add(settingsRepository.changeUsername(username).whenError { result ->
                     if (result.error == NetworkError.CONFLICT) _state.update { it.copy(usernameError = result.error) }
                 })
@@ -88,7 +71,6 @@ class AccountDetailsChangeViewModel(
                 authRepository.thisUser.update {
                     it?.copy(
                         userName = username,
-                        userEmail = email,
                         userBio = bio
                     )
                 }

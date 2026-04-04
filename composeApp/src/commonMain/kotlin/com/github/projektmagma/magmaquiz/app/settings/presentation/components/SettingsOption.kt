@@ -19,7 +19,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun SettingsOption(
     text: StringResource,
-    imageVector: ImageVector? = null,
+    imageVector: ImageVector,
     action: () -> Unit
 ) {
     Row(
@@ -30,12 +30,10 @@ fun SettingsOption(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        if (imageVector != null){
-            Icon(
-                imageVector = imageVector,
-                contentDescription = null
-            )
-        }
+        Icon(
+            imageVector = imageVector,
+            contentDescription = null
+        )
         Text(
             text = stringResource(text),
             style = MaterialTheme.typography.headlineSmall,

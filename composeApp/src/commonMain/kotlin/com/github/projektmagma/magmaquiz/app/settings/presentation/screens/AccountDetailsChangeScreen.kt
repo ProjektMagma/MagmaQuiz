@@ -6,13 +6,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,7 +17,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.projektmagma.magmaquiz.app.auth.presentation.components.EmailTextField
 import com.github.projektmagma.magmaquiz.app.auth.presentation.components.UsernameTextField
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.LocalEvent
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
@@ -31,7 +26,6 @@ import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.account_details_change
 import magmaquiz.composeapp.generated.resources.bio
 import magmaquiz.composeapp.generated.resources.cant_save
-import magmaquiz.composeapp.generated.resources.password
 import magmaquiz.composeapp.generated.resources.save
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
@@ -44,7 +38,7 @@ fun AccountDetailsChangeScreen(
 ) {
     val state by accountDetailsChangeViewModel.state.collectAsStateWithLifecycle()
 
-    val canSave = state.usernameError == null && state.emailError == null
+    val canSave = state.usernameError == null
 
     LaunchedEffect(Unit){
         accountDetailsChangeViewModel.event.collect { event ->
@@ -88,16 +82,6 @@ fun AccountDetailsChangeScreen(
                     }
                 )
 
-                EmailTextField(
-                    emailText = state.email,
-                    error = state.emailError,
-                    onValueChange = {
-                        accountDetailsChangeViewModel.onCommand(
-                            AccountDetailsChangeCommand.EmailChanged(it)
-                        )
-                    }
-                )
-
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = state.bio,
@@ -111,20 +95,6 @@ fun AccountDetailsChangeScreen(
                     label = { Text(stringResource(Res.string.bio)) },
                 )
             }
-        }
-
-        OutlinedButton(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = {}
-        ) {
-            Icon(
-                imageVector = Icons.Default.Lock,
-                contentDescription = null
-            )
-            Text(
-                modifier = Modifier.padding(start = 8.dp),
-                text = stringResource(Res.string.password)
-            )
         }
 
         Button(

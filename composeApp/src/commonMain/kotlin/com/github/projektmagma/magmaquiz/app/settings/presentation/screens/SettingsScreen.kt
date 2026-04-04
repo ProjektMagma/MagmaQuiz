@@ -8,8 +8,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -57,6 +60,8 @@ import io.github.vinceglb.filekit.dialogs.openFilePicker
 import kotlinx.coroutines.launch
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.account_details_change
+import magmaquiz.composeapp.generated.resources.change_email
+import magmaquiz.composeapp.generated.resources.change_password
 import magmaquiz.composeapp.generated.resources.change_profile_picture
 import magmaquiz.composeapp.generated.resources.location_details_change
 import magmaquiz.composeapp.generated.resources.log_out
@@ -70,7 +75,9 @@ import org.koin.compose.viewmodel.koinViewModel
 fun SettingsScreen(
     navigateToAuth: () -> Unit,
     navigateToChangeAccountDetailsScreen: () -> Unit,
-    navigateToChangeLocationDetailsScreen: () -> Unit
+    navigateToChangeLocationDetailsScreen: () -> Unit,
+    navigateToChangePasswordScreen: (forgot: Boolean) -> Unit,
+    navigateToChangeEmailScreen: () -> Unit
 ) {
     val authViewModel = koinViewModel<AuthViewModel>()
     val settingsViewModel = koinViewModel<SettingsViewModel>()
@@ -153,6 +160,7 @@ fun SettingsScreen(
     ) {
         SettingsOption(
             text = Res.string.log_out,
+            imageVector = Icons.AutoMirrored.Default.Logout,
             action = { authViewModel.onCommand(AuthCommand.Logout) }
         )
         SettingsOption(
@@ -191,6 +199,18 @@ fun SettingsScreen(
             text = Res.string.location_details_change,
             imageVector = Icons.Default.LocationOn,
             action = { navigateToChangeLocationDetailsScreen() }
+        )
+
+        SettingsOption(
+            text = Res.string.change_email,
+            imageVector = Icons.Default.Email,
+            action = { navigateToChangeEmailScreen() }
+        )
+
+        SettingsOption(
+            text = Res.string.change_password,
+            imageVector = Icons.Default.Lock,
+            action = { navigateToChangePasswordScreen(false) }
         )
     }
 }

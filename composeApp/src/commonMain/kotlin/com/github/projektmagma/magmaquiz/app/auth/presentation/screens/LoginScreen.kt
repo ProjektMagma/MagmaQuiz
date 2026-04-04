@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.KeyboardActions
@@ -12,12 +13,15 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.projektmagma.magmaquiz.app.auth.presentation.AuthViewModel
 import com.github.projektmagma.magmaquiz.app.auth.presentation.components.EmailTextField
+import com.github.projektmagma.magmaquiz.app.auth.presentation.components.ForgotPasswordText
 import com.github.projektmagma.magmaquiz.app.auth.presentation.components.NavigationAuthText
 import com.github.projektmagma.magmaquiz.app.auth.presentation.components.PasswordTextField
 import com.github.projektmagma.magmaquiz.app.auth.presentation.model.auth.AuthCommand
@@ -36,10 +40,11 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun LoginScreen(
     navigateToRegister: () -> Unit,
-    navigateToHome: () -> Unit
+    navigateToHome: () -> Unit,
+    navigateToChangePassword: (forgot: Boolean) -> Unit
 ) {
     val viewModel = koinViewModel<AuthViewModel>()
-    val state = viewModel.state
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(viewModel.authChannel) {
         viewModel.authChannel.collect { event ->
@@ -84,6 +89,11 @@ fun LoginScreen(
         ) {
             viewModel.onCommand(AuthCommand.PasswordChanged(it))
         }
+
+        ForgotPasswordText(
+            navigateToChangePassword = { navigateToChangePassword(it) },
+            modifier = Modifier.align(Alignment.End).offset(y = ((-16).dp))
+        )
 
         Button(
             modifier = Modifier.fillMaxWidth(),

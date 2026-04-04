@@ -8,14 +8,16 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.HomeScreen
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.CreateQuizViewModel
-import com.github.projektmagma.magmaquiz.app.quizzes.presentation.QuizzesListViewModel
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.CreateQuestionScreen
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.CreateQuizScreen
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.QuizDetailsScreen
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.QuizReviewsScreen
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.QuizzesScreen
+import com.github.projektmagma.magmaquiz.app.settings.presentation.EmailChangeScreen
 import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.AccountDetailsChangeScreen
+import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.EmailVerificationScreen
 import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.LocationDetailsChangeScreen
+import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.PasswordChangeScreen
 import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.SettingsScreen
 import com.github.projektmagma.magmaquiz.app.users.presentation.screens.UserDetailsScreen
 import com.github.projektmagma.magmaquiz.app.users.presentation.screens.UsersScreen
@@ -28,7 +30,6 @@ fun MainNavigation(
     navigateToAuth: () -> Unit,
     navigateToGameScreen: () -> Unit,
 ) {
-    val quizzesListViewModel: QuizzesListViewModel = koinViewModel()
     val createQuizViewModel: CreateQuizViewModel = koinViewModel()
 
     NavDisplay(
@@ -53,6 +54,8 @@ fun MainNavigation(
                         navigateToAuth = { navigateToAuth() },
                         navigateToChangeAccountDetailsScreen = { navigator.navigate(Route.Menus.Settings.DetailsChange) },
                         navigateToChangeLocationDetailsScreen = { navigator.navigate(Route.Menus.Settings.LocationChange) },
+                        navigateToChangePasswordScreen = { navigator.navigate(Route.Menus.Settings.PasswordChange(it)) },
+                        navigateToChangeEmailScreen = { navigator.navigate(Route.Menus.Settings.EmailChange) },
                     )
                 }
                 entry<Route.Menus.Settings.LocationChange> {
@@ -65,6 +68,30 @@ fun MainNavigation(
                         goBack = { navigator.goBack() }
                     )
                 }
+                entry<Route.Menus.Settings.EmailChange> {
+                    EmailChangeScreen(
+                        navigateToEmailVerification = { navigator.navigate(Route.Menus.Settings.EmailVerification(it)) }
+                    )
+                }
+                entry<Route.Menus.Settings.EmailVerification> {
+                    EmailVerificationScreen(
+                        email = it.email,
+                        navigateBack = {
+                            navigator.goBack()
+                            navigator.goBack()
+                        },
+                    )
+                }
+                // todo czesc password dopiero do zrobienia
+                entry<Route.Menus.Settings.PasswordChange> {
+                    PasswordChangeScreen(it.forgot)
+                }
+                entry<Route.Menus.Settings.PasswordEmailEntry> {
+                    
+                }
+                entry<Route.Menus.Settings.PasswordVerification> {
+                    
+                }
                 entry<Route.Menus.Quizzes.QuizList> {
                     QuizzesScreen(
                         navigateToUserDetails = {
@@ -73,7 +100,6 @@ fun MainNavigation(
                         navigateToQuizDetails = { id ->
                             navigator.navigate(Route.Menus.Quizzes.QuizDetails(id))
                         },
-                        quizzesListViewModel = quizzesListViewModel,
                         navigateToQuizReviews = { id, reviewed -> navigator.navigate(Route.Menus.Quizzes.QuizReviews(id, reviewed)) },
                     )
                 }

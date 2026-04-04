@@ -95,6 +95,10 @@ fun Navigation(
                     navigateToMain = {
                         mainBackStack.clear()
                         mainBackStack.add(Route.Menus)
+                    },
+                    navigateToPasswordChange = { 
+                        mainBackStack.add(Route.Menus)
+                        navigator.navigate(Route.Menus.Settings.PasswordChange(it))
                     }
                 )
             }

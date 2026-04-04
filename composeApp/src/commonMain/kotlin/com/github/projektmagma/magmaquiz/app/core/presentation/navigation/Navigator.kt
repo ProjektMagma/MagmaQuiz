@@ -4,7 +4,7 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 
 class Navigator(val state: NavigationState) {
-    fun navigate(route: NavKey, isMyProfile: Boolean = false){
+    fun navigate(route: NavKey){
         when (route) {
             in state.backStacks.keys if state.topLevelRoute == route -> {
                 currentBackStack().clear()
@@ -18,7 +18,7 @@ class Navigator(val state: NavigationState) {
                     value.any { it == route }
                 }
                 
-                if (existingStack != null && isMyProfile) {
+                if (existingStack != null) {
                     state.topLevelRoute = existingStack.key
                 } else if (currentBackStack().last() != route) {
                     currentBackStack().add(route)

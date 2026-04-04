@@ -122,4 +122,17 @@
     <string name="bio">Biogram</string>
     <string name="passwords_dont_match">Hasła się różnią</string>
     <string name="invalid_code">Niepoprawny kod</string>
+    <string name="change_email">Zmień email</string>
+    <string name="change_password">Zmień hasło</string>
+    <string name="forgot_password">Nie pamiętasz hasła?</string>
+    <string name="current_email">Aktualny email</string>
+    <string name="new_email">Nowy email</string>
+    <string name="successful_email_change">Pomyślnie zmieniono email</string>
+    <string name="email_verification">Weryfikacja emaila</string>
+    <string name="code_we_sent">Wpisz kod, który wysłaliśmy na Twój email.</string>
+    <string name="verification_code">Verification code</string>
+    <string name="example_code">np. A1B2C3</string>
+    <string name="confirm">Potwierdź</string>
+    <string name="resend_code">Wyślij kod ponownie</string>
+    <string name="send_again_in">Możesz ponownie wysłać kod za %1$d sekund</string>
 </resources>

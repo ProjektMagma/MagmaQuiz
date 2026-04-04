@@ -12,10 +12,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.projektmagma.magmaquiz.app.auth.presentation.AuthViewModel
 import com.github.projektmagma.magmaquiz.app.auth.presentation.components.EmailTextField
 import com.github.projektmagma.magmaquiz.app.auth.presentation.components.NavigationAuthText
@@ -40,7 +42,7 @@ fun RegisterScreen(
     navigateToHome: () -> Unit
 ) {
     val viewModel = koinViewModel<AuthViewModel>()
-    val state = viewModel.state
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(viewModel.authChannel) {
         viewModel.authChannel.collect { event ->

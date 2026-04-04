@@ -46,6 +46,21 @@ sealed interface Route : NavKey {
             
             @Serializable
             data object LocationChange : Route
+            
+            @Serializable
+            data object EmailChange : Route
+            
+            @Serializable
+            data class EmailVerification(val email: String) : Route
+            
+            @Serializable
+            data object PasswordEmailEntry : Route
+            
+            @Serializable
+            data object PasswordVerification : Route
+            
+            @Serializable
+            data class PasswordChange(val forgot: Boolean) : Route
         }
 
         @Serializable

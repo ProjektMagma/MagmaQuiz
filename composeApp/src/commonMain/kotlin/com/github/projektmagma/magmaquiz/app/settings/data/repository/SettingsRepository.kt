@@ -34,4 +34,16 @@ class SettingsRepository(
     suspend fun changeUsername(username: String): Resource<Unit, NetworkError>{
         return settingsService.changeUsername(username)
     }
+
+    suspend fun sendVerificationCode(email: String): Resource<Unit, NetworkError> {
+        return settingsService.sendVerificationCode(email)
+    }
+
+    suspend fun checkIsEmailTaken(email: String): Resource<Unit, NetworkError> {
+        return settingsService.checkIsEmailTaken(email)
+    }
+
+    suspend fun confirmChangeEmail(email: String, verificationCode: String): Resource<Unit, NetworkError> {
+        return settingsService.confirmChangeEmail(email, verificationCode)
+    }
 }
