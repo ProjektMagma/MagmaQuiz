@@ -32,7 +32,7 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.components.FullSi
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.QuizReviewsViewModel
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.CommentCard
-import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.QuizReviewCommand
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.review.QuizReviewCommand
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.already_reviewed
 import org.jetbrains.compose.resources.stringResource

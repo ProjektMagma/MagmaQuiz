@@ -1,4 +1,4 @@
-package com.github.projektmagma.magmaquiz.app.quizzes.presentation.model
+package com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.review
 
 import java.util.UUID
 

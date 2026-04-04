@@ -3,7 +3,6 @@ package com.github.projektmagma.magmaquiz.app.quizzes.data.repository
 import com.github.projektmagma.magmaquiz.app.core.domain.NetworkError
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.HomeScreenState
 import com.github.projektmagma.magmaquiz.app.quizzes.data.service.QuizService
-import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.QuizListState
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 import com.github.projektmagma.magmaquiz.shared.data.domain.QuizReview
 import com.github.projektmagma.magmaquiz.shared.data.domain.Tag
@@ -18,9 +17,8 @@ class QuizRepository(
 ) {
     val quiz = MutableStateFlow<Quiz?>(null)
     
-    val quizListState = MutableStateFlow(QuizListState())
-    
-    val userDetailsStateQuizzes = MutableStateFlow<List<Quiz>>(emptyList())
+    val quizListQuizzes = MutableStateFlow<List<Quiz>>(emptyList())
+    val userDetailsQuizzes = MutableStateFlow<List<Quiz>>(emptyList())
     val homeState = MutableStateFlow(HomeScreenState())
     
     suspend fun getQuizById(id: UUID): Resource<Quiz, NetworkError> {
@@ -114,8 +112,8 @@ class QuizRepository(
     }
     
     fun updateAllLists(transform: (List<Quiz>) -> List<Quiz>){
-        userDetailsStateQuizzes.update(transform)
-        quizListState.update { it.copy(quizzes = transform(it.quizzes)) }
+        userDetailsQuizzes.update(transform)
+        quizListQuizzes.update(transform)
         homeState.update { it.copy(
             recentQuizzes = transform(it.recentQuizzes),
             mostLikedQuizzes = transform(it.mostLikedQuizzes),

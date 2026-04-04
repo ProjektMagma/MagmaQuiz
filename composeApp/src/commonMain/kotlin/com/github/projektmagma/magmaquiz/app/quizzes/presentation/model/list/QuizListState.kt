@@ -1,5 +1,6 @@
-package com.github.projektmagma.magmaquiz.app.quizzes.presentation.model
+package com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.list
 
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.QuizFilters
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 
 data class QuizListState(

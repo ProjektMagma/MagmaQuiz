@@ -1,6 +1,10 @@
 package com.github.projektmagma.magmaquiz.app.quizzes.presentation.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -16,8 +20,13 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.components.Filter
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.SearchTextField
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.QuizzesListViewModel
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.QuizFilters
-import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.QuizListCommand
-import magmaquiz.composeapp.generated.resources.*
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.list.QuizListCommand
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.favorites
+import magmaquiz.composeapp.generated.resources.friends_quizzes
+import magmaquiz.composeapp.generated.resources.most_liked
+import magmaquiz.composeapp.generated.resources.quiz_title
+import magmaquiz.composeapp.generated.resources.recently_added
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 

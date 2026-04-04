@@ -1,5 +1,6 @@
-package com.github.projektmagma.magmaquiz.app.quizzes.presentation.model
+package com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.list
 
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.QuizFilters
 import java.util.UUID
 
 sealed interface QuizListCommand {

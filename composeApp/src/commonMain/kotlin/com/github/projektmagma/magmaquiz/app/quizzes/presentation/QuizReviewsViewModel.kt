@@ -6,8 +6,8 @@ import com.github.projektmagma.magmaquiz.app.auth.data.AuthRepository
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
 import com.github.projektmagma.magmaquiz.app.quizzes.data.repository.QuizRepository
 import com.github.projektmagma.magmaquiz.app.quizzes.domain.mappers.toModel
-import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.QuizReviewCommand
-import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.QuizReviewState
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.review.QuizReviewCommand
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.review.QuizReviewState
 import com.github.projektmagma.magmaquiz.shared.data.domain.QuizReview
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -1,4 +1,4 @@
-package com.github.projektmagma.magmaquiz.app.quizzes.presentation.model
+package com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.review
 
 import com.github.projektmagma.magmaquiz.app.quizzes.domain.model.QuizReviewModel
 

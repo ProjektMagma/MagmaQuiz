@@ -43,7 +43,6 @@ import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.Q
 import com.github.projektmagma.magmaquiz.app.users.presentation.UserDetailsViewModel
 import com.github.projektmagma.magmaquiz.app.users.presentation.UsersSharedViewModel
 import com.github.projektmagma.magmaquiz.app.users.presentation.model.details.UserDetailsCommand
-import com.github.projektmagma.magmaquiz.app.users.presentation.model.details.UserDetailsState
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import kotlinx.coroutines.flow.distinctUntilChanged
 import magmaquiz.composeapp.generated.resources.Res
@@ -68,7 +67,7 @@ fun UserDetailsScreen(
     
     val uiState by userDetailsViewModel.uiState.collectAsStateWithLifecycle()
     
-    val state by userDetailsViewModel.state.collectAsStateWithLifecycle(UserDetailsState())
+    val state by userDetailsViewModel.state.collectAsStateWithLifecycle()
     
     val lazyListState = rememberLazyListState()
     LaunchedEffect(state.quizzes){

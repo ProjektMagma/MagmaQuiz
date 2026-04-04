@@ -10,12 +10,14 @@ import com.github.projektmagma.magmaquiz.app.quizzes.data.repository.QuizReposit
 import com.github.projektmagma.magmaquiz.app.users.data.repository.UsersRepository
 import com.github.projektmagma.magmaquiz.app.users.presentation.model.details.UserDetailsCommand
 import com.github.projektmagma.magmaquiz.app.users.presentation.model.details.UserDetailsState
+import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.User
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenError
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -28,26 +30,34 @@ class UserDetailsViewModel(
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState = _uiState.asStateFlow()
     
-    private val _state = MutableStateFlow(UserDetailsState())
-    private val _quizzes = quizRepository.userDetailsStateQuizzes
+    private val _selectedTabIndex = MutableStateFlow(0)
+    private val _user = MutableStateFlow<User?>(null)
+    private val _isLoadingMore = MutableStateFlow(false)
+    private val _quizzes = quizRepository.userDetailsQuizzes
 
     val state = combine(
-        _state,
-        _quizzes
-    ) { state, quizzes ->
+        _user,
+        _selectedTabIndex,
+        _quizzes,
+        _isLoadingMore
+    ) { user, selectedTabIndex, quizzes, isLoadingMore ->
         UserDetailsState(
-            selectedTabIndex = state.selectedTabIndex,
+            selectedTabIndex = selectedTabIndex,
             quizzes = quizzes,
-            user = state.user,
-            isLoadingMore = state.isLoadingMore
+            user = user,
+            isLoadingMore = isLoadingMore
         )
-    }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000L),
+        UserDetailsState()
+    )
     
     val paginator = Paginator(
         initialKey = 0,
-        onLoadUpdated = { isLoading ->  _state.update { it.copy(isLoadingMore = isLoading) } },
+        onLoadUpdated = { isLoading ->  _isLoadingMore.value = isLoading },
         onRequest = { currentPage ->
-            if (_state.value.selectedTabIndex == 0) {
+            if (_selectedTabIndex.value == 0) {
                 quizRepository.getQuizzesByUserId(id, offset = currentPage)
             } else {
                 quizRepository.getMyGameHistory(offset = currentPage)
@@ -61,7 +71,7 @@ class UserDetailsViewModel(
 
     fun onCommand(command: UserDetailsCommand) {
         when (command) {
-            is UserDetailsCommand.SelectedTabIndexChanged ->  _state.update { it.copy(selectedTabIndex = command.newIndex) }
+            is UserDetailsCommand.SelectedTabIndexChanged -> _selectedTabIndex.value = command.newIndex 
             is UserDetailsCommand.LoadNextItems -> loadNextItems()
             is UserDetailsCommand.LoadData -> {
                 loadNextItems()
@@ -69,7 +79,7 @@ class UserDetailsViewModel(
             }
             is UserDetailsCommand.LoadQuizzesOrHistory -> {
                 paginator.reset()
-                _state.update { it.copy(quizzes = emptyList()) }
+                _quizzes.value = emptyList()
                 loadNextItems()
             }
             is UserDetailsCommand.GetUserData -> getUserData()
@@ -98,13 +108,13 @@ class UserDetailsViewModel(
         viewModelScope.launch {
             _uiState.value = UiState.Loading
             if (checkOwnership(id)) {
-                _state.update { it.copy(user = authRepository.thisUser.value) }
+                _user.value = authRepository.thisUser.value
                 _uiState.value = UiState.Success
             } else {
                 usersRepository.getUserDataById(id)
                     .whenSuccess { result ->
                         _uiState.value = UiState.Success
-                        _state.update { it.copy(user = result.data) }
+                        _user.value = result.data
                     }
                     .whenError { _uiState.value = UiState.Error(it.error.toResId()) }
             }

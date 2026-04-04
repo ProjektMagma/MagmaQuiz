@@ -5,11 +5,16 @@ import androidx.lifecycle.viewModelScope
 import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
 import com.github.projektmagma.magmaquiz.app.quizzes.data.repository.QuizRepository
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.details.QuizDetailsCommand
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.details.QuizDetailsState
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenError
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -21,43 +26,58 @@ class QuizDetailsViewModel(
     val uiState = _uiState.asStateFlow()
     
     private val _quiz = MutableStateFlow<Quiz?>(null)
-    val quiz = _quiz.asStateFlow()
-
-    private val _quizListState = quizRepository.quizListState
-    val quizListState = _quizListState.asStateFlow()
+    private val _quizListQuizzes = quizRepository.quizListQuizzes
+    
+    val state = combine(
+        _quiz,
+        _quizListQuizzes
+    ) { quiz, quizzes ->
+        QuizDetailsState(
+            quiz = quiz,
+            quizzes = quizzes
+        )
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000L),
+        QuizDetailsState()
+    )
 
     init {
-        if (quiz.value?.id != id) {
-            getQuizById(id)
+        if (_quiz.value?.id != id) {
+            getQuizById()
         }
     }
-
-    // Todo przechwytywanie bledow
-    private fun getQuizById(id: UUID) {
+    
+    fun onCommand(command: QuizDetailsCommand){
+        when (command){
+            QuizDetailsCommand.AddQuizToHistory -> addQuizToMyHistory()
+            QuizDetailsCommand.ChangeFavoriteStatus -> changeFavoriteStatus()
+            QuizDetailsCommand.GetQuizById -> getQuizById()
+            QuizDetailsCommand.SetupQuizForGame -> quizRepository.quiz.value = _quiz.value
+        }
+    }
+    
+    private fun getQuizById() {
         viewModelScope.launch {
             _quiz.value = null
             quizRepository.getQuizById(id).whenSuccess { 
                 _quiz.value = it.data
+                _uiState.value = UiState.Success
+            }.whenError {
+                _uiState.value = UiState.Error(it.error.toResId())
             }
         }
     }
 
-    fun changeFavoriteStatus(id: UUID) {
+    private fun changeFavoriteStatus() {
         viewModelScope.launch {
             quizRepository.changeFavoriteStatus(id)
-                .whenError {
-                    _uiState.value = UiState.Error(it.error.toResId())
-                }
         }
     }
     
-    fun addQuizToMyHistory(id: UUID){
+    private fun addQuizToMyHistory(){
         viewModelScope.launch {
             quizRepository.markQuizAsPlayed(id)
         }
-    }
-    
-    fun setupQuizForGame(){
-        quizRepository.quiz.value = _quiz.value
     }
 }
