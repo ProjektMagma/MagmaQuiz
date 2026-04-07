@@ -17,8 +17,8 @@ application {
 dependencies {
     implementation(projects.shared)
     implementation(libs.logback)
-    implementation(libs.ktor.serverCore)
-    implementation(libs.ktor.serverNetty)
+    implementation(libs.ktor.server.core)
+    implementation(libs.ktor.server.netty)
     implementation(libs.koin.ktor)
     implementation(libs.koin.logger.slf4j)
     implementation(libs.ktor.server.content.negotiation)
@@ -28,6 +28,7 @@ dependencies {
     implementation(libs.ktor.server.sesions)
     implementation(libs.ktor.server.auth)
     implementation(libs.ktor.server.swagger)
+    implementation(libs.ktor.server.websockets)
     implementation(libs.exposed.core)
     implementation(libs.exposed.dao)
     implementation(libs.exposed.jdbc)
@@ -37,6 +38,6 @@ dependencies {
     implementation(libs.postgresql)
     implementation(libs.jbcrypt)
     implementation(libs.simple.java.mail)
-    testImplementation(libs.ktor.serverTestHost)
+    testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.testJunit)
 }

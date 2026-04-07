@@ -1,9 +1,6 @@
 package com.github.projektmagma.magmaquiz.server.configuration
 
-import com.github.projektmagma.magmaquiz.server.controllers.AuthDataController
-import com.github.projektmagma.magmaquiz.server.controllers.QuizDataController
-import com.github.projektmagma.magmaquiz.server.controllers.SettingsDataController
-import com.github.projektmagma.magmaquiz.server.controllers.UsersDataController
+import com.github.projektmagma.magmaquiz.server.controllers.*
 import com.github.projektmagma.magmaquiz.server.repository.FriendshipRepository
 import com.github.projektmagma.magmaquiz.server.repository.QuizRepository
 import com.github.projektmagma.magmaquiz.server.repository.UserRepository
@@ -32,4 +29,5 @@ val serverMainModule = module {
     singleOf(::SettingsDataController)
     singleOf(::QuizDataController)
     singleOf(::UsersDataController)
+    singleOf(::RoomsDataController)
 }

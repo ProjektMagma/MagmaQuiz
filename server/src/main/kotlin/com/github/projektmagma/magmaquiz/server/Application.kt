@@ -16,6 +16,7 @@ fun Application.mainModule() {
     configureCORS()
     configureSessions(get())
     configureContentNegotiation()
+    configureWebSockets()
 
     authRoutes(get(), get())
     settingsRoutes(get(), get())
@@ -23,4 +24,5 @@ fun Application.mainModule() {
     usersRoutes(get())
     tagRoutes(get())
     reviewRoutes(get())
+    multiplayerRoutes(get())
 }
