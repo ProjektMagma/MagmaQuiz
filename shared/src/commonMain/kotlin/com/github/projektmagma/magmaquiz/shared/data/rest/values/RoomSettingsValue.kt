@@ -9,5 +9,6 @@ data class RoomSettingsValue(
     val roomName: String,
     @Serializable(UUIDSerializer::class)
     val quizId: UUID,
-    val questionTimeInMillis: Long
+    val questionTimeInMillis: Long,
+    val isPublic: Boolean,
 )

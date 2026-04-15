@@ -1,6 +1,7 @@
 package com.github.projektmagma.magmaquiz.shared.data.domain
 
 import com.github.projektmagma.magmaquiz.shared.data.domain.serializers.UUIDSerializer
+import com.github.projektmagma.magmaquiz.shared.data.rest.values.RoomSettingsValue
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.util.*
@@ -10,9 +11,7 @@ sealed interface WebSocketMessages {
 
     @Serializable
     sealed interface IncomingMessage {
-        @Serializable
-        @SerialName("StartGame")
-        data object StartGame : IncomingMessage
+
 
         @Serializable
         @SerialName("Answer")
@@ -24,8 +23,16 @@ sealed interface WebSocketMessages {
 
 
         @Serializable
+        @SerialName("StartGame")
+        data object StartGame : IncomingMessage
+
+        @Serializable
         @SerialName("CloseRoom")
         data object CloseRoom : IncomingMessage
+
+        @Serializable
+        @SerialName("ChangeSettings")
+        data class ChangeSettings(val roomSettingsValue: RoomSettingsValue) : IncomingMessage
     }
 
     @Serializable
@@ -48,7 +55,10 @@ sealed interface WebSocketMessages {
 
         @Serializable
         @SerialName("UserAnswered")
-        data class UserAnswered(@Serializable(UUIDSerializer::class) val userId: UUID) : OutgoingMessage
+        data class UserAnswered(
+            @Serializable(UUIDSerializer::class) val userId: UUID,
+            @Serializable(UUIDSerializer::class) val answerId: UUID? = null
+        ) : OutgoingMessage
 
         @Serializable
         @SerialName("GameEnded")

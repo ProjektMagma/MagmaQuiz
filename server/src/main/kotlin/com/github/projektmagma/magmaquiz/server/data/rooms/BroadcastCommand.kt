@@ -14,7 +14,7 @@ sealed interface BroadcastCommand {
 
     data class NextQuestion(val quizQuestionEntity: QuizQuestionEntity) : BroadcastCommand
 
-    data class UserAnswered(val userEntity: UserEntity) : BroadcastCommand
+    data class UserAnswered(val userEntity: UserEntity, val answerId: UUID) : BroadcastCommand
 
     data class GameEnded(val userAnswerMap: Map<UUID, List<UserAnswer>>) : BroadcastCommand
 }

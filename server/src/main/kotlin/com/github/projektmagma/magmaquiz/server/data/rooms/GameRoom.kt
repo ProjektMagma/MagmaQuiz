@@ -2,8 +2,8 @@ package com.github.projektmagma.magmaquiz.server.data.rooms
 
 import com.github.projektmagma.magmaquiz.server.data.conversion.ConversionCommand
 import com.github.projektmagma.magmaquiz.server.data.conversion.UserConversionCommand
-import com.github.projektmagma.magmaquiz.server.data.entities.QuizEntity
 import com.github.projektmagma.magmaquiz.server.data.entities.UserEntity
+import com.github.projektmagma.magmaquiz.server.repository.QuizRepository
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import com.github.projektmagma.magmaquiz.shared.data.domain.RoomSettings
 import com.github.projektmagma.magmaquiz.shared.data.domain.UserAnswer
@@ -11,6 +11,7 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.WebSocketMessages.In
 import com.github.projektmagma.magmaquiz.shared.data.domain.WebSocketMessages.OutgoingMessage
 import com.github.projektmagma.magmaquiz.shared.data.domain.WebSocketMessages.OutgoingMessage.Error.Forbidden
 import com.github.projektmagma.magmaquiz.shared.data.domain.WebSocketMessages.OutgoingMessage.Error.NoQuestion
+import com.github.projektmagma.magmaquiz.shared.data.rest.values.RoomSettingsValue
 import io.ktor.websocket.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.consumeEach
@@ -21,72 +22,90 @@ import kotlin.time.Duration.Companion.milliseconds
 
 class GameRoom {
 
-    constructor(roomSettings: RoomSettingsEntity) {
-        _roomSettingsEntity = roomSettings
+    companion object {
+        private lateinit var _quizRepository: QuizRepository
+
+        fun setRepository(quizRepository: QuizRepository) {
+            _quizRepository = quizRepository
+        }
+    }
+
+
+    constructor(roomSettingsEntity: RoomSettingsEntity) {
+        _roomSettingsEntity = roomSettingsEntity
     }
 
     val roomId get() = _roomSettingsEntity.roomId
     val roomName get() = _roomSettingsEntity.roomName
     val isClosing get() = _roomSettingsEntity.isClosing
+    val isPublic get() = _roomSettingsEntity.isPublic
     val isRoomEmpty get() = _userConnections.isEmpty()
-    private var _roomSettingsEntity: RoomSettingsEntity
+    val roomOwner get() = _roomSettingsEntity.roomOwner
+
     private val _userConnections: MutableList<UserConnection> = mutableListOf()
+    private val _userAnswerList = mutableMapOf<UUID, MutableList<UserAnswer>>()
+
+    private var _roomSettingsEntity: RoomSettingsEntity
     private var _ownerId: UUID? = null
     private var _currentQuestionId: UUID? = null
 
-    private val _userAnswerList = mutableMapOf<UUID, MutableList<UserAnswer>>()
-    private val _scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    fun connectUser(userConnection: UserConnection): Boolean {
+    suspend fun connectUser(userConnection: UserConnection): Boolean {
         synchronized(_userConnections) {
             if (_userConnections.any { transaction { it.userEntity.id == userConnection.userEntity.id } })
                 return false
-            _scope.launch {
-
-                @Suppress("UNCHECKED_CAST")
-                userConnection.webSocketSession.send(
-                    Frame.Text(
-                        Json.encodeToString(
-                            _roomSettingsEntity.toDomain(
-                                userConnection.userEntity,
-                                _userConnections.map {
-                                    it.userEntity.toDomain(
-                                        UserConversionCommand.ForeignUser(
-                                            userConnection.userEntity
-                                        )
-                                    )
-                                } as List<ForeignUser>
-                            ))
-                    )
-                )
-                _roomSettingsEntity.connectedUsers++
-                broadcast(BroadcastCommand.UserJoined(userConnection.userEntity))
-            }
-            _userConnections.add(userConnection)
-            if (transaction { userConnection.userEntity.id == _roomSettingsEntity.roomOwner.id })
-                _ownerId = transaction { userConnection.userEntity.id.value }
         }
+
+        @Suppress("UNCHECKED_CAST")
+        userConnection.webSocketSession.send(
+            Frame.Text(
+                Json.encodeToString(
+                    _roomSettingsEntity.toDomain(
+                        userConnection.userEntity,
+                        _userConnections.map {
+                            it.userEntity.toDomain(
+                                UserConversionCommand.ForeignUser(
+                                    userConnection.userEntity
+                                )
+                            )
+                        } as List<ForeignUser>
+                    ))
+            )
+        )
+        _roomSettingsEntity.connectedUsers++
+        _userConnections.add(userConnection)
+
+        if (transaction { userConnection.userEntity.id == _roomSettingsEntity.roomOwner.id })
+            _ownerId = transaction { userConnection.userEntity.id.value }
+
+        broadcast(BroadcastCommand.UserJoined(userConnection.userEntity))
         return true
     }
 
-
-    fun changeRoomSettings(roomName: String, quizEntity: QuizEntity, questionTimeInMillis: Long) {
-        _roomSettingsEntity.roomName = roomName
-        _roomSettingsEntity.currentQuiz = quizEntity
-        _roomSettingsEntity.questionTimeInMillis = questionTimeInMillis
-
-        _scope.launch {
-            broadcast(BroadcastCommand.SettingsChanged(_roomSettingsEntity))
+    suspend fun disconnectUser(userConnection: UserConnection) {
+        broadcast(BroadcastCommand.UserLeft(userConnection.userEntity))
+        synchronized(_userConnections)
+        {
+            _roomSettingsEntity.connectedUsers--
+            userConnection.webSocketSession.outgoing.close()
+            _userConnections.remove(userConnection)
         }
     }
 
+
+    suspend fun changeRoomSettings(roomSettingsValue: RoomSettingsValue) {
+        _roomSettingsEntity.roomName = roomSettingsValue.roomName
+        _roomSettingsEntity.currentQuiz = _quizRepository.getQuizData(roomSettingsValue.quizId)!!
+        _roomSettingsEntity.questionTimeInMillis = roomSettingsValue.questionTimeInMillis
+
+        broadcast(BroadcastCommand.SettingsChanged(_roomSettingsEntity))
+    }
+
     fun closeRoom() {
-        _scope.launch {
-            _userConnections.forEach { (_, connection) ->
-                connection.outgoing.close()
-            }
-            _roomSettingsEntity.isClosing = true
+        _userConnections.forEach { (_, connection) ->
+            connection.outgoing.close()
         }
+        _roomSettingsEntity.isClosing = true
     }
 
     fun getRoomSettings(caller: UserEntity): RoomSettings {
@@ -117,6 +136,27 @@ class GameRoom {
 
     }
 
+    suspend fun answerQuestion(answer: IncomingMessage.Answer, userConnection: UserConnection) {
+        if (_currentQuestionId == null)
+            userConnection.webSocketSession.outgoing.send(
+                encodedFrame(
+                    NoQuestion("No question to answer")
+                )
+
+            )
+        else {
+            _userAnswerList[_currentQuestionId]?.add(
+                UserAnswer(transaction { userConnection.userEntity.id.value }, answer.answerId)
+            )
+            broadcast(
+                BroadcastCommand.UserAnswered(
+                    userConnection.userEntity,
+                    answer.answerId
+                )
+            )
+        }
+    }
+
     suspend fun handleResponses(userConnection: UserConnection) {
         runCatching {
             val userId = transaction { userConnection.userEntity.id.value }
@@ -125,20 +165,19 @@ class GameRoom {
                     try {
                         when (val receivedMessage =
                             Json.decodeFromString<IncomingMessage>(frame.readText())) {
-                            is IncomingMessage.Answer -> {
-                                if (_currentQuestionId == null)
-                                    userConnection.webSocketSession.outgoing.send(
-                                        encodedFrame(
-                                            NoQuestion("No question to answer")
-                                        )
 
+                            IncomingMessage.Disconnect -> disconnectUser(userConnection)
+
+                            is IncomingMessage.Answer -> answerQuestion(receivedMessage, userConnection)
+
+                            is IncomingMessage.ChangeSettings -> {
+                                if (_ownerId == userId)
+                                    changeRoomSettings(receivedMessage.roomSettingsValue)
+                                else userConnection.webSocketSession.outgoing.send(
+                                    encodedFrame(
+                                        Forbidden("You are not owning this room")
                                     )
-                                else {
-                                    _userAnswerList[_currentQuestionId]?.add(
-                                        UserAnswer(userId, receivedMessage.answerId)
-                                    )
-                                    broadcast(BroadcastCommand.UserAnswered(userConnection.userEntity))
-                                }
+                                )
                             }
 
                             IncomingMessage.StartGame -> {
@@ -162,15 +201,7 @@ class GameRoom {
                                 )
                             }
 
-                            IncomingMessage.Disconnect -> {
-                                broadcast(BroadcastCommand.UserLeft(userConnection.userEntity))
-                                synchronized(_userConnections)
-                                {
-                                    _roomSettingsEntity.connectedUsers--
-                                    userConnection.webSocketSession.outgoing.close()
-                                    _userConnections.remove(userConnection)
-                                }
-                            }
+
                         }
                     } catch (e: Exception) {
                         userConnection.webSocketSession.outgoing.send(Frame.Text(e.toString()))
@@ -221,7 +252,10 @@ class GameRoom {
                         }
 
                         is BroadcastCommand.UserAnswered ->
-                            OutgoingMessage.UserAnswered(transaction { broadcastCommand.userEntity.id.value })
+                            OutgoingMessage.UserAnswered(
+                                transaction { broadcastCommand.userEntity.id.value },
+                                if (isUserOwner(userEntity)) broadcastCommand.answerId else null
+                            )
 
                         is BroadcastCommand.GameEnded -> OutgoingMessage.GameEnded(broadcastCommand.userAnswerMap)
                     }

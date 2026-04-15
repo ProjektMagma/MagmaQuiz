@@ -1,6 +1,7 @@
 package com.github.projektmagma.magmaquiz.server
 
 import com.github.projektmagma.magmaquiz.server.configuration.*
+import com.github.projektmagma.magmaquiz.server.data.rooms.GameRoom
 import com.github.projektmagma.magmaquiz.server.routes.*
 import io.ktor.server.application.*
 import io.ktor.server.netty.*
@@ -25,4 +26,6 @@ fun Application.mainModule() {
     tagRoutes(get())
     reviewRoutes(get())
     multiplayerRoutes(get())
+
+    GameRoom.setRepository(get())
 }

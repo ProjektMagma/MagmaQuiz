@@ -14,6 +14,7 @@ data class RoomSettingsEntity(
     var currentQuiz: QuizEntity,
     val roomOwner: UserEntity,
     var questionTimeInMillis: Long,
+    var isPublic: Boolean = false,
     var isInProgress: Boolean = false,
     var isClosing: Boolean = false,
     var connectedUsers: Int = 0
@@ -25,6 +26,7 @@ data class RoomSettingsEntity(
             currentQuiz = this.currentQuiz.toDomain(QuizConversionCommand.WithUserNoQuestions(caller)),
             roomOwner = this.roomOwner.toDomain(UserConversionCommand.ForeignUser(caller)) as ForeignUser,
             questionTimeInMillis = this.questionTimeInMillis,
+            isPublic = this.isPublic,
             isInProgress = this.isInProgress,
             connectedUsers = connectedUsers,
             userList = userList,
