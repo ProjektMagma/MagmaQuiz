@@ -43,6 +43,7 @@ import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.Qui
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.TagList
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.details.QuizDetailsCommand
 import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.play_multiplayer
 import magmaquiz.composeapp.generated.resources.play_single
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -53,6 +54,7 @@ import java.util.UUID
 fun QuizDetailsScreen(
     id: UUID,
     navigateToPlayScreen: () -> Unit,
+    navigateToSettingsScreen: () -> Unit,
     navigateToReviewsScreen: (id: UUID, reviewed: Boolean) -> Unit
 ) {
     val quizDetailsViewModel: QuizDetailsViewModel = koinViewModel { parametersOf(id) }
@@ -227,17 +229,31 @@ fun QuizDetailsScreen(
                     }
                 }
 
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp),
-                    onClick = {
-                        navigateToPlayScreen()
-                        quizDetailsViewModel.onCommand(QuizDetailsCommand.SetupQuizForGame)
-                        quizDetailsViewModel.onCommand(QuizDetailsCommand.AddQuizToHistory)
+                Row {
+                    Button(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(bottom = 8.dp),
+                        onClick = {
+                            navigateToPlayScreen()
+                            quizDetailsViewModel.onCommand(QuizDetailsCommand.SetupQuizForGame)
+                            quizDetailsViewModel.onCommand(QuizDetailsCommand.AddQuizToHistory)
+                        }
+                    ) {
+                        Text(text = stringResource(Res.string.play_single))
                     }
-                ) {
-                    Text(text = stringResource(Res.string.play_single))
+
+                    Button(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(bottom = 8.dp),
+                        onClick = {
+                            navigateToSettingsScreen()
+                            quizDetailsViewModel.onCommand(QuizDetailsCommand.SetupQuizForGame)
+                        }
+                    ) {
+                        Text(text = stringResource(Res.string.play_multiplayer))
+                    }
                 }
             }
         }

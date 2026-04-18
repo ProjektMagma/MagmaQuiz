@@ -36,7 +36,7 @@
     <string name="answer">Usuń odpowiedz</string>
     <string name="name">Nazwa</string>
     <string name="description">Opis</string>
-    <string name="correct_answer">Poprawna odpowiedz</string>
+    <string name="correct_answer">Poprawna odpowiedz: %1$d</string>
     <string name="wrong_answer">Niepoprawna odpowiedz</string>
     <string name="content_empty">Pusta treść</string>
     <string name="answer_content_empty">Pusta treść odpowiedzi</string>
@@ -135,4 +135,26 @@
     <string name="confirm">Potwierdź</string>
     <string name="resend_code">Wyślij kod ponownie</string>
     <string name="send_again_in">Możesz ponownie wysłać kod za %1$d sekund</string>
+    <string name="play_multiplayer">Stwórz grę</string>
+    <string name="end_of_game">Koniec gry wyniki</string>
+    <string name="end_game">Zakończ grę</string>
+    <string name="correct_points">Poprawnie %1$d / %2$d</string>
+    <string name="left_seconds">Pozostało: %1$d s</string>
+    <string name="back">Wróć</string>
+    <string name="cant_create_room">"Nie udało się stworzyć pokoju"</string>
+    <string name="create_room">Stwórz pokój</string>
+    <string name="set_room_details">Ustaw nazwe pokoju i czas na odpowiedz."</string>
+    <string name="room_name">Nazwa pokoju</string>
+    <string name="room_name_length">Nazwa musi miec od 3 do 30 znakow.</string>
+    <string name="time_to_answer">Czas na pytanie: %1$d</string>
+    <string name="players_count">%1$d graczy</string>
+    <string name="seconds_per_question">%1$ds / pytanie</string>
+    <string name="in_progress">W trakcie</string>
+    <string name="waiting">Oczekiwanie</string>
+    <string name="players">Uczestnicy</string>
+    <string name="nobody_joined">Na razie nikt nie dołączył</string>
+    <string name="close_room">Zamknij pokój</string>
+    <string name="start_game">Zacznij grę</string>
+    <string name="leave_room">Opuść pokój</string>
+    <string name="join">Dołącz</string>
 </resources>

@@ -6,9 +6,9 @@ import com.github.projektmagma.magmaquiz.app.settings.data.repository.SettingsRe
 import com.github.projektmagma.magmaquiz.app.settings.data.service.SettingsService
 import com.github.projektmagma.magmaquiz.app.settings.presentation.AccountDetailsChangeViewModel
 import com.github.projektmagma.magmaquiz.app.settings.presentation.EmailChangeViewModel
+import com.github.projektmagma.magmaquiz.app.settings.presentation.EmailVerifyViewModel
 import com.github.projektmagma.magmaquiz.app.settings.presentation.LocationDetailsChangeViewModel
 import com.github.projektmagma.magmaquiz.app.settings.presentation.SettingsViewModel
-import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.EmailVerifyViewModel
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module

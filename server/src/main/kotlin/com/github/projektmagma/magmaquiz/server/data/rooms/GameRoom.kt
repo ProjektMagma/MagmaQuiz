@@ -12,12 +12,17 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.WebSocketMessages.Ou
 import com.github.projektmagma.magmaquiz.shared.data.domain.WebSocketMessages.OutgoingMessage.Error.Forbidden
 import com.github.projektmagma.magmaquiz.shared.data.domain.WebSocketMessages.OutgoingMessage.Error.NoQuestion
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.RoomSettingsValue
-import io.ktor.websocket.*
-import kotlinx.coroutines.*
+import io.ktor.websocket.Frame
+import io.ktor.websocket.readText
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import java.util.*
+import java.util.UUID
 import kotlin.time.Duration.Companion.milliseconds
 
 class GameRoom {
@@ -52,8 +57,15 @@ class GameRoom {
 
     suspend fun connectUser(userConnection: UserConnection): Boolean {
         synchronized(_userConnections) {
-            if (_userConnections.any { transaction { it.userEntity.id == userConnection.userEntity.id } })
+            if (_userConnections.any { transaction { it.userEntity.id == userConnection.userEntity.id } }) {
                 return false
+            }
+            _userConnections.add(userConnection)
+            _roomSettingsEntity.connectedUsers = _userConnections.size
+        }
+
+        if (transaction { userConnection.userEntity.id == _roomSettingsEntity.roomOwner.id }) {
+            _ownerId = transaction { userConnection.userEntity.id.value }
         }
 
         @Suppress("UNCHECKED_CAST")

@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowRightAlt
 import androidx.compose.material.icons.filled.Check
@@ -25,6 +27,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,25 +43,29 @@ import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationEventHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.ContentImage
+import com.github.projektmagma.magmaquiz.app.core.presentation.components.ProfilePictureIcon
 import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.CustomWindowDraggableArea
-import com.github.projektmagma.magmaquiz.app.game.presentation.GameQuizViewModel
+import com.github.projektmagma.magmaquiz.app.game.presentation.GameMultiplayerViewModel
 import com.github.projektmagma.magmaquiz.app.game.presentation.model.play.GameCommand
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuestionNumber
+import com.github.projektmagma.magmaquiz.shared.data.domain.WebSocketMessages
 import magmaquiz.composeapp.generated.resources.Res
-import magmaquiz.composeapp.generated.resources.back
 import magmaquiz.composeapp.generated.resources.correct_answer
 import magmaquiz.composeapp.generated.resources.correct_points
+import magmaquiz.composeapp.generated.resources.end_game
 import magmaquiz.composeapp.generated.resources.end_of_game
+import magmaquiz.composeapp.generated.resources.left_seconds
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.roundToInt
 
 @Composable
-fun GameScreen(
-    gameQuizViewModel: GameQuizViewModel = koinViewModel(),
+fun GameMultiplayerScreen(
+    gameQuizViewModel: GameMultiplayerViewModel = koinViewModel(),
     navigateOnGameFinish: () -> Unit
 ) {
     val gameState by gameQuizViewModel.gameState.collectAsStateWithLifecycle()
+    val correctQuestions by gameQuizViewModel.correctQuestions.collectAsStateWithLifecycle()
 
     val backState = rememberNavigationEventState(
         currentInfo = NavigationEventInfo.None
@@ -87,23 +94,60 @@ fun GameScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            if (currentState.isQuizFinished) {
-                Text(
-                    text = stringResource(Res.string.end_of_game),
-                    style = MaterialTheme.typography.titleLarge
-                )
-                Text(text = stringResource(Res.string.correct_points, currentState.score, currentState.totalQuestions))
-                Text(text = "${((currentState.score.toDouble() / currentState.totalQuestions.toDouble()) * 100).roundToInt()}%")
+            if (gameState.isQuizFinished) {
+                if (gameQuizViewModel.checkIsHost()) {
+                    Text(
+                        text = stringResource(Res.string.end_of_game),
+                        style = MaterialTheme.typography.titleLarge
+                    )
 
-                Button(
-                    onClick = {
-                        gameQuizViewModel.onCommand(GameCommand.FinishGame)
-                        navigateOnGameFinish()
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f, fill = false)
+                    ) {
+                        items(correctQuestions.toList()) { (user, points) ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row {
+                                    ProfilePictureIcon(
+                                        imageData = user.userProfilePicture
+                                    )
+                                    Text(user.userName)
+                                }
+                                Text("$points / ${gameState.totalQuestions}")
+                            }
+                        }
                     }
-                ) {
-                    Text(stringResource(Res.string.back))
+                    OutlinedButton(
+                        onClick = {
+                            gameQuizViewModel.sendMessage(message = WebSocketMessages.IncomingMessage.CloseRoom)
+                            navigateOnGameFinish()
+                        }
+                    ) {
+                        Text(stringResource(Res.string.end_game))
+                    }
+                } else {
+                    Text(
+                        text = stringResource(Res.string.end_of_game),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    Text(text = stringResource(Res.string.correct_points, currentState.score, currentState.totalQuestions))
+                    Text(
+                        text = "${((currentState.score.toDouble() / currentState.totalQuestions.toDouble()) * 100).roundToInt()}%"
+                    )
                 }
             } else {
+                Text(
+                    text = stringResource(Res.string.left_seconds, currentState.remainingSeconds),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
                 ContentImage(imageData = currentState.questionImage)
 
                 Row(

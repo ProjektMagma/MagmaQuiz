@@ -28,7 +28,7 @@ fun MainNavigation(
     navigator: Navigator,
     navigationState: NavigationState,
     navigateToAuth: () -> Unit,
-    navigateToGameScreen: () -> Unit,
+    navigateToGameScreen: (route: Route) -> Unit,
 ) {
     val createQuizViewModel: CreateQuizViewModel = koinViewModel()
 
@@ -46,7 +46,8 @@ fun MainNavigation(
                         },
                         navigateToQuizReviews = { id, reviewed ->
                             navigator.navigate(Route.Menus.Quizzes.QuizReviews(id, reviewed))
-                        }
+                        },
+                        navigateToGameWait = { navigateToGameScreen(Route.Game.Wait) },
                     )
                 }
                 entry<Route.Menus.Settings.Options> {
@@ -107,11 +108,12 @@ fun MainNavigation(
                     QuizDetailsScreen(
                         id = it.id,
                         navigateToPlayScreen = {
-                            navigateToGameScreen()
+                            navigateToGameScreen(Route.Game.Singleplayer)
                         },
                         navigateToReviewsScreen = { id, reviewed ->
                             navigator.navigate(Route.Menus.Quizzes.QuizReviews(id, reviewed))
-                        }
+                        },
+                        navigateToSettingsScreen = { navigateToGameScreen(Route.Game.Settings) }
                     )
                 }
                 entry<Route.Menus.Quizzes.CreateQuiz> {

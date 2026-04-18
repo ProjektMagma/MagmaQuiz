@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,8 +18,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.AutoScalableLazyRow
+import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.LocalEvent
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
 import com.github.projektmagma.magmaquiz.app.home.presentation.HomeViewModel
+import com.github.projektmagma.magmaquiz.app.home.presentation.components.RoomCardSmall
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.RowLoadingIndicator
 import com.github.projektmagma.magmaquiz.app.home.presentation.components.RowRetryButton
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.HomeScreenCommand
@@ -38,7 +41,8 @@ import java.util.UUID
 fun HomeScreen(
     navigateToQuizDetails: (id: UUID) -> Unit,
     navigateToUserDetails: (id: UUID) -> Unit,
-    navigateToQuizReviews: (id: UUID, reviewed: Boolean) -> Unit
+    navigateToQuizReviews: (id: UUID, reviewed: Boolean) -> Unit,
+    navigateToGameWait: () -> Unit
 ) {
 
     val viewModel = koinViewModel<HomeViewModel>()
@@ -47,8 +51,18 @@ fun HomeScreen(
     val mostLikedQuizzesUiState by viewModel.mostLikedQuizzesUiState.collectAsStateWithLifecycle()
     val incomingFriendsUiState by viewModel.incomingFriendsUiState.collectAsStateWithLifecycle()
     val friendsQuizzesUiState by viewModel.friendsQuizzesUiState.collectAsStateWithLifecycle()
+    val roomListUiState by viewModel.roomListUiState.collectAsStateWithLifecycle()
 
     val state by viewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.event.collect { event -> 
+            when (event) {
+                LocalEvent.Failure -> {} // todo jakas wiadomosc
+                LocalEvent.Success -> { navigateToGameWait() }
+            }
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -66,10 +80,48 @@ fun HomeScreen(
                 )
 
                 Text(
+                    text = "Obecne pokoje gier",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                
+                when (roomListUiState) {
+                    is UiState.Error -> {
+                        RowRetryButton(
+                            message = stringResource((roomListUiState as UiState.Error).errorMessage),
+                            onClick = { viewModel.onCommand(HomeScreenCommand.RoomList) }
+                        )
+                    }
+
+                    UiState.Loading -> {
+                        RowLoadingIndicator()
+                    }
+
+                    UiState.Success -> {
+                        // todo tutaj jeszcze guzik i nawigacja do ekranu gdzie bedzie szukac sie roomow
+                        AutoScalableLazyRow(
+                            itemList = state.roomList,
+                            modifier = Modifier.height(300.dp),
+                            key = { it.roomId },
+                            isLoadingMore = state.isLoadingMoreRooms,
+                            onLoadMore = { viewModel.onCommand(HomeScreenCommand.RoomList) }
+                        ) { room ->
+                            RoomCardSmall(
+                                room = room,
+                                onJoinClick = { 
+                                    viewModel.onCommand(HomeScreenCommand.JoinGame(it))
+                                }
+                            )
+                        }
+                    }
+                }
+
+                Text(
                     text = stringResource(Res.string.the_most_liked_quizzes),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold
                 )
+
                 when (mostLikedQuizzesUiState) {
                     is UiState.Error -> {
                         RowRetryButton(

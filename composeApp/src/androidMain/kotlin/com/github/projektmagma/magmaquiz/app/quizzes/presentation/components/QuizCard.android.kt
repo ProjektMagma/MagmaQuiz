@@ -65,7 +65,9 @@ actual fun QuizCard(
                         }
                     )
                 }
-                Row {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     QuizVisibilityIcon(
                         quizVisibility = quiz.visibility
                     )

@@ -38,7 +38,7 @@
     <string name="delete_answer">Delete answer</string>
     <string name="name">Name</string>
     <string name="description">Description</string>
-    <string name="correct_answer">Correct answer</string>
+    <string name="correct_answer">Correct answer %1$d</string>
     <string name="wrong_answer">Incorrect answer</string>
     <string name="content_empty">Empty content</string>
     <string name="answer_content_empty">Empty answer's content</string>
@@ -139,4 +139,26 @@
     <string name="confirm">Confirm</string>
     <string name="resend_code">Resend code</string>
     <string name="send_again_in">You can resend the code in %1$d seconds</string>
+    <string name="play_multiplayer">Create game</string>
+    <string name="end_of_game">End of game - results</string>
+    <string name="end_game">End game</string>
+    <string name="correct_points">Correctly %1$d / %2$d</string>
+    <string name="left_seconds">Left: %1$d s</string>
+    <string name="back">Back</string>
+    <string name="cant_create_room">Couldn't create room</string>
+    <string name="create_room">Create room</string>
+    <string name="set_room_details">Set room's name and time to answer</string>
+    <string name="room_name">Room's name</string>
+    <string name="room_name_length">The name must be between 3 and 30 characters long</string>
+    <string name="time_to_answer">Time to answer: %1$d</string>
+    <string name="players_count">%1$d players</string>
+    <string name="seconds_per_question">%1$ds / question</string>
+    <string name="in_progress">In progress</string>
+    <string name="waiting">Waiting</string>
+    <string name="players">Players</string>
+    <string name="nobody_joined">No one has joined</string>
+    <string name="close_room">Close room</string>
+    <string name="start_game">Start game</string>
+    <string name="leave_room">Leave room</string>
+    <string name="join">Join</string>
 </resources>

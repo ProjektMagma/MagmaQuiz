@@ -1,6 +1,7 @@
 package com.github.projektmagma.magmaquiz.app.core.presentation
 
 import androidx.compose.animation.animateBounds
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -18,7 +19,6 @@ import io.github.vinceglb.filekit.coil.addPlatformFileSupport
 
 @OptIn(InternalComposeUiApi::class)
 @Composable
-@Suppress("UnusedMaterial3ScaffoldPaddingParameter")
 fun App(modifier: Modifier = Modifier) {
     setSingletonImageLoaderFactory { context ->
         ImageLoader.Builder(context)
@@ -42,8 +42,8 @@ fun App(modifier: Modifier = Modifier) {
                     hostState = snackbarHostState
                 )
             }
-        ) { _ ->
-            NavRoot()
+        ) { innerPadding ->
+            NavRoot(modifier = Modifier.padding(innerPadding))
         }
-        }
+    }
 }

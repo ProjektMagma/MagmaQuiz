@@ -83,7 +83,6 @@ fun Navigation(
     }
     
     NavDisplay(
-        modifier = modifier,
         backStack = mainBackStack,
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator(),
@@ -116,14 +115,17 @@ fun Navigation(
                             navigationState.resetAllBackStacks()
                             mainBackStack.add(Route.Auth)
                         },
-                        navigateToGameScreen = { mainBackStack.add(Route.Game) }
+                        navigateToGameScreen = { mainBackStack.add(Route.Game(it)) }
                     )
                 }
             }
-            entry<Route.Game> {
-                GameNavigation(
-                    navigateToHome = { mainBackStack.add(Route.Menus) }
-                )
+            entry<Route.Game> { parameters ->
+                Column(modifier = modifier) {
+                    GameNavigation(
+                        navigateToHome = { mainBackStack.removeLastOrNull() },
+                        startDestination = parameters.startRoute,
+                    )
+                }
             }
         },
         transitionSpec = {

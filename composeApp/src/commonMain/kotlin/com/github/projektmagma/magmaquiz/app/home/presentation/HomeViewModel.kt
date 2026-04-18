@@ -3,23 +3,28 @@ package com.github.projektmagma.magmaquiz.app.home.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
+import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.LocalEvent
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
 import com.github.projektmagma.magmaquiz.app.core.util.Paginator
+import com.github.projektmagma.magmaquiz.app.game.data.repository.GameRepository
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.HomeScreenCommand
 import com.github.projektmagma.magmaquiz.app.quizzes.data.repository.QuizRepository
 import com.github.projektmagma.magmaquiz.app.users.data.repository.UsersRepository
-import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenError
+import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
 
 class HomeViewModel(
     private val quizRepository: QuizRepository,
-    private val usersRepository: UsersRepository
+    private val usersRepository: UsersRepository,
+    private val gameRepository: GameRepository
 ) : ViewModel() {
 
     private val _recentQuizzesUiState = MutableStateFlow<UiState>(UiState.Loading)
@@ -34,12 +39,14 @@ class HomeViewModel(
     private val _friendsQuizzesUiState = MutableStateFlow<UiState>(UiState.Loading)
     val friendsQuizzesUiState = _friendsQuizzesUiState.asStateFlow()
 
-
-    private val _changedFavoriteUiState = MutableStateFlow<UiState>(UiState.Success)
-    val changedFavoriteUiState = _changedFavoriteUiState.asStateFlow()
+    private val _roomListUiState = MutableStateFlow<UiState>(UiState.Loading)
+    val roomListUiState = _roomListUiState.asStateFlow()
     
     private val _state = quizRepository.homeState
     val state = _state.asStateFlow()
+    
+    private val _event = Channel<LocalEvent>()
+    val event = _event.receiveAsFlow()
     
     val paginatorLikedQuizzes = Paginator(
         initialKey = 0,
@@ -100,6 +107,21 @@ class HomeViewModel(
         },
         endReached = { _, items -> items.isEmpty() }
     )
+
+    val paginatorRooms = Paginator(
+        initialKey = 0,
+        onLoadUpdated = { isLoading ->
+            _state.update { it.copy(isLoadingMoreRooms = isLoading) }
+        },
+        onRequest = { currentPage -> gameRepository.getRoomList(offset = currentPage) },
+        getNextKey = { currentKey, _  -> currentKey + 1},
+        onError = { networkError -> _roomListUiState.value = UiState.Error(networkError.toResId()) },
+        onSuccess = { result, _  ->
+            _state.update { it.copy(roomList = it.roomList + result) }
+            _roomListUiState.value = UiState.Success
+        },
+        endReached = { _, items -> items.isEmpty() }
+    )
     
     private fun loadNextLikedQuizzes(){
         viewModelScope.launch { 
@@ -125,6 +147,11 @@ class HomeViewModel(
         }
     }
     
+    private fun loadNextRooms(){
+        viewModelScope.launch {
+            paginatorRooms.loadNextItems()
+        }
+    }
 
     init {
         viewModelScope.launch {
@@ -132,9 +159,9 @@ class HomeViewModel(
                 async { paginatorFriendQuizzes.loadNextItems() },
                 async { paginatorIncoming.loadNextItems() },
                 async { paginatorLikedQuizzes.loadNextItems() },
-                async { paginatorRecentlyQuizzes.loadNextItems() }
+                async { paginatorRecentlyQuizzes.loadNextItems() },
+                async { paginatorRooms.loadNextItems() }
             )
-
         }
     }
 
@@ -145,6 +172,11 @@ class HomeViewModel(
                 HomeScreenCommand.IncomingFriends -> loadNextIncoming()
                 HomeScreenCommand.MostLikedQuizzes -> loadNextLikedQuizzes()
                 HomeScreenCommand.RecentQuizzes -> loadNextRecentlyQuizzes()
+                HomeScreenCommand.RoomList -> loadNextRooms()
+                is HomeScreenCommand.JoinGame -> gameRepository.joinRoom(homeScreenCommand.id)
+                    .whenSuccess {
+                        _event.send(LocalEvent.Success) 
+                    }
                 is HomeScreenCommand.ChangeFavorite -> changeFavoriteStatus(homeScreenCommand.id)
             }
         }
@@ -153,9 +185,6 @@ class HomeViewModel(
     private fun changeFavoriteStatus(id: UUID) {
         viewModelScope.launch {
             quizRepository.changeFavoriteStatus(id)
-                .whenError {
-                    _changedFavoriteUiState.value = UiState.Error(it.error.toResId())
-                }
         }
     }
 }

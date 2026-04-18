@@ -20,7 +20,7 @@ import java.util.UUID
 
 class QuizDetailsViewModel(
     private val id: UUID,
-    private val quizRepository: QuizRepository
+    private val quizRepository: QuizRepository,
 ): ViewModel() {
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState = _uiState.asStateFlow()

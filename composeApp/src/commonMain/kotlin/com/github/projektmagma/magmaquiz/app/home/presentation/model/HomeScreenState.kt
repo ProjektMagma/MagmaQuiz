@@ -2,6 +2,7 @@ package com.github.projektmagma.magmaquiz.app.home.presentation.model
 
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
+import com.github.projektmagma.magmaquiz.shared.data.domain.RoomSettings
 
 data class HomeScreenState(
     val recentQuizzes: List<Quiz> = emptyList(),
@@ -14,5 +15,8 @@ data class HomeScreenState(
     val isLoadingMoreFriendsQuizzes: Boolean = false,
     
     val incomingFriends: List<ForeignUser> = emptyList(),
-    val isLoadingMoreFriends: Boolean = false
+    val isLoadingMoreFriends: Boolean = false,
+
+    val roomList: List<RoomSettings> = emptyList(),
+    val isLoadingMoreRooms: Boolean = false
 )

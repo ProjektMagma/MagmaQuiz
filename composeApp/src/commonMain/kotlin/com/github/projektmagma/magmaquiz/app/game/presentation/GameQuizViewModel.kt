@@ -2,9 +2,9 @@ package com.github.projektmagma.magmaquiz.app.game.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.projektmagma.magmaquiz.app.game.presentation.model.AnswerState
-import com.github.projektmagma.magmaquiz.app.game.presentation.model.GameCommand
-import com.github.projektmagma.magmaquiz.app.game.presentation.model.GameState
+import com.github.projektmagma.magmaquiz.app.game.presentation.model.play.AnswerState
+import com.github.projektmagma.magmaquiz.app.game.presentation.model.play.GameCommand
+import com.github.projektmagma.magmaquiz.app.game.presentation.model.play.GameState
 import com.github.projektmagma.magmaquiz.app.quizzes.data.repository.QuizRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +24,6 @@ class GameQuizViewModel(
     fun onCommand(command: GameCommand) {
         when (command) {
             is GameCommand.AnswerClicked -> onAnswerSelected(command)
-            GameCommand.StartGame -> startGame()
             GameCommand.FinishGame -> {
                 viewModelScope.launch { 
                     delay(400)
@@ -34,7 +33,7 @@ class GameQuizViewModel(
         }
     }
 
-    private fun startGame() {
+    init {
         updateGameState()
     }
 
@@ -81,7 +80,7 @@ class GameQuizViewModel(
                     questionContent = question.questionContent,
                     questionNumber = question.questionNumber,
                     questionImage = question.questionImage,
-                    answers = question.answerList.map { AnswerState(it.answerContent, it.isCorrect) },
+                    answers = question.answerList.map { AnswerState(it.id!!, it.answerContent, it.isCorrect) },
                     isAnswered = false,
                     isQuizFinished = false,
                     totalQuestions = questions.size

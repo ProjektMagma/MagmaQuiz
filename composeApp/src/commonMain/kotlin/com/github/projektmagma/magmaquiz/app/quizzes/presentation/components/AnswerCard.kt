@@ -11,10 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.AnswerModel
-import magmaquiz.composeapp.generated.resources.Res
-import magmaquiz.composeapp.generated.resources.correct_answer
-import magmaquiz.composeapp.generated.resources.wrong_answer
-import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun AnswerCard(
@@ -26,12 +22,12 @@ fun AnswerCard(
         if (answer.isCorrect) {
             Icon(
                 imageVector = Icons.Outlined.Check,
-                contentDescription = stringResource(Res.string.correct_answer)
+                contentDescription = null
             )
         } else { 
             Icon(
                 imageVector = Icons.Outlined.Close,
-                contentDescription = stringResource(Res.string.wrong_answer)
+                contentDescription = null
             )
         }
         Text(

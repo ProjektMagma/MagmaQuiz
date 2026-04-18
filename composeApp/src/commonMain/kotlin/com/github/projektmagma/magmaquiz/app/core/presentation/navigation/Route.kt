@@ -23,12 +23,18 @@ sealed interface Route : NavKey {
     }
 
     @Serializable
-    data object Game : Route {
-        @Serializable
+    data class Game(val startRoute: Route) : Route {
+        @Serializable 
         data object Singleplayer : Route
-
+        
         @Serializable
         data object Multiplayer : Route
+        
+        @Serializable
+        data object Wait : Route
+        
+        @Serializable
+        data object Settings : Route
     }
 
     @Serializable

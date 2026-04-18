@@ -25,6 +25,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
+import com.github.projektmagma.magmaquiz.app.settings.presentation.EmailVerifyViewModel
 import com.github.projektmagma.magmaquiz.app.settings.presentation.model.email.verify.EmailVerifyCommand
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.code_we_sent

@@ -10,10 +10,16 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.FriendshipStatus
 import com.github.projektmagma.magmaquiz.shared.data.domain.RoomSettings
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkResource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.RoomSettingsValue
-import io.ktor.http.*
-import io.ktor.websocket.*
-import kotlinx.coroutines.*
-import java.util.*
+import io.ktor.http.HttpStatusCode
+import io.ktor.websocket.CloseReason
+import io.ktor.websocket.WebSocketSession
+import io.ktor.websocket.close
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
 
 class RoomsDataController(
@@ -47,13 +53,17 @@ class RoomsDataController(
             return
         }
 
-        if (!existingRoom.connectUser(userConnection)) {
-            webSocketSession.close(CloseReason(CloseReason.Codes.CANNOT_ACCEPT, "Cannot connect to room $roomId"))
+        val hasAccess = existingRoom.isPublic ||
+                existingRoom.isUserOwner(thisUser) ||
+                thisUser.checkFriendship(existingRoom.roomOwner) == FriendshipStatus.Friends
+
+        if (!hasAccess) {
+            webSocketSession.close(CloseReason(CloseReason.Codes.CANNOT_ACCEPT, "You're not allowed to join this room"))
             return
         }
 
-        if (!existingRoom.isPublic && thisUser.checkFriendship(existingRoom.roomOwner) != FriendshipStatus.Friends) {
-            webSocketSession.close(CloseReason(CloseReason.Codes.CANNOT_ACCEPT, "You're not a friend of room owner"))
+        if (!existingRoom.connectUser(userConnection)) {
+            webSocketSession.close(CloseReason(CloseReason.Codes.CANNOT_ACCEPT, "Cannot connect to room $roomId"))
             return
         }
 
@@ -77,6 +87,7 @@ class RoomsDataController(
                 currentQuiz = quizData,
                 roomOwner = thisUser,
                 questionTimeInMillis = roomSettingsValue.questionTimeInMillis,
+                isPublic = roomSettingsValue.isPublic
             )
         )
 
@@ -96,7 +107,11 @@ class RoomsDataController(
         val roomList = _openRoomList
             .asSequence()
             .filter { !it.isClosing && it.roomName.contains(stringToSearch, true) }
-            .filter { if (it.isPublic) true else thisUser.checkFriendship(it.roomOwner) == FriendshipStatus.Friends }
+            .filter {
+                it.isPublic ||
+                        it.isUserOwner(thisUser) ||
+                        thisUser.checkFriendship(it.roomOwner) == FriendshipStatus.Friends
+            }
             .drop(offset)
             .take(count)
             .map { it.getRoomSettings(thisUser) }

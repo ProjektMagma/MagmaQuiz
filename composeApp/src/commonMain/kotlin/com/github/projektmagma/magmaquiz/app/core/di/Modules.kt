@@ -17,6 +17,7 @@ import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.request.header
 import io.ktor.http.URLProtocol
 import io.ktor.http.encodedPath
@@ -43,8 +44,13 @@ val sharedModule = module {
                     val config = get<ServerConfigDao>().getSelectedConfig()
                     val sessionHeader = get<ApiDataStore>().getSessionHeader()
                     
+                    val isWsRequest = request.url.protocol == URLProtocol.WSS
+                    
                     request.url {
-                        protocol = URLProtocol.createOrDefault(config.protocol.toString())
+                        protocol = when {
+                            isWsRequest -> URLProtocol.WS
+                            else -> URLProtocol.createOrDefault(config.protocol.toString())
+                        }
                         host = config.ip
                         port = config.port.toIntOrNull() ?: 0
                         path(request.url.encodedPath)
@@ -68,6 +74,7 @@ val sharedModule = module {
                 }
                 level = LogLevel.HEADERS
             }
+            install(WebSockets)
             install(defaultCredentialsPlugin)
         }
     }

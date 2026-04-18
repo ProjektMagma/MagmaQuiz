@@ -1,17 +1,16 @@
-package com.github.projektmagma.magmaquiz.app.settings.presentation.screens
+package com.github.projektmagma.magmaquiz.app.settings.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.projektmagma.magmaquiz.app.auth.data.AuthRepository
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
+import com.github.projektmagma.magmaquiz.app.core.util.Timer
 import com.github.projektmagma.magmaquiz.app.settings.data.repository.SettingsRepository
 import com.github.projektmagma.magmaquiz.app.settings.presentation.model.email.verify.EmailVerifyCommand
 import com.github.projektmagma.magmaquiz.app.settings.presentation.model.email.verify.EmailVerifyState
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenError
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -29,11 +28,11 @@ class EmailVerifyViewModel(
     private val _state = MutableStateFlow(EmailVerifyState())
     val state = _state.asStateFlow()
     
-    private var timerJob: Job? = null
+    private val resendTimer = Timer(viewModelScope)
     
     init {
         sendVerificationEmail()
-        startResendTimer()
+        startResendTimer(15)
     }
     
     fun onCommand(command: EmailVerifyCommand) {
@@ -66,14 +65,14 @@ class EmailVerifyViewModel(
             settingsRepository.sendVerificationCode(email)
         }
     }
-    
-    private fun startResendTimer(from: Int = _state.value.timeToResend) {
-        timerJob?.cancel()
-        timerJob = viewModelScope.launch {
-            (from downTo 1).forEach { tick -> 
-                delay(1000L)
-                _state.update { it.copy(timeToResend = tick - 1) }
+
+    private fun startResendTimer(from: Int) {
+        resendTimer.start(
+            from = from,
+            onTick = { left ->
+                _state.update { it.copy(timeToResend = left) }
             }
-        }
+        )
     }
+    
 }

@@ -62,7 +62,9 @@ actual fun QuizCard(
                     overflow = TextOverflow.Ellipsis
                 )
 
-                Row {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     QuizVisibilityIcon(quiz.visibility)
                     
                     CommentButton(
