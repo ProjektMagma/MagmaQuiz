@@ -157,4 +157,5 @@
     <string name="start_game">Zacznij grę</string>
     <string name="leave_room">Opuść pokój</string>
     <string name="join">Dołącz</string>
+    <string name="closed_room">Host zamknął pokój</string>
 </resources>

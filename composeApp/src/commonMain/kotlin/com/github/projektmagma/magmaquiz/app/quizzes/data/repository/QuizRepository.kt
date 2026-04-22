@@ -17,6 +17,7 @@ class QuizRepository(
 ) {
     val quiz = MutableStateFlow<Quiz?>(null)
     
+    val cachedQuizzes = MutableStateFlow<List<Quiz>>(emptyList())
     val quizListQuizzes = MutableStateFlow<List<Quiz>>(emptyList())
     val userDetailsQuizzes = MutableStateFlow<List<Quiz>>(emptyList())
     val homeState = MutableStateFlow(HomeScreenState())
@@ -81,8 +82,8 @@ class QuizRepository(
         return quizService.getFriendsQuizzesByName(name, count, offset * count)
     }
     
-    suspend fun markQuizAsPlayed(uuid: UUID): Resource<Unit, NetworkError>{
-        return quizService.markQuizAsPlayed(uuid)
+    suspend fun markQuizAsPlayed(): Resource<Unit, NetworkError>{
+        return quizService.markQuizAsPlayed(quiz.value?.id!!)
     }
     
     suspend fun getQuizReviews(uuid: UUID): Resource<List<QuizReview>, NetworkError>{
@@ -114,6 +115,7 @@ class QuizRepository(
     fun updateAllLists(transform: (List<Quiz>) -> List<Quiz>){
         userDetailsQuizzes.update(transform)
         quizListQuizzes.update(transform)
+        cachedQuizzes.update(transform)
         homeState.update { it.copy(
             recentQuizzes = transform(it.recentQuizzes),
             mostLikedQuizzes = transform(it.mostLikedQuizzes),

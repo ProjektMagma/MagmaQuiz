@@ -3,11 +3,14 @@ package com.github.projektmagma.magmaquiz.app.game.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.projektmagma.magmaquiz.app.auth.data.AuthRepository
-import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.LocalEvent
 import com.github.projektmagma.magmaquiz.app.game.data.WsEvent
 import com.github.projektmagma.magmaquiz.app.game.data.repository.GameRepository
+import com.github.projektmagma.magmaquiz.app.game.presentation.model.GameEvent
+import com.github.projektmagma.magmaquiz.app.game.presentation.model.wait.GameWaitCommand
+import com.github.projektmagma.magmaquiz.app.game.presentation.model.wait.GameWaitState
 import com.github.projektmagma.magmaquiz.shared.data.domain.WebSocketMessages
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -20,43 +23,39 @@ class GameWaitViewModel(
     private val _roomSettings = gameRepository.roomSettings
     val roomSettings = _roomSettings.asStateFlow()
     
-    private val _event = Channel<LocalEvent>()
+    private val _state = MutableStateFlow(GameWaitState())
+    val state = _state.asStateFlow()
+    
+    private val _event = Channel<GameEvent>()
     val event = _event.receiveAsFlow()
 
     init {
         viewModelScope.launch { 
-            gameRepository.getMessages().collect { message ->
+            gameRepository.messages.collect { message ->
                 when (message) {
-                    is WsEvent.Closed -> _event.send(LocalEvent.Failure)
+                    is WsEvent.Closed -> if (!checkIsHost() && !_state.value.isUserInitializeLeave) 
+                        _state.update { it.copy(errorMessage = message.reason, isVisibleDialog = true) } 
+                    else 
+                        _event.send(GameEvent.Closed(message.reason))
                     is WsEvent.OutGoing -> when (message.message) {
-                        is WebSocketMessages.OutgoingMessage.SettingsChanged -> { _roomSettings.value = message.message.roomSettings }
-                        is WebSocketMessages.OutgoingMessage.UserJoined -> {
-                            _roomSettings.update { state ->
-                                val updatedUsers = (state!!.userList.plus(message.message.user))
-                                state.copy(
-                                    userList = updatedUsers,
-                                    connectedUsers = updatedUsers.size
-                                )
-                            }
-                        }
-                        is WebSocketMessages.OutgoingMessage.UserLeft -> {
-                            _roomSettings.update { state ->
-                                val updatedUsers = state!!.userList.filter { it.userId != message.message.userId }
-                                state.copy(
-                                    userList = updatedUsers,
-                                    connectedUsers = updatedUsers.size
-                                )
-                            }
-                        }
                         is WebSocketMessages.OutgoingMessage.NextQuestion -> {
-                            gameRepository.questions.update { it.plus(message.message.question) }
-                            _event.trySend(LocalEvent.Success)
+                            _event.trySend(GameEvent.Success)
                         }
                         else -> Unit
                     }
                 }
             }
         }
+    }
+    
+    fun onCommand(command: GameWaitCommand) {
+        when (command) {
+            is GameWaitCommand.DialogVisibilityChanged -> _state.update { it.copy(isVisibleDialog = command.visibility) }
+        }
+    }
+    
+    fun leaveRoom() {
+        _state.update { it.copy(isUserInitializeLeave = true) }
     }
     
     fun sendMessage(message: WebSocketMessages.IncomingMessage){

@@ -54,6 +54,7 @@ import magmaquiz.composeapp.generated.resources.correct_answer
 import magmaquiz.composeapp.generated.resources.correct_points
 import magmaquiz.composeapp.generated.resources.end_game
 import magmaquiz.composeapp.generated.resources.end_of_game
+import magmaquiz.composeapp.generated.resources.leave_room
 import magmaquiz.composeapp.generated.resources.left_seconds
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -141,6 +142,14 @@ fun GameMultiplayerScreen(
                     Text(
                         text = "${((currentState.score.toDouble() / currentState.totalQuestions.toDouble()) * 100).roundToInt()}%"
                     )
+                    OutlinedButton(
+                        onClick = {
+                            gameQuizViewModel.sendMessage(message = WebSocketMessages.IncomingMessage.Disconnect)
+                            navigateOnGameFinish()
+                        }
+                    ) {
+                        Text(stringResource(Res.string.leave_room))
+                    }
                 }
             } else {
                 Text(

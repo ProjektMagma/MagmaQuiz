@@ -31,48 +31,38 @@ class GameSettingsViewModel(
         when (command) {
             is GameSettingsCommand.NameChanged -> if (command.newName.length < 30) _state.update { it.copy(roomName = command.newName) }
             is GameSettingsCommand.QuestionTimeChanged -> _state.update { it.copy(questionTime = command.newTime) }
+            is GameSettingsCommand.VisibilityChanged -> _state.update { it.copy(isPublic = command.visibility) }
+            GameSettingsCommand.AddToHistory -> addQuizToHistory()
             GameSettingsCommand.Submit -> createRoom()
         }
     }
 
-//    private fun createRoom(){
-//        viewModelScope.launch {
-//            gameRepository.createGameRoom(
-//                roomName = _state.value.roomName,
-//                id = quizRepository.quiz.value?.id!!,
-//                isPublic = _state.value.isPublic, // todo to trzeba ustawiac w UI
-//                questionTimeMillis = _state.value.questionTime.toMillis()
-//            ).whenSuccess {
-//                gameRepository.roomSettings.value = it.data
-//                gameRepository.joinRoom(gameRepository.roomSettings.value!!.roomId)
-//                _event.trySend(NetworkEvent.Success)
-//            }
-//            .whenError {
-//                _event.trySend(NetworkEvent.Failure(it.error))
-//            }
-//        }
-//    }
-private fun createRoom() {
-    viewModelScope.launch {
-        gameRepository.createGameRoom(
-            roomName = _state.value.roomName,
-            id = quizRepository.quiz.value?.id!!,
-            isPublic = _state.value.isPublic,
-            questionTimeMillis = _state.value.questionTime.toMillis()
-        ).whenSuccess { createdRoom ->
-            gameRepository.roomSettings.value = createdRoom.data
+    private fun createRoom() {
+        viewModelScope.launch {
+            gameRepository.createGameRoom(
+                roomName = _state.value.roomName,
+                id = quizRepository.quiz.value?.id!!,
+                isPublic = _state.value.isPublic,
+                questionTimeMillis = _state.value.questionTime.toMillis()
+            ).whenSuccess { createdRoom ->
+                gameRepository.roomSettings.value = createdRoom.data
 
-            gameRepository.joinRoom(createdRoom.data.roomId)
-                .whenSuccess {
-                    _event.trySend(NetworkEvent.Success)
-                }
-                .whenError {
-                    _event.trySend(NetworkEvent.Failure(it.error))
-                }
-        }.whenError {
-            _event.trySend(NetworkEvent.Failure(it.error))
+                gameRepository.joinRoom(createdRoom.data.roomId)
+                    .whenSuccess {
+                        _event.trySend(NetworkEvent.Success)
+                    }
+                    .whenError {
+                        _event.trySend(NetworkEvent.Failure(it.error))
+                    }
+            }.whenError {
+                _event.trySend(NetworkEvent.Failure(it.error))
+            }
         }
     }
-}
     
+    private fun addQuizToHistory(){
+        viewModelScope.launch { 
+            quizRepository.markQuizAsPlayed()
+        }
+    }
 }

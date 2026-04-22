@@ -1,6 +1,9 @@
 package com.github.projektmagma.magmaquiz.app.home.presentation.components
 
-import androidx.compose.foundation.clickable
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -10,11 +13,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Group
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.SportsEsports
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -47,7 +51,7 @@ fun RoomCardSmall(
         modifier = Modifier
             .widthIn(min = 220.dp, max = 340.dp)
             .padding(6.dp)
-            .clickable { onJoinClick(room.roomId) },
+            .animateContentSize(),
         shape = MaterialTheme.shapes.large,
         tonalElevation = 2.dp,
         shadowElevation = 2.dp,
@@ -56,7 +60,7 @@ fun RoomCardSmall(
         Column(
             modifier = Modifier.padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
+        ) { 
             Text(
                 text = room.roomName,
                 style = MaterialTheme.typography.titleSmall,
@@ -66,7 +70,7 @@ fun RoomCardSmall(
             )
 
             Row(
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 ContentImage(
@@ -104,7 +108,7 @@ fun RoomCardSmall(
 
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy((-8).dp)
             ) {
                 AssistChip(
                     onClick = {},
@@ -118,17 +122,26 @@ fun RoomCardSmall(
                 )
                 AssistChip(
                     onClick = {},
+                    label = { Text(if (room.isPublic) "Publiczny" else "Tylko znajomi") },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = if (room.isPublic) Icons.Outlined.Public else Icons.Outlined.Lock,
+                            contentDescription = null
+                        )
+                    }
+                )
+                AssistChip(
+                    onClick = {},
                     label = { Text(if (room.isInProgress) stringResource(Res.string.in_progress) else stringResource(Res.string.waiting)) },
                     leadingIcon = { Icon(Icons.Outlined.SportsEsports, contentDescription = null) }
                 )
             }
 
-            HorizontalDivider(
-                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
-                thickness = 0.5.dp
-            )
-
-            if (!room.isInProgress) {
+            AnimatedVisibility(
+                visible = !room.isInProgress,
+                enter = expandVertically(),
+                exit = shrinkVertically()
+            ) {
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = { onJoinClick(room.roomId) }

@@ -3,18 +3,21 @@ package com.github.projektmagma.magmaquiz.app.game.presentation.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -67,6 +70,7 @@ fun GameSettingsScreen(
             .padding(horizontal = 20.dp, vertical = 16.dp)
             .imePadding()
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .widthIn(max = 640.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -139,7 +143,46 @@ fun GameSettingsScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.padding(top = 4.dp))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        gameSettingsViewModel.onCommand(
+                            GameSettingsCommand.VisibilityChanged(!state.isPublic)
+                        )
+                    }
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(2.dp)
+                        ) {
+                            Text(
+                                text = "Widoczność pokoju",
+                                style = MaterialTheme.typography.titleSmall
+                            )
+                            Text(
+                                text = if (state.isPublic) "Publiczny - każdy może dołączyć" else "Tylko dla znajomych",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
+                        Switch(
+                            checked = state.isPublic,
+                            onCheckedChange = { checked ->
+                                gameSettingsViewModel.onCommand(
+                                    GameSettingsCommand.VisibilityChanged(checked)
+                                )
+                            }
+                        )
+                    }
+                }
 
                 Button(
                     modifier = Modifier.fillMaxWidth(),

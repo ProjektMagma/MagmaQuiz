@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.SportsEsports
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -36,9 +37,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.ContentImage
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.FullSizeCircularProgressIndicator
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.ProfilePictureIcon
-import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.LocalEvent
 import com.github.projektmagma.magmaquiz.app.core.util.TimeConverter.toSeconds
 import com.github.projektmagma.magmaquiz.app.game.presentation.GameWaitViewModel
+import com.github.projektmagma.magmaquiz.app.game.presentation.model.GameEvent
+import com.github.projektmagma.magmaquiz.app.game.presentation.model.wait.GameWaitCommand
+import com.github.projektmagma.magmaquiz.app.game.presentation.model.wait.GameWaitState
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import com.github.projektmagma.magmaquiz.shared.data.domain.RoomSettings
 import com.github.projektmagma.magmaquiz.shared.data.domain.WebSocketMessages
@@ -62,12 +65,13 @@ fun GameWaitScreen(
     onLeaveRoom: () -> Unit,
 ) {
     val room by gameWaitViewModel.roomSettings.collectAsStateWithLifecycle()
+    val state by gameWaitViewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit){
         gameWaitViewModel.event.collect { 
             when (it) {
-                LocalEvent.Failure -> onLeaveRoom()
-                LocalEvent.Success -> onStartGame()
+                is GameEvent.Closed -> onLeaveRoom()
+                GameEvent.Success -> onStartGame()
             }
         }
     }
@@ -76,6 +80,8 @@ fun GameWaitScreen(
         null -> FullSizeCircularProgressIndicator()
         else -> GameHostContent(
             room = roomState,
+            state = state,
+            onLeaveRoom,
             gameWaitViewModel = gameWaitViewModel
         )
     }
@@ -84,6 +90,8 @@ fun GameWaitScreen(
 @Composable
 private fun GameHostContent(
     room: RoomSettings,
+    state: GameWaitState,
+    onLeaveRoom: () -> Unit,
     gameWaitViewModel: GameWaitViewModel
 ) {
     val timeSeconds = room.questionTimeInMillis.toSeconds()
@@ -98,6 +106,20 @@ private fun GameHostContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
+        if (state.isVisibleDialog) {
+            AlertDialog(
+                confirmButton = { Button(
+                    onClick = {
+                        onLeaveRoom()   
+                    }
+                ) {
+                    Text("OK")
+                } },
+                onDismissRequest = { gameWaitViewModel.onCommand(GameWaitCommand.DialogVisibilityChanged(false)) },
+                text = { Text(state.errorMessage ?: "") }
+            )
+        }
+        
         Card(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -237,6 +259,7 @@ private fun GameHostContent(
                     modifier = Modifier.weight(1f),
                     onClick = {
                         gameWaitViewModel.sendMessage(WebSocketMessages.IncomingMessage.Disconnect)
+                        gameWaitViewModel.leaveRoom()
                     }
                 ) {
                     Text(stringResource(Res.string.leave_room))
@@ -273,11 +296,6 @@ private fun UserRow(
                 Text(
                     text = user.userName,
                     style = MaterialTheme.typography.bodyLarge
-                )
-                Text(
-                    text = "${user.userTown}, ${user.userCountryCode}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             if (isHost) {

@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -26,11 +27,11 @@ class QuizDetailsViewModel(
     val uiState = _uiState.asStateFlow()
     
     private val _quiz = MutableStateFlow<Quiz?>(null)
-    private val _quizListQuizzes = quizRepository.quizListQuizzes
+    private val _cachedQuizzes = quizRepository.cachedQuizzes
     
     val state = combine(
         _quiz,
-        _quizListQuizzes
+        _cachedQuizzes
     ) { quiz, quizzes ->
         QuizDetailsState(
             quiz = quiz,
@@ -53,15 +54,18 @@ class QuizDetailsViewModel(
             QuizDetailsCommand.AddQuizToHistory -> addQuizToMyHistory()
             QuizDetailsCommand.ChangeFavoriteStatus -> changeFavoriteStatus()
             QuizDetailsCommand.GetQuizById -> getQuizById()
-            QuizDetailsCommand.SetupQuizForGame -> quizRepository.quiz.value = _quiz.value
+            QuizDetailsCommand.SetupQuizForGame -> {
+                quizRepository.quiz.value = _quiz.value
+            }
         }
     }
     
     private fun getQuizById() {
         viewModelScope.launch {
             _quiz.value = null
-            quizRepository.getQuizById(id).whenSuccess { 
-                _quiz.value = it.data
+            quizRepository.getQuizById(id).whenSuccess { result ->
+                _quiz.value = result.data
+                _cachedQuizzes.update { it.plus(result.data) }
                 _uiState.value = UiState.Success
             }.whenError {
                 _uiState.value = UiState.Error(it.error.toResId())
@@ -77,7 +81,7 @@ class QuizDetailsViewModel(
     
     private fun addQuizToMyHistory(){
         viewModelScope.launch {
-            quizRepository.markQuizAsPlayed(id)
+            quizRepository.markQuizAsPlayed()
         }
     }
 }

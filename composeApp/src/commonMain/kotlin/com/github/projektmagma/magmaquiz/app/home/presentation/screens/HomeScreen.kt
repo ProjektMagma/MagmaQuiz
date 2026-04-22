@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -101,7 +102,7 @@ fun HomeScreen(
                         // todo tutaj jeszcze guzik i nawigacja do ekranu gdzie bedzie szukac sie roomow
                         AutoScalableLazyRow(
                             itemList = state.roomList,
-                            modifier = Modifier.height(300.dp),
+                            modifier = Modifier.wrapContentHeight(),
                             key = { it.roomId },
                             isLoadingMore = state.isLoadingMoreRooms,
                             onLoadMore = { viewModel.onCommand(HomeScreenCommand.RoomList) }

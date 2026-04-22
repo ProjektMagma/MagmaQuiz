@@ -157,7 +157,7 @@ fun QuizDetailsScreen(
                                         )
                                     }
                                     Text(
-                                        text = state.quiz!!.reviewCount.toString(),
+                                        text = currentQuiz?.reviewCount.toString(),
                                         style = MaterialTheme.typography.labelMedium,
                                     )
                                 }
@@ -233,7 +233,7 @@ fun QuizDetailsScreen(
                     Button(
                         modifier = Modifier
                             .weight(1f)
-                            .padding(bottom = 8.dp),
+                            .padding(4.dp),
                         onClick = {
                             navigateToPlayScreen()
                             quizDetailsViewModel.onCommand(QuizDetailsCommand.SetupQuizForGame)
@@ -246,7 +246,7 @@ fun QuizDetailsScreen(
                     Button(
                         modifier = Modifier
                             .weight(1f)
-                            .padding(bottom = 8.dp),
+                            .padding(4.dp),
                         onClick = {
                             navigateToSettingsScreen()
                             quizDetailsViewModel.onCommand(QuizDetailsCommand.SetupQuizForGame)

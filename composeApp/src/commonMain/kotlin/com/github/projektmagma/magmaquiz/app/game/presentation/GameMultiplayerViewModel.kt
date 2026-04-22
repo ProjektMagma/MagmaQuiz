@@ -7,19 +7,21 @@ import com.github.projektmagma.magmaquiz.app.core.util.TimeConverter.toSeconds
 import com.github.projektmagma.magmaquiz.app.core.util.Timer
 import com.github.projektmagma.magmaquiz.app.game.data.WsEvent
 import com.github.projektmagma.magmaquiz.app.game.data.repository.GameRepository
+import com.github.projektmagma.magmaquiz.app.game.presentation.model.GameEvent
 import com.github.projektmagma.magmaquiz.app.game.presentation.model.play.AnswerState
 import com.github.projektmagma.magmaquiz.app.game.presentation.model.play.GameCommand
 import com.github.projektmagma.magmaquiz.app.game.presentation.model.play.GameState
 import com.github.projektmagma.magmaquiz.app.quizzes.data.repository.QuizRepository
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
-import com.github.projektmagma.magmaquiz.shared.data.domain.UserAnswer
 import com.github.projektmagma.magmaquiz.shared.data.domain.WebSocketMessages
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.UUID
+import kotlin.time.Duration.Companion.milliseconds
 
 class GameMultiplayerViewModel(
     private val gameRepository: GameRepository,
@@ -33,16 +35,26 @@ class GameMultiplayerViewModel(
 
     private val _questions = gameRepository.questions
 
-    private val _correctQuestions = MutableStateFlow<Map<ForeignUser, Int>>(emptyMap())
+    private val _correctQuestions = MutableStateFlow<Map<ForeignUser, Int>>(
+        _room.value?.userList
+            ?.map { it }
+            ?.associateWith { 0 }
+            ?.toMutableMap() 
+            ?: mutableMapOf()
+    )
     val correctQuestions = _correctQuestions.asStateFlow()
+    
+    private val _event = Channel<GameEvent>()
+    val event = _event.receiveAsFlow()
+    
     private val countdownTimer = Timer(viewModelScope)
 
     init {
         updateGameState()
         viewModelScope.launch {
-            gameRepository.getMessages().collect { message ->
+            gameRepository.messages.collect { message ->
                 when (message) {
-                    is WsEvent.Closed -> {}
+                    is WsEvent.Closed -> _event.send(GameEvent.Closed(message.reason))
                     is WsEvent.OutGoing -> {
                         when (message.message) {
                             is WebSocketMessages.OutgoingMessage.GameEnded -> {
@@ -52,14 +64,28 @@ class GameMultiplayerViewModel(
                                         totalQuestions = _questions.value.size
                                     )
                                 }
-                                checkCorrectness(message.message.userAnswerMap)
                             }
 
                             is WebSocketMessages.OutgoingMessage.NextQuestion -> {
                                 updateGameState()
                             }
 
-                            is WebSocketMessages.OutgoingMessage.UserAnswered -> {} // id usera
+                            is WebSocketMessages.OutgoingMessage.UserAnswered -> {
+                                val payload = message.message
+                                val correctAnswerId = _gameState.value.answers
+                                    .firstOrNull { it.isCorrect }
+                                    ?.id
+                                    ?: return@collect
+
+                                if (payload.answerId == correctAnswerId) {
+                                    val user = _room.value?.userList?.firstOrNull { it.userId == payload.userId } ?: return@collect
+                                    _correctQuestions.update { current ->
+                                        val updated = current.toMutableMap()
+                                        updated[user] = (updated[user] ?: 0) + 1
+                                        updated
+                                    }
+                                }
+                            }
                             else -> Unit
                         }
                     }
@@ -76,7 +102,7 @@ class GameMultiplayerViewModel(
 
             GameCommand.FinishGame -> {
                 viewModelScope.launch {
-                    delay(400)
+                    delay(400.milliseconds)
                     _gameState.update { it.copy(score = 0, currentQuestionIndex = 0) }
                     val message = if (checkIsHost()) WebSocketMessages.IncomingMessage.CloseRoom else WebSocketMessages.IncomingMessage.Disconnect
                     sendMessage(message)
@@ -143,32 +169,6 @@ class GameMultiplayerViewModel(
                 _gameState.update { it.copy(remainingSeconds = tick) }
             }
         )
-    }
-
-    private fun checkCorrectness(userAnswerMap: Map<UUID, List<UserAnswer>>) {
-        viewModelScope.launch {
-            val map = _room.value?.userList
-                ?.mapNotNull { it.userId }
-                ?.associateWith { 0 }
-                ?.toMutableMap()
-                ?: mutableMapOf()
-
-            userAnswerMap.forEach { (uUID, answers) ->
-                val question = _questions.value.firstOrNull { it.id == uUID } ?: return@forEach
-                answers.forEach { answer ->
-                    if (question.answerList.firstOrNull { it.isCorrect }?.id == answer.answerId) {
-                        map[answer.userId] = (map[answer.userId] ?: 0) + 1
-                    }
-                }
-            }
-                
-            _correctQuestions.value = map
-                .mapNotNull { (userId, points) -> 
-                    _room.value?.userList
-                        ?.firstOrNull { it.userId == userId }
-                        ?.let { user -> user to points }
-                }.toMap()
-        }
     }
 
     fun checkIsHost(): Boolean {

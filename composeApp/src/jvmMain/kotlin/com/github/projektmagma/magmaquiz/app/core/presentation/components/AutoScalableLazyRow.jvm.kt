@@ -56,7 +56,7 @@ actual fun <T> AutoScalableLazyRow(
             )
         }
     else
-        Column(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = modifier.fillMaxWidth()) {
             LazyRow(modifier = Modifier.fillMaxWidth(), state = state) {
                 items(itemList, key = key) {
                     content(it)

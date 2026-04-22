@@ -76,19 +76,13 @@ class GameRoom {
                         userConnection.userEntity,
                         _userConnections.map {
                             it.userEntity.toDomain(
-                                UserConversionCommand.ForeignUser(
-                                    userConnection.userEntity
-                                )
+                                UserConversionCommand.ForeignUser(userConnection.userEntity)
                             )
                         } as List<ForeignUser>
-                    ))
+                    )
+                )
             )
         )
-        _roomSettingsEntity.connectedUsers++
-        _userConnections.add(userConnection)
-
-        if (transaction { userConnection.userEntity.id == _roomSettingsEntity.roomOwner.id })
-            _ownerId = transaction { userConnection.userEntity.id.value }
 
         broadcast(BroadcastCommand.UserJoined(userConnection.userEntity))
         return true

@@ -161,4 +161,5 @@
     <string name="start_game">Start game</string>
     <string name="leave_room">Leave room</string>
     <string name="join">Join</string>
+    <string name="closed_room">Host has closed room</string>
 </resources>

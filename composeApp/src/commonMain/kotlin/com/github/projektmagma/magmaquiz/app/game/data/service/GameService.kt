@@ -28,6 +28,9 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.closed_room
+import org.jetbrains.compose.resources.getString
 import java.util.UUID
 
 class GameService(
@@ -71,6 +74,8 @@ class GameService(
 
     suspend fun joinRoom(id: UUID): Resource<RoomSettings, NetworkError> {
         return try {
+            session?.close()
+            
             val ws = httpClient.webSocketSession {
                 url {
                     encodedPath = "/multiplayerRooms/join/$id"
@@ -119,7 +124,7 @@ class GameService(
             } catch(e : Exception) {
                 _events.emit(WsEvent.Closed(e.message))
             } finally {
-                _events.emit(WsEvent.Closed("Ended connection"))
+                _events.emit(WsEvent.Closed(getString(Res.string.closed_room)))
             }
         }
     }
