@@ -14,8 +14,8 @@ import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.Create
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.QuizDetailsScreen
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.QuizReviewsScreen
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.QuizzesScreen
-import com.github.projektmagma.magmaquiz.app.settings.presentation.EmailChangeScreen
 import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.AccountDetailsChangeScreen
+import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.EmailChangeScreen
 import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.EmailVerificationScreen
 import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.LocationDetailsChangeScreen
 import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.PasswordChangeScreen

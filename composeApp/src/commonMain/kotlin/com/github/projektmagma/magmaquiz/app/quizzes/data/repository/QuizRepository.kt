@@ -95,6 +95,7 @@ class QuizRepository(
         
         updateAllLists { 
             it.changeRating(uuid, review.rating)
+            it.changeReviewedStatus(uuid, true)
         }
         return result
     }
@@ -103,6 +104,7 @@ class QuizRepository(
         val newRating = -rating
         updateAllLists { 
             it.changeRating(uuid, newRating)
+            it.changeReviewedStatus(uuid, false)
         }
         
         return quizService.deleteQuizReview(uuid, rating)
@@ -112,7 +114,17 @@ class QuizRepository(
         return quizService.getTags(name, count)
     }
     
-    fun updateAllLists(transform: (List<Quiz>) -> List<Quiz>){
+    fun List<Quiz>.changeReviewedStatus(id: UUID, reviewed: Boolean): List<Quiz>{
+        return this.map { quiz -> 
+            if (quiz.id == id) {
+                quiz.copy(reviewedByYou = reviewed)
+            } else {
+                quiz
+            }
+        }
+    }
+    
+    private fun updateAllLists(transform: (List<Quiz>) -> List<Quiz>){
         userDetailsQuizzes.update(transform)
         quizListQuizzes.update(transform)
         cachedQuizzes.update(transform)
@@ -123,7 +135,7 @@ class QuizRepository(
         ) }
     }
 
-    fun List<Quiz>.changeLikeStatusInList(id: UUID): List<Quiz>{
+    private fun List<Quiz>.changeLikeStatusInList(id: UUID): List<Quiz>{
         return this.map { quiz ->
             if (quiz.id == id) {
                 quiz.copy(
@@ -136,7 +148,7 @@ class QuizRepository(
         }
     }
 
-    fun List<Quiz>.changeRating(id: UUID, rate: Int): List<Quiz> {
+    private fun List<Quiz>.changeRating(id: UUID, rate: Int): List<Quiz> {
         return this.map { quiz ->
             val reviewDigit = if (rate > 0) 1 else -1
             val reviewCount = quiz.reviewCount + reviewDigit
@@ -151,7 +163,7 @@ class QuizRepository(
         }
     }
     
-    fun List<Quiz>.deleteQuizInList(id: UUID): List<Quiz> {
+    private fun List<Quiz>.deleteQuizInList(id: UUID): List<Quiz> {
         return this.filter { it.id != id }
     }
 }

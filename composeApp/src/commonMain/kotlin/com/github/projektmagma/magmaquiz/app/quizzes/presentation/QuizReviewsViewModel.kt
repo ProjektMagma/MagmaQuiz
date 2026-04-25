@@ -66,7 +66,7 @@ class QuizReviewsViewModel(
             quizRepository.createQuizReview(
                 id,
                 review
-            ).whenSuccess { 
+            ).whenSuccess {
                 _state.update { 
                     it.copy(
                         reviews = it.reviews + review.toModel(authRepository.thisUser.value!!),

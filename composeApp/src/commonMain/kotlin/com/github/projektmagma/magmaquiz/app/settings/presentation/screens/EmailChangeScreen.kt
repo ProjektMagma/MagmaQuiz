@@ -1,4 +1,4 @@
-package com.github.projektmagma.magmaquiz.app.settings.presentation
+package com.github.projektmagma.magmaquiz.app.settings.presentation.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +21,7 @@ import com.github.projektmagma.magmaquiz.app.auth.presentation.components.EmailT
 import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
+import com.github.projektmagma.magmaquiz.app.settings.presentation.EmailChangeViewModel
 import com.github.projektmagma.magmaquiz.app.settings.presentation.model.email.change.EmailChangeCommand
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.change_email
@@ -64,7 +66,7 @@ fun EmailChangeScreen(
         
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = androidx.compose.material3.CardDefaults.cardColors(
+            colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.secondaryContainer
             )
         ) {
