@@ -1,17 +1,36 @@
 package com.github.projektmagma.magmaquiz.server.controllers
 
+import com.github.projektmagma.magmaquiz.server.data.codes.VerificationCode
 import com.github.projektmagma.magmaquiz.server.data.entities.UserEntity
-import com.github.projektmagma.magmaquiz.server.data.entities.VerificationCodeEntity
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import com.github.projektmagma.magmaquiz.server.mailer.MailTemplates
 import com.github.projektmagma.magmaquiz.server.mailer.MailerService
 import com.github.projektmagma.magmaquiz.server.repository.UserRepository
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkResource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangeProfilePictureValue
-import io.ktor.http.HttpStatusCode
+import io.ktor.http.*
+import kotlinx.coroutines.*
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import kotlin.time.Duration.Companion.minutes
 
 class SettingsDataController(private val userRepository: UserRepository) {
+
+
+    private val _verificationCodesList = mutableListOf<VerificationCode>()
+
+    init {
+        val healthScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+        healthScope.launch {
+            while (true) {
+                delay(2.minutes)
+                _verificationCodesList.forEach { code ->
+                    if (code.isExpired())
+                        _verificationCodesList.remove(code)
+                }
+            }
+        }
+    }
 
     fun settingsChangePassword(
         session: UserSession,
@@ -22,7 +41,7 @@ class SettingsDataController(private val userRepository: UserRepository) {
         val thisUser = userRepository.getUserData(session)
 
         val codeEntity =
-            VerificationCodeEntity.tryFindCodeByUser(thisUser)
+            _verificationCodesList.firstOrNull { it.owner.id == thisUser.id }
                 ?: return NetworkResource.Error(HttpStatusCode.BadRequest)
 
         if (!codeEntity.compareCode(verificationCode))
@@ -77,10 +96,8 @@ class SettingsDataController(private val userRepository: UserRepository) {
     }
 
     fun checkIsEmailTaken(
-        session: UserSession,
         newEmail: String
     ): NetworkResource<Unit> {
-        val thisUser = userRepository.getUserData(session)
 
         if (UserEntity.isEmailTaken(newEmail)) {
             return NetworkResource.Error(HttpStatusCode.Conflict)
@@ -100,7 +117,7 @@ class SettingsDataController(private val userRepository: UserRepository) {
             return NetworkResource.Error(HttpStatusCode.Conflict)
         }
 
-        val codeEntity = VerificationCodeEntity.tryFindCodeByUser(thisUser)
+        val codeEntity = _verificationCodesList.firstOrNull { it.owner.id == thisUser.id }
             ?: return NetworkResource.Error(HttpStatusCode.BadRequest)
 
         if (!codeEntity.compareCode(verificationCode)) {
@@ -111,8 +128,8 @@ class SettingsDataController(private val userRepository: UserRepository) {
 
         transaction {
             thisUser.userEmail = newEmail
-            codeEntity.delete()
         }
+        _verificationCodesList.remove(codeEntity)
 
         MailerService.sendMail(oldEmail, MailTemplates.EmailChanged, Pair("username", thisUser.userName))
         MailerService.sendMail(newEmail, MailTemplates.EmailChanged, Pair("username", thisUser.userName))
@@ -153,16 +170,19 @@ class SettingsDataController(private val userRepository: UserRepository) {
     fun settingsVerificationCode(session: UserSession, email: String): NetworkResource<Unit> {
         val thisUser = userRepository.getUserData(session)
 
-        val verificationCode = VerificationCodeEntity.tryFindCodeByUser(thisUser)
-            ?: transaction { VerificationCodeEntity.new { owner = thisUser } }
+        val verificationCode = _verificationCodesList.firstOrNull { it.owner.id == thisUser.id }
+            ?: transaction {
+                val code = VerificationCode(thisUser)
+                _verificationCodesList.add(code)
+                code
+            }
 
-        val generatedCode = verificationCode.generateCode()
 
         MailerService.sendMail(
             email,
             MailTemplates.VerificationCode,
             Pair("username", thisUser.userName),
-            Pair("verification_code", generatedCode)
+            Pair("verification_code", verificationCode.generateCode())
         )
 
         return NetworkResource.Success(Unit)

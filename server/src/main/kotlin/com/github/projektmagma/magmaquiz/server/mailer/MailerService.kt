@@ -1,6 +1,10 @@
 package com.github.projektmagma.magmaquiz.server.mailer
 
-import io.ktor.server.application.ApplicationEnvironment
+import io.ktor.server.application.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import org.simplejavamail.api.email.ContentTransferEncoding
 import org.simplejavamail.api.email.Recipient
 import org.simplejavamail.api.mailer.Mailer
@@ -50,22 +54,26 @@ object MailerService {
         if (!emailFile.exists())
             throw IllegalStateException("Email Template ${emailTemplate.fileName} does not exist under ${_emailTemplatesFolder.path}.")
 
+        val mailScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-        val emailHtmlText = emailFile
-            .readText(Charsets.UTF_8)
-            .replaceValues(*replaceValues, Pair("support_email", _supportEmail))
+        mailScope.launch {
 
-
-        val email = EmailBuilder.startingBlank()
-            .from(Recipient(_displayedName, _emailFrom, null))
-            .to(emailTo)
-            .withSubject(emailHtmlText.extractSubject())
-            .withHTMLText(emailHtmlText)
-            .withContentTransferEncoding(ContentTransferEncoding.BASE_64)
-            .buildEmail()
+            val emailHtmlText = emailFile
+                .readText(Charsets.UTF_8)
+                .replaceValues(*replaceValues, Pair("support_email", _supportEmail))
 
 
-        _mailer.sendMail(email)
+            val email = EmailBuilder.startingBlank()
+                .from(Recipient(_displayedName, _emailFrom, null))
+                .to(emailTo)
+                .withSubject(emailHtmlText.extractSubject())
+                .withHTMLText(emailHtmlText)
+                .withContentTransferEncoding(ContentTransferEncoding.BASE_64)
+                .buildEmail()
+
+
+            _mailer.sendMail(email)
+        }
     }
 }
 

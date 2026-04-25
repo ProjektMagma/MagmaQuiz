@@ -36,7 +36,6 @@ fun Application.configureDatabase() {
             QuizzesReviewsTable,
             QuizzesTagsTable,
             QuizzesTagsMapTable,
-            VerificationCodesTable
         )
 
         SchemaUtils.run {

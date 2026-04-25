@@ -6,18 +6,12 @@ import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import com.github.projektmagma.magmaquiz.server.data.util.respondToResource
 import com.github.projektmagma.magmaquiz.server.storage.ExposedSessionStorage
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangeProfilePictureValue
-import com.github.projektmagma.magmaquiz.shared.data.rest.values.ConfirmEmailChangeValue
-import io.ktor.server.application.Application
-import io.ktor.server.auth.authenticate
-import io.ktor.server.request.receive
-import io.ktor.server.routing.delete
-import io.ktor.server.routing.get
-import io.ktor.server.routing.post
-import io.ktor.server.routing.route
-import io.ktor.server.routing.routing
-import io.ktor.server.sessions.clear
-import io.ktor.server.sessions.get
-import io.ktor.server.sessions.sessions
+import com.github.projektmagma.magmaquiz.shared.data.rest.values.ConfirmChangeValue
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.request.*
+import io.ktor.server.routing.*
+import io.ktor.server.sessions.*
 
 
 fun Application.settingsRoutes(
@@ -50,38 +44,32 @@ fun Application.settingsRoutes(
                     }
 
                     get("/email/checkIsTaken/{email}") {
-                        val session = call.sessions.get<UserSession>()!!
                         val email = call.parameters["email"]!!
 
                         call.respondToResource(
-                            settingsDataController.checkIsEmailTaken(
-                                session, 
-                                email
-                            )
+                            settingsDataController.checkIsEmailTaken(email)
                         )
                     }
-                    
-                    get("/email/confirm") {
+
+                    post("/email/confirm") {
                         val session = call.sessions.get<UserSession>()!!
-                        val body = call.receive<ConfirmEmailChangeValue>()
+                        val body = call.receive<ConfirmChangeValue>()
 
                         call.respondToResource(
                             settingsDataController.settingsConfirmEmailChange(
-                                session,
-                                body.email,
-                                body.verificationCode
+                                session, body.payload, body.verificationCode
                             )
                         )
                     }
 
-                    get("/password/{newPassword}/{verificationCode}") {
+                    post("/password/confirm") {
                         val session = call.sessions.get<UserSession>()!!
-                        val newPassword = call.parameters["newPassword"]!!
-                        val verificationCode = call.parameters["verificationCode"]!!
+                        val body = call.receive<ConfirmChangeValue>()
+
 
                         call.respondToResource(
                             settingsDataController.settingsChangePassword(
-                                session, newPassword, verificationCode
+                                session, body.payload, body.verificationCode
                             )
                         )
                     }
