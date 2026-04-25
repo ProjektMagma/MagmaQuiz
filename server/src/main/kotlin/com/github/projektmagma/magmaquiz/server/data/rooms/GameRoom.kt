@@ -57,6 +57,7 @@ class GameRoom {
 
     suspend fun connectUser(userConnection: UserConnection): Boolean {
         synchronized(_userConnections) {
+            if (_roomSettingsEntity.isClosing) return false
             if (_userConnections.any { transaction { it.userEntity.id == userConnection.userEntity.id } }) {
                 return false
             }
@@ -137,9 +138,11 @@ class GameRoom {
                 }
 
             _roomSettingsEntity.isInProgress = false
+            _currentQuestionId = null
             broadcast(BroadcastCommand.GameEnded(_userAnswerList))
+            
+            closeRoom()
         }
-
     }
 
     suspend fun answerQuestion(answer: IncomingMessage.Answer, userConnection: UserConnection) {

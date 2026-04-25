@@ -17,7 +17,7 @@ data class BottomNavItem (
 )
 
 val TOP_LEVEL_DESTINATIONS = mapOf(
-    Route.Menus.Home to BottomNavItem(
+    Route.Menus.Home.Main to BottomNavItem(
         title = Res.string.home_nav,
         icon = Icons.Default.Home
     ),

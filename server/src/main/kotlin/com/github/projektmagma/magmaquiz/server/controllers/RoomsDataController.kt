@@ -35,9 +35,8 @@ class RoomsDataController(
         healthScope.launch {
             while (true) {
                 delay(2.minutes)
-                _openRoomList.forEach { room ->
-                    if (room.isClosing || room.isRoomEmpty)
-                        _openRoomList.remove(room)
+                _openRoomList.removeAll { room ->
+                    room.isClosing || room.isRoomEmpty
                 }
             }
         }
@@ -48,8 +47,8 @@ class RoomsDataController(
         val userConnection = UserConnection(thisUser, webSocketSession)
         val existingRoom = _openRoomList.firstOrNull { it.roomId == roomId }
 
-        if (existingRoom == null) {
-            webSocketSession.close(CloseReason(CloseReason.Codes.CANNOT_ACCEPT, "Room $roomId not found"))
+        if (existingRoom == null || existingRoom.isClosing) {
+            webSocketSession.close(CloseReason(CloseReason.Codes.CANNOT_ACCEPT, "Room $roomId is closed"))
             return
         }
 

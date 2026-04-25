@@ -158,4 +158,8 @@
     <string name="leave_room">Opuść pokój</string>
     <string name="join">Dołącz</string>
     <string name="closed_room">Host zamknął pokój</string>
+    <string name="find_games">Szukaj gier</string>
+    <string name="available_rooms">Dostępne pokoje %1$d</string>
+    <string name="current_games">Aktualne gry</string>
+    <string name="game_not_exist">Gra nie istnieje</string>
 </resources>

@@ -1,7 +1,7 @@
 package com.github.projektmagma.magmaquiz.app.quizzes.data.repository
 
 import com.github.projektmagma.magmaquiz.app.core.domain.NetworkError
-import com.github.projektmagma.magmaquiz.app.home.presentation.model.HomeScreenState
+import com.github.projektmagma.magmaquiz.app.home.presentation.model.main.HomeScreenState
 import com.github.projektmagma.magmaquiz.app.quizzes.data.service.QuizService
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
 import com.github.projektmagma.magmaquiz.shared.data.domain.QuizReview

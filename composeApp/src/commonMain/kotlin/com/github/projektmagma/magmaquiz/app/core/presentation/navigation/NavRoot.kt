@@ -74,7 +74,7 @@ fun Navigation(
     authRepository: AuthRepository = koinInject()
 ) {
     val navigationState = rememberNavigationState(
-        startRoute = Route.Menus.Home,
+        startRoute = Route.Menus.Home.Main,
         topLevelRoutes = TOP_LEVEL_DESTINATIONS.keys
     )
 

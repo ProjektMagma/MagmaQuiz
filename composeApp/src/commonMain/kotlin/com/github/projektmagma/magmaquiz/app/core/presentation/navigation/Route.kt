@@ -40,7 +40,13 @@ sealed interface Route : NavKey {
     @Serializable
     data object Menus : Route {
         @Serializable
-        data object Home : Route
+        data object Home : Route {
+            @Serializable
+            data object Main : Route
+            
+            @Serializable
+            data object Rooms : Route
+        }
 
         @Serializable
         data object Settings : Route {

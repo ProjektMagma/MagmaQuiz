@@ -127,7 +127,6 @@ fun GameMultiplayerScreen(
                     }
                     OutlinedButton(
                         onClick = {
-                            gameQuizViewModel.sendMessage(message = WebSocketMessages.IncomingMessage.CloseRoom)
                             navigateOnGameFinish()
                         }
                     ) {

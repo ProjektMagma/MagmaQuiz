@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.HomeScreen
+import com.github.projektmagma.magmaquiz.app.home.presentation.screens.RoomListScreen
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.CreateQuizViewModel
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.CreateQuestionScreen
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.CreateQuizScreen
@@ -36,7 +37,7 @@ fun MainNavigation(
         onBack = navigator::goBack,
         entries = navigationState.toEntries(
             entryProvider {
-                entry<Route.Menus.Home> {
+                entry<Route.Menus.Home.Main> {
                     HomeScreen(
                         navigateToQuizDetails = { id ->
                             navigator.navigate(Route.Menus.Quizzes.QuizDetails(id))
@@ -47,7 +48,14 @@ fun MainNavigation(
                         navigateToQuizReviews = { id, reviewed ->
                             navigator.navigate(Route.Menus.Quizzes.QuizReviews(id, reviewed))
                         },
-                        navigateToGameWait = { navigateToGameScreen(Route.Game.Wait) },
+                        navigateToRoomList = { navigator.navigate(Route.Menus.Home.Rooms) },
+                    )
+                }
+                entry<Route.Menus.Home.Rooms> {
+                    RoomListScreen(
+                        onJoinClick = {
+                            navigateToGameScreen(Route.Game.Wait)
+                        }
                     )
                 }
                 entry<Route.Menus.Settings.Options> {

@@ -92,7 +92,8 @@ fun NavigationState.toEntries(
 val serializersConfig = SavedStateConfiguration {
     serializersModule = SerializersModule {
         polymorphic(NavKey::class) {
-            subclass(Route.Menus.Home::class, Route.Menus.Home.serializer())
+            subclass(Route.Menus.Home.Main::class, Route.Menus.Home.Main.serializer())
+            subclass(Route.Menus.Home.Rooms::class, Route.Menus.Home.Rooms.serializer())
             subclass(Route.Menus.Quizzes::class, Route.Menus.Quizzes.serializer())
             subclass(Route.Menus.Users::class, Route.Menus.Users.serializer())
             subclass(Route.Menus.Settings::class, Route.Menus.Settings.serializer())

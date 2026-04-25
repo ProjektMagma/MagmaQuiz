@@ -1,9 +1,5 @@
 package com.github.projektmagma.magmaquiz.app.home.presentation.components
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -50,8 +46,7 @@ fun RoomCardSmall(
     Surface(
         modifier = Modifier
             .widthIn(min = 220.dp, max = 340.dp)
-            .padding(6.dp)
-            .animateContentSize(),
+            .padding(8.dp),
         shape = MaterialTheme.shapes.large,
         tonalElevation = 2.dp,
         shadowElevation = 2.dp,
@@ -137,11 +132,7 @@ fun RoomCardSmall(
                 )
             }
 
-            AnimatedVisibility(
-                visible = !room.isInProgress,
-                enter = expandVertically(),
-                exit = shrinkVertically()
-            ) {
+            if (!room.isInProgress){
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = { onJoinClick(room.roomId) }
