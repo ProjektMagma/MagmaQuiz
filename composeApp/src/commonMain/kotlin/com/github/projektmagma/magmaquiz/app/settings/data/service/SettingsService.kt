@@ -5,9 +5,12 @@ import com.github.projektmagma.magmaquiz.app.core.domain.NetworkError
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Resource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangeProfilePictureValue
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.ConfirmChangeValue
-import io.ktor.client.*
-import io.ktor.client.request.*
-import io.ktor.http.*
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 
 class SettingsService(
     private val httpClient: HttpClient,
@@ -69,7 +72,7 @@ class SettingsService(
     
     suspend fun confirmChangeEmail(email: String, verificationCode: String): Resource<Unit, NetworkError> {
         return safeCall<Unit> { 
-            httpClient.get("settings/change/email/confirm") {
+            httpClient.post("settings/change/email/confirm") {
                 contentType(ContentType.Application.Json)
                 setBody(ConfirmChangeValue(email, verificationCode))
             }
