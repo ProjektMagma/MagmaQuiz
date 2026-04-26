@@ -5,11 +5,7 @@ import com.github.projektmagma.magmaquiz.server.data.abstraction.ExtUUIDEntity
 import com.github.projektmagma.magmaquiz.server.data.conversion.ConversionCommand
 import com.github.projektmagma.magmaquiz.server.data.conversion.QuizConversionCommand
 import com.github.projektmagma.magmaquiz.server.data.conversion.UserConversionCommand
-import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesQuestionsTable
-import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesReviewsTable
-import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesTable
-import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesTagsMapTable
-import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesTagsTable
+import com.github.projektmagma.magmaquiz.server.data.tables.*
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import com.github.projektmagma.magmaquiz.shared.data.domain.FriendshipStatus
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
@@ -19,7 +15,7 @@ import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.dao.java.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import java.util.UUID
+import java.util.*
 
 class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable),
     DomainCapable<Quiz, QuizConversionCommand> {
@@ -118,7 +114,7 @@ class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable),
 
     private fun getAverageRating(): Float {
         return transaction {
-            val ratings = reviewList.filter { it.isActive }. map { it.rating }
+            val ratings = reviewList.filter { it.isActive }.map { it.rating }
             if (ratings.isEmpty()) 0f else ratings.average().toFloat()
         }
     }
@@ -175,7 +171,9 @@ class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable),
 
             when (visibilityStatus) {
                 QuizVisibility.Private -> isUserCreator(thisUser)
-                QuizVisibility.FriendsOnly -> thisUser.checkFriendship(this@QuizEntity.quizCreator) == FriendshipStatus.Friends
+                QuizVisibility.FriendsOnly -> isUserCreator(thisUser) ||
+                        thisUser.checkFriendship(this@QuizEntity.quizCreator) == FriendshipStatus.Friends
+
                 QuizVisibility.Public -> true
             }
         }
