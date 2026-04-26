@@ -166,4 +166,7 @@
     <string name="available_rooms">Available rooms</string>
     <string name="current_games">Current games</string>
     <string name="game_not_exist">Game doesn't exist</string>
+    <string name="about_application">About application</string>
+    <string name="creators">App creators</string>
+    <string name="version">Version</string>
 </resources>

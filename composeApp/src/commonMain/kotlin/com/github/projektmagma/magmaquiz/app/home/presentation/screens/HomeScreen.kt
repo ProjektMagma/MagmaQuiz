@@ -1,10 +1,6 @@
 package com.github.projektmagma.magmaquiz.app.home.presentation.screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -25,16 +21,10 @@ import com.github.projektmagma.magmaquiz.app.home.presentation.components.RowRet
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.main.HomeScreenCommand
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuizCardSmall
 import com.github.projektmagma.magmaquiz.app.users.presentation.components.UserCardSmall
-import magmaquiz.composeapp.generated.resources.Res
-import magmaquiz.composeapp.generated.resources.find_games
-import magmaquiz.composeapp.generated.resources.good_to_see_you
-import magmaquiz.composeapp.generated.resources.new_quizzes_from_your_friends
-import magmaquiz.composeapp.generated.resources.pepole_who_whant_know_you
-import magmaquiz.composeapp.generated.resources.recently_added_quizzes
-import magmaquiz.composeapp.generated.resources.the_most_liked_quizzes
+import magmaquiz.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-import java.util.UUID
+import java.util.*
 
 @Composable
 fun HomeScreen(
@@ -59,7 +49,7 @@ fun HomeScreen(
         verticalArrangement = Arrangement.Center
     ) {
 
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(modifier = Modifier.fillMaxSize().padding(bottom = 32.dp)) {
             item {
                 Text(
                     modifier = Modifier.fillMaxWidth(),

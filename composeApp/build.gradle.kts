@@ -1,3 +1,4 @@
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -10,6 +11,7 @@ plugins {
     alias(libs.plugins.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.androidx.room)
+    alias(libs.plugins.buildkonfig)
 }
 
 kotlin {
@@ -99,7 +101,7 @@ kotlin {
 }
 
 val appPackageRoute = "com.github.projektmagma.magmaquiz"
-val appVersion = "0.3.0"
+val appVersion = "0.9.0"
 
 android {
     namespace = appPackageRoute
@@ -175,5 +177,22 @@ compose.desktop {
                 iconFile = project.file("./src/commonMain/composeResources/drawable/app_icon.png")
             }
         }
+    }
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath(libs.buildkonfig)
+    }
+}
+
+buildkonfig {
+    packageName = appPackageRoute
+
+    defaultConfigs {
+        buildConfigField(STRING, "version", appVersion)
     }
 }

@@ -162,4 +162,7 @@
     <string name="available_rooms">Dostępne pokoje %1$d</string>
     <string name="current_games">Aktualne gry</string>
     <string name="game_not_exist">Gra nie istnieje</string>
+    <string name="about_application">O aplikacji</string>
+    <string name="creators">Twórcy aplikacji</string>
+    <string name="version">Wersja</string>
 </resources>

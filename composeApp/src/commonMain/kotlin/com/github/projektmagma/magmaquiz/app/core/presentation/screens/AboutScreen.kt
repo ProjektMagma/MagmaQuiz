@@ -1,8 +1,7 @@
-package com.github.projektmagma.magmaquiz.app.auth.presentation.screens
+package com.github.projektmagma.magmaquiz.app.core.presentation.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,22 +17,13 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun OnBoardingScreen(
-    navigateToLogin: () -> Unit,
-    navigateToRegister: () -> Unit,
-    navigateToServerConfig: () -> Unit
-) {
+fun AboutScreen(navigateBack: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = stringResource(Res.string.welcome_in),
-            style = MaterialTheme.typography.headlineMedium
-        )
-
         Image(
             modifier = Modifier.clip(MaterialTheme.shapes.large),
             painter = painterResource(Res.drawable.app_icon),
@@ -45,47 +35,45 @@ fun OnBoardingScreen(
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold
         )
+        Text(
+            text = "${stringResource(Res.string.version)}: ${BuildKonfig.version}",
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.Gray,
+            fontWeight = FontWeight.Bold
+        )
 
         Spacer(modifier = Modifier.height(64.dp))
 
-        Button(
-            onClick = { navigateToLogin() }
-        ) {
-            Text(text = stringResource(Res.string.log_in))
-        }
+        Text(
+            text = stringResource(Res.string.creators),
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold
+        )
 
-        Button(
-            onClick = { navigateToRegister() }
-        ) {
-            Text(text = stringResource(Res.string.register))
-        }
+        Text(
+            text = "Bartosz Perz",
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold
+        )
 
-        Button(
-            onClick = { navigateToServerConfig() }
-        ) {
-            Text(text = stringResource(Res.string.change_server))
-        }
-
+        Text(
+            text = "Miłosz Michalak",
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold
+        )
 
         Column(
             modifier = Modifier.fillMaxHeight()
-                .padding(bottom = 4.dp)
+                .padding(vertical = 4.dp)
                 .weight(1f),
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "${stringResource(Res.string.version)}: ${BuildKonfig.version}",
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray,
-                fontWeight = FontWeight.Bold
-            )
             Text(
                 text = "${Typography.copyright} 2026 Projekt Magma.",
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold
             )
         }
-
     }
 }

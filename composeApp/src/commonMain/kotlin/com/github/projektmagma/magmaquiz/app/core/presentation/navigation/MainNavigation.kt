@@ -3,23 +3,17 @@ package com.github.projektmagma.magmaquiz.app.core.presentation.navigation
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.github.projektmagma.magmaquiz.app.core.presentation.screens.AboutScreen
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.HomeScreen
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.RoomListScreen
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.CreateQuizViewModel
-import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.CreateQuestionScreen
-import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.CreateQuizScreen
-import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.QuizDetailsScreen
-import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.QuizReviewsScreen
-import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.QuizzesScreen
-import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.AccountDetailsChangeScreen
-import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.EmailChangeScreen
-import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.EmailVerificationScreen
-import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.LocationDetailsChangeScreen
-import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.PasswordChangeScreen
-import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.SettingsScreen
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.*
+import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.*
 import com.github.projektmagma.magmaquiz.app.users.presentation.screens.UserDetailsScreen
 import com.github.projektmagma.magmaquiz.app.users.presentation.screens.UsersScreen
 import org.koin.compose.viewmodel.koinViewModel
@@ -34,6 +28,7 @@ fun MainNavigation(
     val createQuizViewModel: CreateQuizViewModel = koinViewModel()
 
     NavDisplay(
+        modifier = Modifier.fillMaxWidth(),
         onBack = navigator::goBack,
         entries = navigationState.toEntries(
             entryProvider {
@@ -65,6 +60,7 @@ fun MainNavigation(
                         navigateToChangeLocationDetailsScreen = { navigator.navigate(Route.Menus.Settings.LocationChange) },
                         navigateToChangePasswordScreen = { navigator.navigate(Route.Menus.Settings.PasswordChange(it)) },
                         navigateToChangeEmailScreen = { navigator.navigate(Route.Menus.Settings.EmailChange) },
+                        navigateToAboutScreen = { navigator.navigate(Route.Menus.Settings.About) },
                     )
                 }
                 entry<Route.Menus.Settings.LocationChange> {
@@ -82,6 +78,11 @@ fun MainNavigation(
                         navigateToEmailVerification = { navigator.navigate(Route.Menus.Settings.EmailVerification(it)) }
                     )
                 }
+                entry<Route.Menus.Settings.About> {
+                    AboutScreen(
+                        navigateBack = { navigator.goBack() }
+                    )
+                }
                 entry<Route.Menus.Settings.EmailVerification> {
                     EmailVerificationScreen(
                         email = it.email,
@@ -96,10 +97,10 @@ fun MainNavigation(
                     PasswordChangeScreen(it.forgot)
                 }
                 entry<Route.Menus.Settings.PasswordEmailEntry> {
-                    
+
                 }
                 entry<Route.Menus.Settings.PasswordVerification> {
-                    
+
                 }
                 entry<Route.Menus.Quizzes.QuizList> {
                     QuizzesScreen(
@@ -109,7 +110,14 @@ fun MainNavigation(
                         navigateToQuizDetails = { id ->
                             navigator.navigate(Route.Menus.Quizzes.QuizDetails(id))
                         },
-                        navigateToQuizReviews = { id, reviewed -> navigator.navigate(Route.Menus.Quizzes.QuizReviews(id, reviewed)) },
+                        navigateToQuizReviews = { id, reviewed ->
+                            navigator.navigate(
+                                Route.Menus.Quizzes.QuizReviews(
+                                    id,
+                                    reviewed
+                                )
+                            )
+                        },
                     )
                 }
                 entry<Route.Menus.Quizzes.QuizDetails> {
@@ -144,7 +152,7 @@ fun MainNavigation(
                 }
                 entry<Route.Menus.Quizzes.QuizReviews> { parameters ->
                     QuizReviewsScreen(
-                        parameters.id, 
+                        parameters.id,
                         parameters.reviewed,
                         navigateToQuizDetails = {
                             navigator.navigate(Route.Menus.Users.UserDetails(it))
@@ -158,7 +166,14 @@ fun MainNavigation(
                         navigateToEditScreen = { navigator.navigate(Route.Menus.Quizzes.CreateQuiz) },
                         navigateToQuizDetails = { navigator.navigate(Route.Menus.Quizzes.QuizDetails(it)) },
                         navigateToSettingsScreen = { navigator.navigate(Route.Menus.Settings.Options) },
-                        navigateToQuizReviews = { id, reviewed -> navigator.navigate(Route.Menus.Quizzes.QuizReviews(id, reviewed)) }
+                        navigateToQuizReviews = { id, reviewed ->
+                            navigator.navigate(
+                                Route.Menus.Quizzes.QuizReviews(
+                                    id,
+                                    reviewed
+                                )
+                            )
+                        }
                     )
                 }
                 entry<Route.Menus.Users.Find> {

@@ -1,29 +1,15 @@
 package com.github.projektmagma.magmaquiz.app.settings.presentation.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,13 +20,7 @@ import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import com.attafitamim.krop.core.crop.AspectRatio
-import com.attafitamim.krop.core.crop.CircleCropShape
-import com.attafitamim.krop.core.crop.CropError
-import com.attafitamim.krop.core.crop.CropResult
-import com.attafitamim.krop.core.crop.crop
-import com.attafitamim.krop.core.crop.cropperStyle
-import com.attafitamim.krop.core.crop.rememberImageCropper
+import com.attafitamim.krop.core.crop.*
 import com.attafitamim.krop.filekit.encodeToByteArray
 import com.attafitamim.krop.filekit.toImageSrc
 import com.attafitamim.krop.ui.ImageCropperDialog
@@ -58,15 +38,7 @@ import io.github.vinceglb.filekit.dialogs.FileKitMode
 import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.openFilePicker
 import kotlinx.coroutines.launch
-import magmaquiz.composeapp.generated.resources.Res
-import magmaquiz.composeapp.generated.resources.account_details_change
-import magmaquiz.composeapp.generated.resources.change_email
-import magmaquiz.composeapp.generated.resources.change_password
-import magmaquiz.composeapp.generated.resources.change_profile_picture
-import magmaquiz.composeapp.generated.resources.location_details_change
-import magmaquiz.composeapp.generated.resources.log_out
-import magmaquiz.composeapp.generated.resources.no_image_provided_error
-import magmaquiz.composeapp.generated.resources.save
+import magmaquiz.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -77,7 +49,8 @@ fun SettingsScreen(
     navigateToChangeAccountDetailsScreen: () -> Unit,
     navigateToChangeLocationDetailsScreen: () -> Unit,
     navigateToChangePasswordScreen: (forgot: Boolean) -> Unit,
-    navigateToChangeEmailScreen: () -> Unit
+    navigateToChangeEmailScreen: () -> Unit,
+    navigateToAboutScreen: () -> Unit
 ) {
     val authViewModel = koinViewModel<AuthViewModel>()
     val settingsViewModel = koinViewModel<SettingsViewModel>()
@@ -211,6 +184,12 @@ fun SettingsScreen(
             text = Res.string.change_password,
             imageVector = Icons.Default.Lock,
             action = { navigateToChangePasswordScreen(false) }
+        )
+
+        SettingsOption(
+            text = Res.string.about_application,
+            imageVector = Icons.Default.Info,
+            action = { navigateToAboutScreen() }
         )
     }
 }
