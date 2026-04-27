@@ -57,7 +57,7 @@ import magmaquiz.composeapp.generated.resources.start_game
 import magmaquiz.composeapp.generated.resources.waiting
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-
+// todo poprawic screen i content architekture
 @Composable
 fun GameWaitScreen(
     gameWaitViewModel: GameWaitViewModel = koinViewModel(),

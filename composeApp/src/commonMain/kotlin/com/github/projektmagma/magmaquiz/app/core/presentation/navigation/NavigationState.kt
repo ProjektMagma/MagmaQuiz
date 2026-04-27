@@ -121,9 +121,6 @@ val serializersConfig = SavedStateConfiguration {
             subclass(Route.Menus.Settings.LocationChange::class, Route.Menus.Settings.LocationChange.serializer())
             subclass(Route.Menus.Settings.EmailChange::class, Route.Menus.Settings.EmailChange.serializer())
             subclass(Route.Menus.Settings.EmailVerification::class, Route.Menus.Settings.EmailVerification.serializer())
-            subclass(Route.Menus.Settings.PasswordChange::class, Route.Menus.Settings.PasswordChange.serializer())
-            subclass(Route.Menus.Settings.PasswordVerification::class, Route.Menus.Settings.PasswordVerification.serializer())
-            subclass(Route.Menus.Settings.PasswordEmailEntry::class, Route.Menus.Settings.PasswordEmailEntry.serializer())
             subclass(Route.Menus.Settings.Options::class, Route.Menus.Settings.Options.serializer())
         }
     }

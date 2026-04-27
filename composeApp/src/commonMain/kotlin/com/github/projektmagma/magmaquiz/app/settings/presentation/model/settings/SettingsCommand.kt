@@ -4,4 +4,5 @@ sealed interface SettingsCommand {
 
     data class ImageChanged(val profilePicture: ByteArray?) : SettingsCommand
     data object ChangeProfilePicture : SettingsCommand
+    data object DeleteAccount : SettingsCommand
 }

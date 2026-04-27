@@ -12,8 +12,16 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.screens.AboutScre
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.HomeScreen
 import com.github.projektmagma.magmaquiz.app.home.presentation.screens.RoomListScreen
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.CreateQuizViewModel
-import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.*
-import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.*
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.CreateQuestionScreen
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.CreateQuizScreen
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.QuizDetailsScreen
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.QuizReviewsScreen
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens.QuizzesScreen
+import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.SettingsScreen
+import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.account.AccountDetailsChangeScreen
+import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.email.change.EmailChangeScreen
+import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.email.verify.EmailVerificationScreen
+import com.github.projektmagma.magmaquiz.app.settings.presentation.screens.location.LocationDetailsChangeScreen
 import com.github.projektmagma.magmaquiz.app.users.presentation.screens.UserDetailsScreen
 import com.github.projektmagma.magmaquiz.app.users.presentation.screens.UsersScreen
 import org.koin.compose.viewmodel.koinViewModel
@@ -24,6 +32,7 @@ fun MainNavigation(
     navigationState: NavigationState,
     navigateToAuth: () -> Unit,
     navigateToGameScreen: (route: Route) -> Unit,
+    navigateToChangePassword: () -> Unit
 ) {
     val createQuizViewModel: CreateQuizViewModel = koinViewModel()
 
@@ -58,7 +67,7 @@ fun MainNavigation(
                         navigateToAuth = { navigateToAuth() },
                         navigateToChangeAccountDetailsScreen = { navigator.navigate(Route.Menus.Settings.DetailsChange) },
                         navigateToChangeLocationDetailsScreen = { navigator.navigate(Route.Menus.Settings.LocationChange) },
-                        navigateToChangePasswordScreen = { navigator.navigate(Route.Menus.Settings.PasswordChange(it)) },
+                        navigateToChangePasswordScreen = { navigateToChangePassword() },
                         navigateToChangeEmailScreen = { navigator.navigate(Route.Menus.Settings.EmailChange) },
                         navigateToAboutScreen = { navigator.navigate(Route.Menus.Settings.About) },
                     )
@@ -91,16 +100,6 @@ fun MainNavigation(
                             navigator.goBack()
                         },
                     )
-                }
-                // todo czesc password dopiero do zrobienia
-                entry<Route.Menus.Settings.PasswordChange> {
-                    PasswordChangeScreen(it.forgot)
-                }
-                entry<Route.Menus.Settings.PasswordEmailEntry> {
-
-                }
-                entry<Route.Menus.Settings.PasswordVerification> {
-
                 }
                 entry<Route.Menus.Quizzes.QuizList> {
                     QuizzesScreen(

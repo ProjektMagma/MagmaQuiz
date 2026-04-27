@@ -1,4 +1,4 @@
-package com.github.projektmagma.magmaquiz.app.settings.presentation.screens
+package com.github.projektmagma.magmaquiz.app.settings.presentation.screens.account
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,7 +20,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.projektmagma.magmaquiz.app.auth.presentation.components.UsernameTextField
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.LocalEvent
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
-import com.github.projektmagma.magmaquiz.app.settings.presentation.AccountDetailsChangeViewModel
 import com.github.projektmagma.magmaquiz.app.settings.presentation.model.account.AccountDetailsChangeCommand
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.account_details_change

@@ -8,48 +8,110 @@ import com.github.projektmagma.magmaquiz.server.mailer.MailerService
 import com.github.projektmagma.magmaquiz.server.repository.UserRepository
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkResource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.ChangeProfilePictureValue
-import io.ktor.http.*
-import kotlinx.coroutines.*
+import io.ktor.http.HttpStatusCode
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import java.util.UUID
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Instant
 
 class SettingsDataController(private val userRepository: UserRepository) {
 
 
     private val _verificationCodesList = mutableListOf<VerificationCode>()
+    
+    private val _passwordResetVerifiedUntil = mutableMapOf<UUID, Instant>()
+    private val _passwordResetTtl = 2.minutes
+    
 
     init {
         val healthScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
         healthScope.launch {
             while (true) {
-                delay(2.minutes)
+                delay(_passwordResetTtl)
                 _verificationCodesList.forEach { code ->
                     if (code.isExpired())
                         _verificationCodesList.remove(code)
+                }
+                _passwordResetVerifiedUntil.entries.removeAll { (_, expiresAt) ->
+                    Clock.System.now() > expiresAt
                 }
             }
         }
     }
 
-    fun settingsChangePassword(
-        session: UserSession,
-        newPassword: String,
+    fun settingsVerifyPasswordResetCode(
+        email: String,
         verificationCode: String
     ): NetworkResource<Unit> {
+        val thisUser = userRepository.getUserByEmail(email.lowercase())
+            ?: return NetworkResource.Error(HttpStatusCode.BadRequest)
 
+        val codeEntity = _verificationCodesList.firstOrNull { it.owner.id == thisUser.id }
+            ?: return NetworkResource.Error(HttpStatusCode.BadRequest)
+
+        if (!codeEntity.compareCode(verificationCode)) {
+            return NetworkResource.Error(HttpStatusCode.Forbidden)
+        }
+
+        _verificationCodesList.remove(codeEntity)
+        _passwordResetVerifiedUntil[thisUser.id.value] = Clock.System.now().plus(_passwordResetTtl)
+
+        return NetworkResource.Success(Unit)
+    }
+
+    fun settingsChangePasswordAfterVerifiedCode(
+        email: String,
+        newPassword: String
+    ): NetworkResource<Unit> {
+        val thisUser = userRepository.getUserByEmail(email.lowercase())
+            ?: return NetworkResource.Error(HttpStatusCode.BadRequest)
+
+        val userId = thisUser.id.value
+        val expiresAt = _passwordResetVerifiedUntil[userId]
+            ?: return NetworkResource.Error(HttpStatusCode.Forbidden)
+
+        if (Clock.System.now() > expiresAt) {
+            _passwordResetVerifiedUntil.remove(userId)
+            return NetworkResource.Error(HttpStatusCode.Forbidden)
+        }
+
+        thisUser.setHashedPassword(newPassword)
+        _passwordResetVerifiedUntil.remove(userId)
+
+        MailerService.sendMail(
+            thisUser.userEmail,
+            MailTemplates.PasswordChanged,
+            Pair("username", thisUser.userName)
+        )
+
+        return NetworkResource.Success(Unit)
+    }
+    
+    fun settingsChangePasswordWithOld(
+        session: UserSession,
+        oldPassword: String,
+        newPassword: String
+    ): NetworkResource<Unit> {
         val thisUser = userRepository.getUserData(session)
 
-        val codeEntity =
-            _verificationCodesList.firstOrNull { it.owner.id == thisUser.id }
-                ?: return NetworkResource.Error(HttpStatusCode.BadRequest)
-
-        if (!codeEntity.compareCode(verificationCode))
+        if (!thisUser.checkUserPassword(oldPassword)) {
             return NetworkResource.Error(HttpStatusCode.Forbidden)
+        }
 
         thisUser.setHashedPassword(newPassword)
 
-        MailerService.sendMail(thisUser.userEmail, MailTemplates.PasswordChanged, Pair("username", thisUser.userName))
+        MailerService.sendMail(
+            thisUser.userEmail,
+            MailTemplates.PasswordChanged,
+            Pair("username", thisUser.userName)
+        )
 
         return NetworkResource.Success(Unit)
     }
@@ -167,19 +229,16 @@ class SettingsDataController(private val userRepository: UserRepository) {
         return NetworkResource.Success(Unit)
     }
 
-    fun settingsVerificationCode(session: UserSession, email: String): NetworkResource<Unit> {
-        val thisUser = userRepository.getUserData(session)
+    fun settingsVerificationCode(email: String): NetworkResource<Unit> {
+        val normalizedEmail = email.lowercase()
+        val thisUser = userRepository.getUserByEmail(normalizedEmail)
+            ?: return NetworkResource.Success(Unit) // nie ujawniasz czy email istnieje
 
         val verificationCode = _verificationCodesList.firstOrNull { it.owner.id == thisUser.id }
-            ?: transaction {
-                val code = VerificationCode(thisUser)
-                _verificationCodesList.add(code)
-                code
-            }
-
+            ?: VerificationCode(thisUser).also { _verificationCodesList.add(it) }
 
         MailerService.sendMail(
-            email,
+            normalizedEmail,
             MailTemplates.VerificationCode,
             Pair("username", thisUser.userName),
             Pair("verification_code", verificationCode.generateCode())

@@ -41,6 +41,7 @@ fun NavRoot(
                     subclass(Route.Game::class, Route.Game.serializer())
                     subclass(Route.Auth::class, Route.Auth.serializer())
                     subclass(Route.Menus::class, Route.Menus.serializer())
+                    subclass(Route.Password::class, Route.Password.serializer())
                 }
             }
         },
@@ -90,16 +91,17 @@ fun Navigation(
         ),
         entryProvider = entryProvider {
             entry<Route.Auth> {
-                AuthNavigation(
-                    navigateToMain = {
-                        mainBackStack.clear()
-                        mainBackStack.add(Route.Menus)
-                    },
-                    navigateToPasswordChange = { 
-                        mainBackStack.add(Route.Menus)
-                        navigator.navigate(Route.Menus.Settings.PasswordChange(it))
-                    }
-                )
+                Column(modifier = modifier) {
+                    AuthNavigation(
+                        navigateToMain = {
+                            mainBackStack.clear()
+                            mainBackStack.add(Route.Menus)
+                        },
+                        navigateToEmailEntry = {
+                            mainBackStack.add(Route.Password(Route.Password.PasswordEmailEntry))
+                        }
+                    )
+                }
             }
             entry<Route.Menus> {
                 MainNavMenu(
@@ -115,7 +117,8 @@ fun Navigation(
                             navigationState.resetAllBackStacks()
                             mainBackStack.add(Route.Auth)
                         },
-                        navigateToGameScreen = { mainBackStack.add(Route.Game(it)) }
+                        navigateToGameScreen = { mainBackStack.add(Route.Game(it)) },
+                        navigateToChangePassword = { mainBackStack.add(Route.Password(Route.Password.PasswordChange(false))) }
                     )
                 }
             }
@@ -124,6 +127,14 @@ fun Navigation(
                     GameNavigation(
                         navigateToHome = { mainBackStack.removeLastOrNull() },
                         startDestination = parameters.startRoute,
+                    )
+                }
+            }
+            entry<Route.Password> { parameters ->
+                Column(modifier) { 
+                    PasswordNavigation(
+                        startRoute = parameters.startRoute,
+                        navigateBack = { mainBackStack.removeLastOrNull() }
                     )
                 }
             }

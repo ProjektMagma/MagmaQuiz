@@ -1,4 +1,4 @@
-package com.github.projektmagma.magmaquiz.app.settings.presentation.screens
+package com.github.projektmagma.magmaquiz.app.settings.presentation.screens.email.change
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,7 +21,6 @@ import com.github.projektmagma.magmaquiz.app.auth.presentation.components.EmailT
 import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
-import com.github.projektmagma.magmaquiz.app.settings.presentation.EmailChangeViewModel
 import com.github.projektmagma.magmaquiz.app.settings.presentation.model.email.change.EmailChangeCommand
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.change_email

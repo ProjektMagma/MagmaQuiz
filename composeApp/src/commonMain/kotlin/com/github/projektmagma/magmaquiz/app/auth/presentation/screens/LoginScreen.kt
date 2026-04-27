@@ -41,7 +41,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun LoginScreen(
     navigateToRegister: () -> Unit,
     navigateToHome: () -> Unit,
-    navigateToChangePassword: (forgot: Boolean) -> Unit
+    navigateToEmailEntry: () -> Unit
 ) {
     val viewModel = koinViewModel<AuthViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -91,7 +91,7 @@ fun LoginScreen(
         }
 
         ForgotPasswordText(
-            navigateToChangePassword = { navigateToChangePassword(it) },
+            navigateToEmailSettings = { navigateToEmailEntry() },
             modifier = Modifier.align(Alignment.End).offset(y = ((-16).dp))
         )
 

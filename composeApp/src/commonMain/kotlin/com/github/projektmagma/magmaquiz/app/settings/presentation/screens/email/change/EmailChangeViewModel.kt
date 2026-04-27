@@ -1,4 +1,4 @@
-package com.github.projektmagma.magmaquiz.app.settings.presentation
+package com.github.projektmagma.magmaquiz.app.settings.presentation.screens.email.change
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

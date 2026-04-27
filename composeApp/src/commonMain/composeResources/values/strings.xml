@@ -169,4 +169,16 @@
     <string name="about_application">About application</string>
     <string name="creators">App creators</string>
     <string name="version">Version</string>
+    <string name="current_password">Current password</string>
+    <string name="new_password">New password</string>
+    <string name="repeat_new_password">Repeat new password</string>
+    <string name="delete_account">Delete account</string>
+    <string name="forbidden">Forbidden</string>
+    <string name="couldnt_change_password">Couldn't change password</string>
+    <string name="successfuly_changed_password">Successfully changed password</string>
+    <string name="sent_code">Code sent</string>
+    <string name="couldnt_send_code">Couldn't send code</string>
+    <string name="couldnt_verify_code">Couldn't verify code</string>
+    <string name="delete_account_confirm_title">Delete account?</string>
+    <string name="delete_account_confirm_message">Are you sure you want to delete your account? This action cannot be undone.</string>
 </resources>

@@ -33,6 +33,7 @@ class SettingsViewModel(
         when (command) {
             SettingsCommand.ChangeProfilePicture -> changeProfilePicture(state.profilePicture)
             is SettingsCommand.ImageChanged -> state = state.copy(profilePicture = command.profilePicture)
+            SettingsCommand.DeleteAccount -> deleteAccount()
         }
     }
 
@@ -49,6 +50,18 @@ class SettingsViewModel(
             )
                 .whenSuccess {
                     _uiChannel.trySend(UiEvent.ShowSnackbar(Res.string.profile_picture_changed_success))
+                }
+                .whenError {
+                    _uiChannel.trySend(UiEvent.ShowSnackbar(it.error.toResId()))
+                }
+        }
+    }
+
+    private fun deleteAccount() {
+        viewModelScope.launch {
+            settingsRepository.deleteAccount()
+                .whenSuccess {
+                    _uiChannel.trySend(UiEvent.NavigateBack)
                 }
                 .whenError {
                     _uiChannel.trySend(UiEvent.ShowSnackbar(it.error.toResId()))

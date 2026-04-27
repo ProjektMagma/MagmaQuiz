@@ -12,13 +12,13 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ForgotPasswordText(
-    navigateToChangePassword: (forgot: Boolean) -> Unit,
+    navigateToEmailSettings: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Text(
         modifier = modifier
             .clickable(onClick = {
-                navigateToChangePassword(true)
+                navigateToEmailSettings()
             }
         ),
         text = stringResource(Res.string.forgot_password),

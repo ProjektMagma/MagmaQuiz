@@ -165,4 +165,16 @@
     <string name="about_application">O aplikacji</string>
     <string name="creators">Twórcy aplikacji</string>
     <string name="version">Wersja</string>
+    <string name="current_password">Aktualne hasło</string>
+    <string name="new_password">Nowe hasło</string>
+    <string name="repeat_new_password">Powtórz nowe hasło</string>
+    <string name="delete_account">Usuń konto</string>
+    <string name="forbidden">Zakaz</string>
+    <string name="couldnt_change_password">Nie udało się zmienić hasła</string>
+    <string name="successfuly_changed_password">Pomyślnie zmieniono hasło</string>
+    <string name="sent_code">Kod został wysłany</string>
+    <string name="couldnt_send_code">Nie udało się wysłać kodu</string>
+    <string name="couldnt_verify_code">Nie udało się zweryfikować kodu</string>
+    <string name="delete_account_confirm_title">Usunąć konto?</string>
+    <string name="delete_account_confirm_message">Czy na pewno chcesz usunąć konto? Tej operacji nie można cofnąć.</string>
 </resources>

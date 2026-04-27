@@ -3,7 +3,7 @@ package com.github.projektmagma.magmaquiz.shared.data.rest.values
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ConfirmChangeValue(
-    val email: String,
-    val payload: String
+data class ChangePasswordWithOldValue(
+    val oldPassword: String,
+    val newPassword: String
 )

@@ -1,4 +1,4 @@
-package com.github.projektmagma.magmaquiz.app.settings.presentation.screens
+package com.github.projektmagma.magmaquiz.app.settings.presentation.screens.location
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,7 +35,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.LocalEvent
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
 import com.github.projektmagma.magmaquiz.app.settings.domain.model.Country
-import com.github.projektmagma.magmaquiz.app.settings.presentation.LocationDetailsChangeViewModel
 import com.github.projektmagma.magmaquiz.app.settings.presentation.model.location.LocationDetailsChangeCommand
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.cant_save

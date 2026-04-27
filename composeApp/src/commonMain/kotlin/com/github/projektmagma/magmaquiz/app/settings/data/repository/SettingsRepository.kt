@@ -2,12 +2,15 @@ package com.github.projektmagma.magmaquiz.app.settings.data.repository
 
 import com.github.projektmagma.magmaquiz.app.core.domain.NetworkError
 import com.github.projektmagma.magmaquiz.app.settings.data.service.SettingsService
+import com.github.projektmagma.magmaquiz.app.settings.presentation.model.password.entry.PasswordEmailEntryState
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Resource
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class SettingsRepository(
     private val settingsService: SettingsService
 ) {
-
+    val passwordEmailEntryState = MutableStateFlow(PasswordEmailEntryState())
+    
     suspend fun changeProfilePicture(
         profilePictureBig: ByteArray,
         profilePictureSmall: ByteArray
@@ -45,5 +48,21 @@ class SettingsRepository(
 
     suspend fun confirmChangeEmail(email: String, verificationCode: String): Resource<Unit, NetworkError> {
         return settingsService.confirmChangeEmail(email, verificationCode)
+    }
+    
+    suspend fun verifyPasswordCode(email: String, verificationCode: String): Resource<Unit, NetworkError> {
+        return settingsService.verifyPasswordCode(email, verificationCode)
+    }
+
+    suspend fun changePassword(email: String, password: String): Resource<Unit, NetworkError> {
+        return settingsService.changePassword(email, password)
+    }
+
+    suspend fun changePasswordWithOld(oldPassword: String, newPassword: String): Resource<Unit, NetworkError> {
+        return settingsService.changePasswordWithOld(oldPassword, newPassword)
+    }
+
+    suspend fun deleteAccount(): Resource<Unit, NetworkError> {
+        return settingsService.deleteAccount()
     }
 }
