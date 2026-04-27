@@ -177,4 +177,5 @@
     <string name="couldnt_verify_code">Nie udało się zweryfikować kodu</string>
     <string name="delete_account_confirm_title">Usunąć konto?</string>
     <string name="delete_account_confirm_message">Czy na pewno chcesz usunąć konto? Tej operacji nie można cofnąć.</string>
+    <string name="incorrect_password">Niepoprawne hasło</string>
 </resources>

@@ -81,7 +81,7 @@ fun PasswordChangeScreen(
                     )
                     PasswordTextField(
                         passwordText = state.oldPassword,
-                        passwordError = state.oldPasswordError,
+                        error = state.oldPasswordError,
                         onValueChange = { passwordChangeViewModel.onCommand(PasswordChangeCommand.OldPasswordChanged(it)) }
                     )
                 }
@@ -92,7 +92,7 @@ fun PasswordChangeScreen(
                 )
                 PasswordTextField(
                     passwordText = state.newPassword,
-                    passwordError = state.newPasswordError,
+                    error = state.newPasswordError,
                     onValueChange = { passwordChangeViewModel.onCommand(PasswordChangeCommand.NewPasswordChanged(it)) }
                 )
                 
@@ -102,7 +102,7 @@ fun PasswordChangeScreen(
                 )
                 PasswordTextField(
                     passwordText = state.repeatedPassword,
-                    passwordError = null,
+                    error = null,
                     onValueChange = {
                         passwordChangeViewModel.onCommand(PasswordChangeCommand.RepeatedPasswordChange(it))
                     }

@@ -2,6 +2,7 @@ package com.github.projektmagma.magmaquiz.app.settings.presentation.screens.pass
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.projektmagma.magmaquiz.app.auth.data.AuthRepository
 import com.github.projektmagma.magmaquiz.app.core.domain.NetworkError
 import com.github.projektmagma.magmaquiz.app.core.util.Timer
 import com.github.projektmagma.magmaquiz.app.settings.data.repository.SettingsRepository
@@ -19,13 +20,16 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class PasswordVerifyViewModel(
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    authRepository: AuthRepository
 ) : ViewModel() {
     private val _code = MutableStateFlow("")
     private val _remainingSeconds = MutableStateFlow(15)
     private val _codeError = MutableStateFlow<NetworkError?>(null)
     private val _event = Channel<PasswordVerifyEvent>()
     val event = _event.receiveAsFlow()
+    
+    private val _email = settingsRepository.passwordEmailEntryState.value.email ?: authRepository.thisUser.value?.userEmail ?: ""
 
     val state = combine(
         _code,
@@ -35,7 +39,7 @@ class PasswordVerifyViewModel(
     ) { code, passwordEntryEmailState, remainingSeconds, codeError ->
         PasswordVerifyState(
             code = code,
-            email = passwordEntryEmailState.email ?: "",
+            email = passwordEntryEmailState.email ?: authRepository.thisUser.value?.userEmail ?: "",
             remainingSeconds = remainingSeconds,
             codeError = codeError
         )
@@ -70,7 +74,7 @@ class PasswordVerifyViewModel(
     
     private fun sendCode(){
         viewModelScope.launch {
-            settingsRepository.sendVerificationCode(settingsRepository.passwordEmailEntryState.value.email?:"")
+            settingsRepository.sendVerificationCode(_email)
                 .whenSuccess { _event.send(PasswordVerifyEvent.CodeSent) }
                 .whenError { _event.send(PasswordVerifyEvent.FailureSent) }
         }
@@ -78,7 +82,7 @@ class PasswordVerifyViewModel(
     
     private fun verify(){
         viewModelScope.launch { 
-            settingsRepository.verifyPasswordCode( settingsRepository.passwordEmailEntryState.value.email?:"", state.value.code)
+            settingsRepository.verifyPasswordCode(_email, state.value.code)
                 .whenError { 
                     val networkError = it.error
                     if (networkError == NetworkError.FORBIDDEN) {

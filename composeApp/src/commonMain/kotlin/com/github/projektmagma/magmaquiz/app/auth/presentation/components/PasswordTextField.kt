@@ -25,21 +25,29 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import com.github.projektmagma.magmaquiz.app.auth.domain.validator.PasswordError
 import com.github.projektmagma.magmaquiz.app.auth.domain.validator.toResId
+import com.github.projektmagma.magmaquiz.app.core.domain.NetworkError
+import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Error
 import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.incorrect_password
 import magmaquiz.composeapp.generated.resources.password
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun PasswordTextField(
     passwordText: String,
-    passwordError: PasswordError?,
+    error: Error?,
     imeAction: ImeAction = ImeAction.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
-    onValueChange: (String) -> Unit,
-
-    ) {
+    onValueChange: (String) -> Unit
+) {
     var isVisible by remember { mutableStateOf(false) }
 
+    val supportingText = when (error) {
+        is NetworkError -> stringResource(Res.string.incorrect_password)
+        is PasswordError -> stringResource(error.toResId())
+        else -> null
+    }
+    
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
         value = passwordText,
@@ -68,10 +76,10 @@ fun PasswordTextField(
         },
         visualTransformation = if (isVisible) VisualTransformation.None else PasswordVisualTransformation(),
         singleLine = true,
-        isError = passwordError != null,
+        isError = error != null,
         supportingText = {
             Text(
-                text = if (passwordError != null) stringResource(passwordError.toResId()) else "",
+                text = supportingText ?: "",
                 color = MaterialTheme.colorScheme.error,
             )
         },

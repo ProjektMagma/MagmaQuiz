@@ -88,7 +88,7 @@ fun RegisterScreen(
 
         PasswordTextField(
             passwordText = state.password,
-            passwordError = state.passwordError,
+            error = state.passwordError,
             imeAction = ImeAction.Done,
             keyboardActions = KeyboardActions(onDone = {
                 viewModel.onCommand(AuthCommand.Register)

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.github.projektmagma.magmaquiz.app.auth.data.AuthRepository
 import com.github.projektmagma.magmaquiz.app.auth.domain.validator.validateIsEmptyPassword
 import com.github.projektmagma.magmaquiz.app.auth.domain.validator.validatePassword
+import com.github.projektmagma.magmaquiz.app.core.domain.NetworkError
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
 import com.github.projektmagma.magmaquiz.app.settings.data.repository.SettingsRepository
 import com.github.projektmagma.magmaquiz.app.settings.presentation.model.password.change.PasswordChangeCommand
@@ -59,12 +60,19 @@ class PasswordChangeViewModel(
         viewModelScope.launch { 
             if (forgot) {
                 settingsRepository.changePassword( email, _state.value.newPassword)
+                    .whenError {
+                        _event.send(NetworkEvent.Failure(it.error))
+                    }
             } else {
                 settingsRepository.changePasswordWithOld(_state.value.oldPassword, _state.value.newPassword)
+                    .whenError { result ->
+                        when (result.error) {
+                            NetworkError.FORBIDDEN -> _state.update { it.copy(oldPasswordError = result.error) } 
+                            else -> _event.send(NetworkEvent.Failure(result.error))
+                        }
+                    }
             }.whenSuccess { 
                 _event.send(NetworkEvent.Success)
-            }.whenError { 
-                _event.send(NetworkEvent.Failure(it.error))
             }
         }
     }
