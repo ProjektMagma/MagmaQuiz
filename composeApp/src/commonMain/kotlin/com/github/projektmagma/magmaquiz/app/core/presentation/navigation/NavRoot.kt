@@ -91,7 +91,7 @@ fun Navigation(
         ),
         entryProvider = entryProvider {
             entry<Route.Auth> {
-                Column(modifier = modifier) {
+                Column(modifier = modifier.fillMaxSize()) {
                     AuthNavigation(
                         navigateToMain = {
                             mainBackStack.clear()
@@ -123,7 +123,7 @@ fun Navigation(
                 }
             }
             entry<Route.Game> { parameters ->
-                Column(modifier = modifier) {
+                Column(modifier = modifier.fillMaxSize()) {
                     GameNavigation(
                         navigateToHome = { mainBackStack.removeLastOrNull() },
                         startDestination = parameters.startRoute,
@@ -131,7 +131,7 @@ fun Navigation(
                 }
             }
             entry<Route.Password> { parameters ->
-                Column(modifier) { 
+                Column(modifier.fillMaxSize()) { 
                     PasswordNavigation(
                         startRoute = parameters.startRoute,
                         navigateBack = { mainBackStack.removeLastOrNull() }

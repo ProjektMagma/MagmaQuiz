@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -56,81 +57,86 @@ fun PasswordChangeScreen(
     }
 
     Column(
-        modifier = Modifier
-            .widthIn(max = 560.dp)
-            .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = stringResource(Res.string.change_password),
-            style = MaterialTheme.typography.headlineSmall
-        )
+        Column(
+            modifier = Modifier
+                .widthIn(max = 560.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = stringResource(Res.string.change_password),
+                style = MaterialTheme.typography.headlineSmall
+            )
 
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                if (!forgot) {
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    if (!forgot) {
+                        Text(
+                            text = stringResource(Res.string.current_password),
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                        PasswordTextField(
+                            passwordText = state.oldPassword,
+                            error = state.oldPasswordError,
+                            onValueChange = { passwordChangeViewModel.onCommand(PasswordChangeCommand.OldPasswordChanged(it)) }
+                        )
+                    }
+
                     Text(
-                        text = stringResource(Res.string.current_password),
+                        text = if (forgot) stringResource(Res.string.password) else stringResource(Res.string.new_password),
                         style = MaterialTheme.typography.labelLarge
                     )
                     PasswordTextField(
-                        passwordText = state.oldPassword,
-                        error = state.oldPasswordError,
-                        onValueChange = { passwordChangeViewModel.onCommand(PasswordChangeCommand.OldPasswordChanged(it)) }
+                        passwordText = state.newPassword,
+                        error = state.newPasswordError,
+                        onValueChange = { passwordChangeViewModel.onCommand(PasswordChangeCommand.NewPasswordChanged(it)) }
                     )
-                }
-
-                Text(
-                    text = if (forgot) stringResource(Res.string.password) else stringResource(Res.string.new_password),
-                    style = MaterialTheme.typography.labelLarge
-                )
-                PasswordTextField(
-                    passwordText = state.newPassword,
-                    error = state.newPasswordError,
-                    onValueChange = { passwordChangeViewModel.onCommand(PasswordChangeCommand.NewPasswordChanged(it)) }
-                )
-                
-                Text(
-                    text = stringResource(Res.string.repeat_new_password),
-                    style = MaterialTheme.typography.labelLarge
-                )
-                PasswordTextField(
-                    passwordText = state.repeatedPassword,
-                    error = null,
-                    onValueChange = {
-                        passwordChangeViewModel.onCommand(PasswordChangeCommand.RepeatedPasswordChange(it))
-                    }
-                )
-
-                if (state.passwordMatch == false) {
+                    
                     Text(
-                        text = stringResource(Res.string.passwords_dont_match),
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall
+                        text = stringResource(Res.string.repeat_new_password),
+                        style = MaterialTheme.typography.labelLarge
                     )
-                }
-                
-                if (!forgot) {
-                    ForgotPasswordText(
-                        navigateToEmailSettings = { navigateToPasswordVerification() }
+                    PasswordTextField(
+                        passwordText = state.repeatedPassword,
+                        error = null,
+                        onValueChange = {
+                            passwordChangeViewModel.onCommand(PasswordChangeCommand.RepeatedPasswordChange(it))
+                        }
                     )
-                }
-            }
-        }
 
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = {
-                passwordChangeViewModel.onCommand(PasswordChangeCommand.Save)
+                    if (state.passwordMatch == false) {
+                        Text(
+                            text = stringResource(Res.string.passwords_dont_match),
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    
+                    if (!forgot) {
+                        ForgotPasswordText(
+                            navigateToEmailSettings = { navigateToPasswordVerification() }
+                        )
+                    }
+                }
             }
-        ) {
-            Text(text = stringResource(Res.string.save))
+
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {
+                    passwordChangeViewModel.onCommand(PasswordChangeCommand.Save)
+                }
+            ) {
+                Text(text = stringResource(Res.string.save))
+            }
         }
     }
 }

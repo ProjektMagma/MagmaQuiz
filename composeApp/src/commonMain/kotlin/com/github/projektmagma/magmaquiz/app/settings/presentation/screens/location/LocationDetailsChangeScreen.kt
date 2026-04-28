@@ -72,15 +72,14 @@ fun LocationDetailsChangeScreen(
     }
     
     Column(
-        modifier = Modifier
-            .widthIn(max = 1000.dp)
-            .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 20.dp),
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth(),
+                .widthIn(max = 560.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 20.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             Text(

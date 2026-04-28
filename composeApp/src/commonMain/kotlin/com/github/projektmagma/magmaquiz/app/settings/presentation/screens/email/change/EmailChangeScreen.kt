@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -52,70 +53,75 @@ fun EmailChangeScreen(
     val canSave = state.email.isNotBlank() && state.emailError == null
 
     Column(
-        modifier = Modifier
-            .widthIn(max = 560.dp)
-            .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = stringResource(Res.string.change_email),
-            style = MaterialTheme.typography.headlineSmall
-        )
-        
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer
+        Column(
+            modifier = Modifier
+                .widthIn(max = 560.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = stringResource(Res.string.change_email),
+                style = MaterialTheme.typography.headlineSmall
             )
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(14.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
+            
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                )
             ) {
-                Text(
-                    text = stringResource(Res.string.current_email),
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-                Text(
-                    text = currentEmail,
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(14.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Text(
+                        text = stringResource(Res.string.current_email),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                    Text(
+                        text = currentEmail,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                }
             }
-        }
-        
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+            
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = stringResource(Res.string.new_email),
+                        style = MaterialTheme.typography.labelLarge
+                    )
+
+                    EmailTextField(
+                        emailText = state.email,
+                        error = state.emailError,
+                        onValueChange = {
+                            emailChangeViewModel.onCommand(EmailChangeCommand.ChangeEmail(it))
+                        }
+                    )
+                }
+            }
+
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                enabled = canSave,
+                onClick = { emailChangeViewModel.onCommand(EmailChangeCommand.CheckIsEmailTaken) }
             ) {
-                Text(
-                    text = stringResource(Res.string.new_email),
-                    style = MaterialTheme.typography.labelLarge
-                )
-
-                EmailTextField(
-                    emailText = state.email,
-                    error = state.emailError,
-                    onValueChange = {
-                        emailChangeViewModel.onCommand(EmailChangeCommand.ChangeEmail(it))
-                    }
-                )
+                Text(text = stringResource(Res.string.save))
             }
-        }
-
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            enabled = canSave,
-            onClick = { emailChangeViewModel.onCommand(EmailChangeCommand.CheckIsEmailTaken) }
-        ) {
-            Text(text = stringResource(Res.string.save))
         }
     }
 }

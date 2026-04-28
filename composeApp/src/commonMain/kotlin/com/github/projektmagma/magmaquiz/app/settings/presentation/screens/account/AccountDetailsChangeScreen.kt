@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -51,57 +52,62 @@ fun AccountDetailsChangeScreen(
     }
 
     Column(
-        modifier = Modifier
-            .widthIn(max = 1000.dp)
-            .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp)
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = stringResource(Res.string.account_details_change),
-            style = MaterialTheme.typography.headlineSmall
-        )
-
-        Card(
-            modifier = Modifier.fillMaxWidth()
+        Column(
+            modifier = Modifier
+                .widthIn(max = 560.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+            Text(
+                text = stringResource(Res.string.account_details_change),
+                style = MaterialTheme.typography.headlineSmall
+            )
+
+            Card(
+                modifier = Modifier.fillMaxWidth()
             ) {
-                UsernameTextField(
-                    usernameText = state.username,
-                    error = state.usernameError,
-                    onValueChange = {
-                        accountDetailsChangeViewModel.onCommand(
-                            AccountDetailsChangeCommand.UsernameChanged(it)
-                        )
-                    }
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    UsernameTextField(
+                        usernameText = state.username,
+                        error = state.usernameError,
+                        onValueChange = {
+                            accountDetailsChangeViewModel.onCommand(
+                                AccountDetailsChangeCommand.UsernameChanged(it)
+                            )
+                        }
+                    )
 
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = state.bio,
-                    onValueChange = {
-                        accountDetailsChangeViewModel.onCommand(
-                            AccountDetailsChangeCommand.BioChanged(it)
-                        )
-                    },
-                    minLines = 3,
-                    maxLines = 5,
-                    label = { Text(stringResource(Res.string.bio)) },
-                )
+                    OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = state.bio,
+                        onValueChange = {
+                            accountDetailsChangeViewModel.onCommand(
+                                AccountDetailsChangeCommand.BioChanged(it)
+                            )
+                        },
+                        minLines = 3,
+                        maxLines = 5,
+                        label = { Text(stringResource(Res.string.bio)) },
+                    )
+                }
             }
-        }
 
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            enabled = canSave,
-            onClick = { accountDetailsChangeViewModel.onCommand(AccountDetailsChangeCommand.Save) }
-        ) {
-            Text(stringResource(Res.string.save))
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                enabled = canSave,
+                onClick = { accountDetailsChangeViewModel.onCommand(AccountDetailsChangeCommand.Save) }
+            ) {
+                Text(stringResource(Res.string.save))
+            }
         }
     }
 }

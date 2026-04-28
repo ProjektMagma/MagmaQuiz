@@ -8,11 +8,11 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +28,7 @@ import com.github.projektmagma.magmaquiz.app.auth.presentation.model.auth.AuthCo
 import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.ErrorMessageContext
 import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
+import com.github.projektmagma.magmaquiz.app.core.util.ObserveAsEvents
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.dont_have_an_account
@@ -46,26 +47,25 @@ fun LoginScreen(
     val viewModel = koinViewModel<AuthViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    LaunchedEffect(viewModel.authChannel) {
-        viewModel.authChannel.collect { event ->
-            when (event) {
-                is NetworkEvent.Failure -> {
-                    SnackbarController.onEvent(getString(event.networkError.toResId(ErrorMessageContext.Auth)))
-                }
+    ObserveAsEvents(viewModel.authChannel) { event ->
+        when (event) {
+            is NetworkEvent.Failure -> {
+                SnackbarController.onEvent(getString(event.networkError.toResId(ErrorMessageContext.Auth)))
+            }
 
-                NetworkEvent.Success -> {
-                    navigateToHome()
-                }
+            NetworkEvent.Success -> {
+                navigateToHome()
             }
         }
     }
 
     Column(
         modifier = Modifier
-            .padding(horizontal = 32.dp)
-            .imePadding()
             .fillMaxSize()
-            .widthIn(max = 512.dp),
+            .imePadding()
+            .wrapContentWidth(align = Alignment.CenterHorizontally)
+            .widthIn(max = 512.dp)
+            .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
     ) {

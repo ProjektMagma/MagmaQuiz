@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -42,47 +43,52 @@ fun PasswordEmailEntry(
     }
 
     Column(
-        modifier = Modifier
-            .widthIn(max = 560.dp)
-            .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = stringResource(Res.string.change_password),
-            style = MaterialTheme.typography.headlineSmall
-        )
-
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = stringResource(Res.string.email),
-                    style = MaterialTheme.typography.labelLarge
-                )
-
-                EmailTextField(
-                    emailText = state.email ?: "",
-                    error = state.emailError,
-                    onValueChange = {
-                        passwordEmailEntryViewModel.onCommand(PasswordEmailEntryCommand.EmailChanged(it))
-                    }
-                )
-            }
-        }
-
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            enabled = canSend,
-            onClick = {
-                passwordEmailEntryViewModel.onCommand(PasswordEmailEntryCommand.CheckEmail)
-            }
+        Column(
+            modifier = Modifier
+                .widthIn(max = 560.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(stringResource(Res.string.confirm))
+            Text(
+                text = stringResource(Res.string.change_password),
+                style = MaterialTheme.typography.headlineSmall
+            )
+
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = stringResource(Res.string.email),
+                        style = MaterialTheme.typography.labelLarge
+                    )
+
+                    EmailTextField(
+                        emailText = state.email ?: "",
+                        error = state.emailError,
+                        onValueChange = {
+                            passwordEmailEntryViewModel.onCommand(PasswordEmailEntryCommand.EmailChanged(it))
+                        }
+                    )
+                }
+            }
+
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                enabled = canSend,
+                onClick = {
+                    passwordEmailEntryViewModel.onCommand(PasswordEmailEntryCommand.CheckEmail)
+                }
+            ) {
+                Text(stringResource(Res.string.confirm))
+            }
         }
     }
 }

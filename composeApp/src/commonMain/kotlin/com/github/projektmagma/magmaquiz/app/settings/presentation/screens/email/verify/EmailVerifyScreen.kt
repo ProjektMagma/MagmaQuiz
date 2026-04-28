@@ -62,68 +62,73 @@ fun EmailVerificationScreen(
     val state by emailVerifyViewModel.state.collectAsStateWithLifecycle()
 
     Column(
-        modifier = Modifier
-            .widthIn(max = 1000.dp)
-            .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp)
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = stringResource(Res.string.email_verification),
-            style = MaterialTheme.typography.headlineSmall
-        )
-
-        Card(
-            modifier = Modifier.fillMaxWidth()
+        Column(
+            modifier = Modifier
+                .widthIn(max = 560.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+            Text(
+                text = stringResource(Res.string.email_verification),
+                style = MaterialTheme.typography.headlineSmall
+            )
+
+            Card(
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text(
-                    text = stringResource(Res.string.code_we_sent),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = state.code,
-                    onValueChange = { input ->
-                        emailVerifyViewModel.onCommand(EmailVerifyCommand.ChangeVerificationCode(input))
-                    },
-                    singleLine = true,
-                    label = { Text(stringResource(Res.string.verification_code)) },
-                    placeholder = { Text(stringResource(Res.string.example_code)) },
-                    keyboardOptions = KeyboardOptions(
-                        capitalization = KeyboardCapitalization.Characters,
-                        imeAction = ImeAction.Done
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Text(
+                        text = stringResource(Res.string.code_we_sent),
+                        style = MaterialTheme.typography.bodyMedium
                     )
-                )
+
+                    OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = state.code,
+                        onValueChange = { input ->
+                            emailVerifyViewModel.onCommand(EmailVerifyCommand.ChangeVerificationCode(input))
+                        },
+                        singleLine = true,
+                        label = { Text(stringResource(Res.string.verification_code)) },
+                        placeholder = { Text(stringResource(Res.string.example_code)) },
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Characters,
+                            imeAction = ImeAction.Done
+                        )
+                    )
+                }
             }
-        }
 
-        OutlinedButton(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = { emailVerifyViewModel.onCommand(EmailVerifyCommand.ResendCode) },
-            enabled = state.timeToResend == 0
-        ) {
-            Text(stringResource(Res.string.resend_code))
-        }
-        
-        Text(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            text = stringResource(Res.string.send_again_in, state.timeToResend),
-            color = MaterialTheme.colorScheme.outline,
-            style = MaterialTheme.typography.labelSmall
-        )
+            OutlinedButton(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { emailVerifyViewModel.onCommand(EmailVerifyCommand.ResendCode) },
+                enabled = state.timeToResend == 0
+            ) {
+                Text(stringResource(Res.string.resend_code))
+            }
+            
+            Text(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                text = stringResource(Res.string.send_again_in, state.timeToResend),
+                color = MaterialTheme.colorScheme.outline,
+                style = MaterialTheme.typography.labelSmall
+            )
 
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = { emailVerifyViewModel.onCommand(EmailVerifyCommand.VerifyCode) }
-        ) {
-            Text(stringResource(Res.string.confirm))
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { emailVerifyViewModel.onCommand(EmailVerifyCommand.VerifyCode) }
+            ) {
+                Text(stringResource(Res.string.confirm))
+            }
         }
     }
 }

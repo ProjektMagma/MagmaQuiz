@@ -58,80 +58,85 @@ fun PasswordVerifyScreen(
     }
 
     Column(
-        modifier = Modifier
-            .widthIn(max = 560.dp)
-            .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = CenterHorizontally
     ) {
-        Text(
-            text = stringResource(Res.string.change_password),
-            style = MaterialTheme.typography.headlineSmall
-        )
+        Column(
+            modifier = Modifier
+                .widthIn(max = 560.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = stringResource(Res.string.change_password),
+                style = MaterialTheme.typography.headlineSmall
+            )
 
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                Text(
-                    text = stringResource(Res.string.code_we_sent),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-
-                Text(
-                    text = state.email,
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
-
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = state.code,
-                    onValueChange = { passwordVerifyViewModel.onCommand(PasswordVerifyCommand.CodeChanged(it)) },
-                    singleLine = true,
-                    isError = state.codeError != null,
-                    supportingText = {
-                        if (state.codeError != null) {
-                            Text(stringResource(Res.string.invalid_code))
-                        }
-                    },
-                    label = { Text(stringResource(Res.string.verification_code)) },
-                    placeholder = { Text(stringResource(Res.string.example_code)) },
-                    keyboardOptions = KeyboardOptions(
-                        capitalization = KeyboardCapitalization.Characters,
-                        imeAction = ImeAction.Done
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Text(
+                        text = stringResource(Res.string.code_we_sent),
+                        style = MaterialTheme.typography.bodyMedium
                     )
-                )
+
+                    Text(
+                        text = state.email,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+
+                    OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = state.code,
+                        onValueChange = { passwordVerifyViewModel.onCommand(PasswordVerifyCommand.CodeChanged(it)) },
+                        singleLine = true,
+                        isError = state.codeError != null,
+                        supportingText = {
+                            if (state.codeError != null) {
+                                Text(stringResource(Res.string.invalid_code))
+                            }
+                        },
+                        label = { Text(stringResource(Res.string.verification_code)) },
+                        placeholder = { Text(stringResource(Res.string.example_code)) },
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Characters,
+                            imeAction = ImeAction.Done
+                        )
+                    )
+                }
             }
-        }
 
-        val canConfirm = state.code.length == 6
+            val canConfirm = state.code.length == 6
 
-        OutlinedButton(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = { passwordVerifyViewModel.onCommand(PasswordVerifyCommand.SendCode) },
-            enabled = state.remainingSeconds == 0
-        ) {
-            Text(stringResource(Res.string.resend_code))
-        }
+            OutlinedButton(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { passwordVerifyViewModel.onCommand(PasswordVerifyCommand.SendCode) },
+                enabled = state.remainingSeconds == 0
+            ) {
+                Text(stringResource(Res.string.resend_code))
+            }
 
-        Text(
-            modifier = Modifier.align(CenterHorizontally),
-            text = stringResource(Res.string.send_again_in, state.remainingSeconds),
-            color = MaterialTheme.colorScheme.outline,
-            style = MaterialTheme.typography.labelSmall
-        )
+            Text(
+                modifier = Modifier.align(CenterHorizontally),
+                text = stringResource(Res.string.send_again_in, state.remainingSeconds),
+                color = MaterialTheme.colorScheme.outline,
+                style = MaterialTheme.typography.labelSmall
+            )
 
 
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            enabled = canConfirm,
-            onClick = { passwordVerifyViewModel.onCommand(PasswordVerifyCommand.Verify) }
-        ) {
-            Text(stringResource(Res.string.confirm))
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                enabled = canConfirm,
+                onClick = { passwordVerifyViewModel.onCommand(PasswordVerifyCommand.Verify) }
+            ) {
+                Text(stringResource(Res.string.confirm))
+            }
         }
     }
 }
