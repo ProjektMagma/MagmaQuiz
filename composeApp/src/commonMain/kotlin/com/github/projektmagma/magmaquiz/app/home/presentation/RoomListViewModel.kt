@@ -65,7 +65,14 @@ class RoomListViewModel(
         viewModelScope.launch {
             gameRepository.joinRoom(id)
                 .whenSuccess { _event.send(NetworkEvent.Success) }
-                .whenError { _event.send(NetworkEvent.Failure(it.error)) }
+                .whenError { result ->
+                    _state.update { 
+                        it.copy(
+                            roomList = it.roomList.filter { room -> room.roomId != id }
+                        )
+                    }
+                    _event.send(NetworkEvent.Failure(result.error)) 
+                }
         }
     }
 

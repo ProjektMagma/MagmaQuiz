@@ -2,10 +2,11 @@ package com.github.projektmagma.magmaquiz.app.settings.presentation.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
@@ -53,6 +54,7 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.UiEvent
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
+import com.github.projektmagma.magmaquiz.app.core.util.reloadDI
 import com.github.projektmagma.magmaquiz.app.settings.presentation.SettingsViewModel
 import com.github.projektmagma.magmaquiz.app.settings.presentation.components.SettingsOption
 import com.github.projektmagma.magmaquiz.app.settings.presentation.model.settings.SettingsCommand
@@ -109,6 +111,7 @@ fun SettingsScreen(
                 }
 
                 NetworkEvent.Success -> {
+                    reloadDI()
                     navigateToAuth()
                 }
             }
@@ -197,7 +200,10 @@ fun SettingsScreen(
     )
 
     Column(
-        modifier = Modifier.fillMaxHeight().widthIn(max = 1000.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .wrapContentWidth(Alignment.CenterHorizontally)
+            .widthIn(max = 1280.dp)
     ) {
         SettingsOption(
             text = Res.string.log_out,

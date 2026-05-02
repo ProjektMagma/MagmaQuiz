@@ -150,7 +150,7 @@
     <string name="set_room_details">Set room's name and time to answer</string>
     <string name="room_name">Room's name</string>
     <string name="room_name_length">The name must be between 3 and 30 characters long</string>
-    <string name="time_to_answer">Time to answer: %1$d</string>
+    <string name="time_to_answer">Time to answer: %1$ds</string>
     <string name="players_count">%1$d players</string>
     <string name="seconds_per_question">%1$ds / question</string>
     <string name="in_progress">In progress</string>
@@ -182,4 +182,9 @@
     <string name="delete_account_confirm_title">Delete account?</string>
     <string name="delete_account_confirm_message">Are you sure you want to delete your account? This action cannot be undone.</string>
     <string name="incorrect_password">Incorrect password</string>
+    <string name="room_visibility">Room visibility</string>
+    <string name="public_room">Public - anyone can join</string>
+    <string name="private_room">For friends only</string>
+    <string name="percent_correct">%1$d% correct</string>
+    <string name="enter_answer">Enter the answer…</string>
 </resources>

@@ -33,8 +33,11 @@ import com.github.projektmagma.magmaquiz.app.game.presentation.model.settings.Ga
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.cant_create_room
 import magmaquiz.composeapp.generated.resources.create_room
+import magmaquiz.composeapp.generated.resources.private_room
+import magmaquiz.composeapp.generated.resources.public_room
 import magmaquiz.composeapp.generated.resources.room_name
 import magmaquiz.composeapp.generated.resources.room_name_length
+import magmaquiz.composeapp.generated.resources.room_visibility
 import magmaquiz.composeapp.generated.resources.set_room_details
 import magmaquiz.composeapp.generated.resources.time_to_answer
 import org.jetbrains.compose.resources.getString
@@ -67,11 +70,11 @@ fun GameSettingsScreen(
 
     Column(
         modifier = Modifier
-            .padding(horizontal = 20.dp, vertical = 16.dp)
-            .imePadding()
             .fillMaxSize()
+            .imePadding()
+            .widthIn(max = 640.dp)
             .verticalScroll(rememberScrollState())
-            .widthIn(max = 640.dp),
+            .padding(horizontal = 20.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -163,11 +166,11 @@ fun GameSettingsScreen(
                             verticalArrangement = Arrangement.spacedBy(2.dp)
                         ) {
                             Text(
-                                text = "Widoczność pokoju",
+                                text = stringResource(Res.string.room_visibility),
                                 style = MaterialTheme.typography.titleSmall
                             )
                             Text(
-                                text = if (state.isPublic) "Publiczny - każdy może dołączyć" else "Tylko dla znajomych",
+                                text = stringResource(if (state.isPublic) Res.string.public_room else Res.string.private_room),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )

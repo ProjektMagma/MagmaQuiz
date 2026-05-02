@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.ContentImage
@@ -75,8 +77,9 @@ fun QuizDetailsScreen(
         UiState.Success -> {
             Column(
                 modifier = Modifier
-                    .widthIn(max = 1000.dp)
                     .fillMaxSize()
+                    .wrapContentWidth(Alignment.CenterHorizontally)
+                    .widthIn(max = 1280.dp)
                     .padding(horizontal = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
@@ -208,18 +211,19 @@ fun QuizDetailsScreen(
                                     .fillMaxWidth()
                                     .padding(10.dp),
                                 horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                verticalAlignment = Alignment.CenterVertically
                             ) {
                                 ContentImage(
                                     imageData = question.questionImage,
                                     imageSize = 72.dp
                                 )
-                                Column(
-                                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
                                 ) {
                                     QuestionNumber(question.questionNumber)
                                     Text(
                                         text = question.questionContent,
+                                        overflow = TextOverflow.Ellipsis,
+                                        maxLines = 3,
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                                 }

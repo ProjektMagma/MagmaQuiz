@@ -28,11 +28,12 @@ class GameMultiplayerViewModel(
     private val quizRepository: QuizRepository,
     private val authRepository: AuthRepository
 ) : ViewModel() {
-    private val _gameState = MutableStateFlow(GameState())
-    val gameState = _gameState.asStateFlow()
-
     private val _room = gameRepository.roomSettings
 
+    private val _gameState = MutableStateFlow(GameState(
+        secondsForQuestion = _room.value!!.questionTimeInMillis.toSeconds()
+    ))
+    val gameState = _gameState.asStateFlow()
     private val _questions = gameRepository.questions
 
     private val _correctQuestions = MutableStateFlow<Map<ForeignUser, Int>>(
@@ -162,9 +163,8 @@ class GameMultiplayerViewModel(
     }
 
     private fun startCountdown() {
-        val seconds = _room.value!!.questionTimeInMillis.toSeconds()
         countdownTimer.start(
-            from = seconds,
+            from = _gameState.value.secondsForQuestion,
             onTick = { tick ->
                 _gameState.update { it.copy(remainingSeconds = tick) }
             }

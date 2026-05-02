@@ -57,7 +57,7 @@ import magmaquiz.composeapp.generated.resources.start_game
 import magmaquiz.composeapp.generated.resources.waiting
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-// todo poprawic screen i content architekture
+
 @Composable
 fun GameWaitScreen(
     gameWaitViewModel: GameWaitViewModel = koinViewModel(),
@@ -81,8 +81,11 @@ fun GameWaitScreen(
         else -> GameHostContent(
             room = roomState,
             state = state,
-            onLeaveRoom,
-            gameWaitViewModel = gameWaitViewModel
+            isHost = gameWaitViewModel.checkIsHost(),
+            onLeaveRoom = { onLeaveRoom() },
+            dialogVisibilityChanged = { gameWaitViewModel.onCommand(GameWaitCommand.DialogVisibilityChanged(it)) },
+            sendMessage = { gameWaitViewModel.sendMessage(it) },
+            leaveRoom = { gameWaitViewModel.leaveRoom() },
         )
     }
 }
@@ -91,18 +94,19 @@ fun GameWaitScreen(
 private fun GameHostContent(
     room: RoomSettings,
     state: GameWaitState,
+    isHost: Boolean,
     onLeaveRoom: () -> Unit,
-    gameWaitViewModel: GameWaitViewModel
+    dialogVisibilityChanged: (value: Boolean) -> Unit,
+    sendMessage: (WebSocketMessages.IncomingMessage) -> Unit,
+    leaveRoom: () -> Unit
 ) {
     val timeSeconds = room.questionTimeInMillis.toSeconds()
-    val isHost = gameWaitViewModel.checkIsHost()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .imePadding()
-            .padding(horizontal = 16.dp, vertical = 12.dp)
-            .widthIn(max = 900.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
@@ -115,7 +119,7 @@ private fun GameHostContent(
                 ) {
                     Text("OK")
                 } },
-                onDismissRequest = { gameWaitViewModel.onCommand(GameWaitCommand.DialogVisibilityChanged(false)) },
+                onDismissRequest = { dialogVisibilityChanged(false) },
                 text = { Text(state.errorMessage ?: "") }
             )
         }
@@ -239,7 +243,7 @@ private fun GameHostContent(
                 OutlinedButton(
                     modifier = Modifier.weight(1f),
                     onClick = {
-                        gameWaitViewModel.sendMessage(WebSocketMessages.IncomingMessage.CloseRoom)
+                        sendMessage(WebSocketMessages.IncomingMessage.CloseRoom)
                     }
                 ) {
                     Text(stringResource(Res.string.close_room))
@@ -248,7 +252,7 @@ private fun GameHostContent(
                 Button(
                     modifier = Modifier.weight(1f),
                     onClick = {
-                        gameWaitViewModel.sendMessage(WebSocketMessages.IncomingMessage.StartGame)
+                        sendMessage(WebSocketMessages.IncomingMessage.StartGame)
                     },
                     enabled = room.userList.isNotEmpty() && !room.isInProgress
                 ) {
@@ -258,8 +262,8 @@ private fun GameHostContent(
                 OutlinedButton(
                     modifier = Modifier.weight(1f),
                     onClick = {
-                        gameWaitViewModel.sendMessage(WebSocketMessages.IncomingMessage.Disconnect)
-                        gameWaitViewModel.leaveRoom()
+                        sendMessage(WebSocketMessages.IncomingMessage.Disconnect)
+                        leaveRoom()
                     }
                 ) {
                     Text(stringResource(Res.string.leave_room))
@@ -281,6 +285,7 @@ private fun UserRow(
     ) {
         Row(
             modifier = Modifier
+                .widthIn(256.dp)
                 .fillMaxWidth()
                 .padding(horizontal = 10.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,

@@ -146,7 +146,7 @@
     <string name="set_room_details">Ustaw nazwe pokoju i czas na odpowiedz."</string>
     <string name="room_name">Nazwa pokoju</string>
     <string name="room_name_length">Nazwa musi miec od 3 do 30 znakow.</string>
-    <string name="time_to_answer">Czas na pytanie: %1$d</string>
+    <string name="time_to_answer">Czas na pytanie: %1$ds</string>
     <string name="players_count">%1$d graczy</string>
     <string name="seconds_per_question">%1$ds / pytanie</string>
     <string name="in_progress">W trakcie</string>
@@ -178,4 +178,9 @@
     <string name="delete_account_confirm_title">Usunąć konto?</string>
     <string name="delete_account_confirm_message">Czy na pewno chcesz usunąć konto? Tej operacji nie można cofnąć.</string>
     <string name="incorrect_password">Niepoprawne hasło</string>
+    <string name="room_visibility">Widoczność pokoju</string>
+    <string name="public_room">Publiczny - każdy może dołączyć</string>
+    <string name="private_room">Tylko dla znajomych</string>
+    <string name="percent_correct">%1$d% poprawnych</string>
+    <string name="enter_answer">Wprowadź odpowiedź…</string>
 </resources>

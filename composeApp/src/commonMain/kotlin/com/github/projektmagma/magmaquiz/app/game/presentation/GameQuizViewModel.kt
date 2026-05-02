@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class GameQuizViewModel(
     quizRepository: QuizRepository
@@ -26,7 +28,7 @@ class GameQuizViewModel(
             is GameCommand.AnswerClicked -> onAnswerSelected(command)
             GameCommand.FinishGame -> {
                 viewModelScope.launch { 
-                    delay(400)
+                    delay(400.milliseconds)
                     _gameState.update { it.copy(score = 0, currentQuestionIndex = 0) }
                 }
             }
@@ -57,7 +59,7 @@ class GameQuizViewModel(
         }
 
         viewModelScope.launch {
-            delay(2000)
+            delay(2.seconds)
             _gameState.update { gameState ->
                 gameState.copy(currentQuestionIndex = gameState.currentQuestionIndex + 1)
             }

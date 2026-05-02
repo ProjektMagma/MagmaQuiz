@@ -10,5 +10,6 @@ data class GameState(
     val isAnswered: Boolean = false,
     val isQuizFinished: Boolean = false,
     val totalQuestions: Int = 0,
-    val remainingSeconds: Int = 0
+    val remainingSeconds: Int = 0,
+    val secondsForQuestion: Int = 0
 )
