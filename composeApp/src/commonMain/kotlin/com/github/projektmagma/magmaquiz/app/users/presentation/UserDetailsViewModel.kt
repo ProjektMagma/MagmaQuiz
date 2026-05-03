@@ -52,20 +52,34 @@ class UserDetailsViewModel(
         SharingStarted.WhileSubscribed(5000L),
         UserDetailsState()
     )
-    
+
+    private val _isFirstLoad = MutableStateFlow(true)
+
     val paginator = Paginator(
         initialKey = 0,
-        onLoadUpdated = { isLoading ->  _isLoadingMore.value = isLoading },
+        onLoadUpdated = { isLoading ->
+            _isLoadingMore.value = isLoading
+            if (_isFirstLoad.value && isLoading) {
+                _uiState.value = UiState.Loading
+            }
+        },
         onRequest = { currentPage ->
             if (_selectedTabIndex.value == 0) {
                 quizRepository.getQuizzesByUserId(id, offset = currentPage)
             } else {
                 quizRepository.getMyGameHistory(offset = currentPage)
-            } 
+            }
         },
         getNextKey = { key, _ -> key + 1 },
-        onError = { networkError -> _uiState.value = UiState.Error(networkError.toResId()) },
-        onSuccess = { item, _ -> _quizzes.value += item },
+        onError = { networkError ->
+            _isFirstLoad.value = false
+            _uiState.value = UiState.Error(networkError.toResId())
+        },
+        onSuccess = { item, _ ->
+            _isFirstLoad.value = false
+            _quizzes.value += item
+            _uiState.value = UiState.Success
+        },
         endReached = { _, item -> item.isEmpty() }
     )
 
@@ -80,6 +94,7 @@ class UserDetailsViewModel(
             is UserDetailsCommand.LoadQuizzesOrHistory -> {
                 paginator.reset()
                 _quizzes.value = emptyList()
+                _isFirstLoad.value = true
                 loadNextItems()
             }
             is UserDetailsCommand.GetUserData -> getUserData()
@@ -103,10 +118,12 @@ class UserDetailsViewModel(
     fun checkOwnership(id: UUID): Boolean{
         return id == authRepository.thisUser.value?.userId
     }
-    
+
     private fun getUserData() {
         viewModelScope.launch {
-            _uiState.value = UiState.Loading
+            if (_user.value == null) {
+                _uiState.value = UiState.Loading
+            }
             if (checkOwnership(id)) {
                 _user.value = authRepository.thisUser.value
                 _uiState.value = UiState.Success

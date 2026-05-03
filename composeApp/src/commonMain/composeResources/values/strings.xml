@@ -139,7 +139,7 @@
     <string name="confirm">Confirm</string>
     <string name="resend_code">Resend code</string>
     <string name="send_again_in">You can resend the code in %1$d seconds</string>
-    <string name="play_multiplayer">Create game</string>
+    <string name="play_multiplayer">Create room</string>
     <string name="end_of_game">End of game - results</string>
     <string name="end_game">End game</string>
     <string name="correct_points">Correctly %1$d / %2$d</string>

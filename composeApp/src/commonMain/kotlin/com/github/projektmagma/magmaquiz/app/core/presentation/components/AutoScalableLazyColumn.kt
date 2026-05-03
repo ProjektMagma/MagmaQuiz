@@ -16,5 +16,6 @@ expect fun <T> AutoScalableLazyColumn(
     isLoadingMore: Boolean = false,
     onLoadMore: () -> Unit = {},
     stickyHeader: @Composable (modifier: Modifier) -> Unit,
+    skeletonContent: @Composable (() -> Unit)? = null,
     content: @Composable (T) -> Unit
 )

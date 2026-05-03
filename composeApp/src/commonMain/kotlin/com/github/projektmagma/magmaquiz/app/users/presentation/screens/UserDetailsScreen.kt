@@ -4,9 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -191,7 +189,5 @@ fun UserDetailsScreen(
             onEditClick = { createQuizViewModel.onCommand(QuizCommand.SetForEdit(quiz.id!!)) },
             navigateToQuizReviews = { navigateToQuizReviews(quiz.id!!, quiz.reviewedByYou) },
         )
-
-        Spacer(modifier = Modifier.height(8.dp))
     }
 }

@@ -1,5 +1,6 @@
 package com.github.projektmagma.magmaquiz.app.game.presentation.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,15 +23,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.correct_answer
 import magmaquiz.composeapp.generated.resources.enter_answer
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun OpenAnswerField(
     isAnswered: Boolean,
+    correctAnswerContent: String,
     onSubmit: (String) -> Unit
 ) {
     var inputValue by remember { mutableStateOf("") }
@@ -41,6 +46,11 @@ fun OpenAnswerField(
         border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant)
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
+            AnimatedVisibility(
+                visible = isAnswered,
+            ) {
+                CorrectAnswerHint(answer = correctAnswerContent)
+            }
             OutlinedTextField(
                 value = inputValue,
                 onValueChange = { if (!isAnswered) inputValue = it },
@@ -82,5 +92,23 @@ fun OpenAnswerField(
                 modifier = Modifier.fillMaxWidth()
             )
         }
+    }
+}
+
+@Composable
+private fun CorrectAnswerHint(answer: String) {
+    Surface(
+        shape = RoundedCornerShape(8.dp),
+        color = Color(0xFFE1F5EE)
+    ) {
+        Text(
+            text = stringResource(Res.string.correct_answer, answer),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            style = MaterialTheme.typography.bodySmall,
+            color = Color(0xFF085041),
+            textAlign = TextAlign.Center
+        )
     }
 }

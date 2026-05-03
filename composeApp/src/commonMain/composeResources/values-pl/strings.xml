@@ -135,7 +135,7 @@
     <string name="confirm">Potwierdź</string>
     <string name="resend_code">Wyślij kod ponownie</string>
     <string name="send_again_in">Możesz ponownie wysłać kod za %1$d sekund</string>
-    <string name="play_multiplayer">Stwórz grę</string>
+    <string name="play_multiplayer">Stwórz pokój</string>
     <string name="end_of_game">Koniec gry wyniki</string>
     <string name="end_game">Zakończ grę</string>
     <string name="correct_points">Poprawnie %1$d / %2$d</string>

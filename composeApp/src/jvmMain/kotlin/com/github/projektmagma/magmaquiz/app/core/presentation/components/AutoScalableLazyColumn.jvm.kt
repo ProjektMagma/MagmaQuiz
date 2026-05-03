@@ -40,6 +40,7 @@ actual fun <T> AutoScalableLazyColumn(
     isLoadingMore: Boolean,
     onLoadMore: () -> Unit,
     stickyHeader: @Composable (modifier: Modifier) -> Unit,
+    skeletonContent: @Composable (() -> Unit)?,
     content: @Composable ((T) -> Unit)
 ) {
     val state = rememberLazyGridState()
@@ -105,7 +106,15 @@ actual fun <T> AutoScalableLazyColumn(
                 }
 
                 is UiState.Error -> FullSizeErrorIndicator(message = uiState.errorMessage)
-                UiState.Loading -> FullSizeCircularProgressIndicator()
+                UiState.Loading -> if (skeletonContent == null){
+                    FullSizeCircularProgressIndicator()
+                } else {
+                    Column(Modifier.fillMaxWidth()) {
+                        repeat(5){
+                            skeletonContent()
+                        }
+                    }
+                }
             }
         }
 

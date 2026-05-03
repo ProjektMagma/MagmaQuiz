@@ -5,6 +5,7 @@ import androidx.compose.foundation.ScrollbarStyle
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -23,7 +24,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 @Composable
 actual fun <T> AutoScalableLazyRow(
     itemList: List<T>,
-    modifier: Modifier,
     key: ((T) -> Any)?,
     isLoadingMore: Boolean,
     onLoadMore: () -> Unit,
@@ -45,7 +45,7 @@ actual fun <T> AutoScalableLazyRow(
 
     if (itemList.isEmpty())
         Column(
-            modifier = modifier.fillMaxWidth(),
+            modifier = Modifier.wrapContentHeight().fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -55,14 +55,14 @@ actual fun <T> AutoScalableLazyRow(
             )
         }
     else
-        Column(modifier = modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.wrapContentHeight().fillMaxWidth()) {
             LazyRow(modifier = Modifier.fillMaxWidth(), state = state) {
                 items(itemList, key = key) {
                     content(it)
                 }
                 item {
                     if (isLoadingMore) {
-                        Column(modifier = modifier, verticalArrangement = Arrangement.Center) {
+                        Column(modifier = Modifier.wrapContentHeight(), verticalArrangement = Arrangement.Center) {
                             CircularProgressIndicator()
                         }
                     }

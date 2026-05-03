@@ -2,10 +2,9 @@ package com.github.projektmagma.magmaquiz.app.quizzes.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,13 +29,13 @@ fun UserProfileButton(
                 onClick()
             }
             .padding(8.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        ProfilePictureIcon(profilePicture, 25.dp)
         Text(
             text = userName,
             fontWeight = FontWeight.Bold
         )
-        Spacer(modifier = Modifier.width(4.dp))
-        ProfilePictureIcon(profilePicture, 25.dp)
     }
 }

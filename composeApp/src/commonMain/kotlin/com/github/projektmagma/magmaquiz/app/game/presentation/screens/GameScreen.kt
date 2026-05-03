@@ -70,12 +70,14 @@ fun GameScreen(
                 content = gameState.questionContent
             )
             if (gameState.answers.size == 1) {
+                val answer = gameState.answers.first()
                 OpenAnswerField(
                     isAnswered = gameState.isAnswered,
+                    correctAnswerContent = answer.content,
                     onSubmit = { value ->
                         gameQuizViewModel.onCommand(
                             GameCommand.AnswerClicked(
-                                isCorrect = gameState.answers.first().isCorrect,
+                                isCorrect = answer.isCorrect,
                                 content = value
                             )
                         )

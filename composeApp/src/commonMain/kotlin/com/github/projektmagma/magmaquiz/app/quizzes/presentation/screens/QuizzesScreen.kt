@@ -10,6 +10,7 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.components.AutoSc
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.QuizzesListViewModel
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuizCard
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuizSearchFieldAndFilters
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.skeleton.QuizCardSkeleton
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.list.QuizListCommand
 import org.koin.compose.viewmodel.koinViewModel
 import java.util.UUID
@@ -36,6 +37,7 @@ fun QuizzesScreen(
             stickyHeader = {
                 QuizSearchFieldAndFilters(it)
             },
+            skeletonContent = { QuizCardSkeleton() },
             content = { quiz ->
                 QuizCard(
                     quiz = quiz,

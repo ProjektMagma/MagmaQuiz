@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.AutoScalableLazyColumn
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.skeleton.UserCardSkeleton
 import com.github.projektmagma.magmaquiz.app.users.presentation.UsersListViewModel
 import com.github.projektmagma.magmaquiz.app.users.presentation.UsersSharedViewModel
 import com.github.projektmagma.magmaquiz.app.users.presentation.components.UserCard
@@ -36,6 +37,7 @@ fun UsersScreen(
             stickyHeader = {
                 UserSearchFieldAndFilters(it, usersListViewModel)
             },
+            skeletonContent = { UserCardSkeleton() },
             content = { user ->
                 UserCard(
                     user,
