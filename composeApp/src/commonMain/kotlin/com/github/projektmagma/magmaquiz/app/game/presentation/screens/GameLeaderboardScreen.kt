@@ -3,26 +3,12 @@ package com.github.projektmagma.magmaquiz.app.game.presentation.screens
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -35,16 +21,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.projektmagma.magmaquiz.app.core.presentation.components.ContentImage
+import com.github.projektmagma.magmaquiz.app.core.presentation.components.ProfilePictureIcon
 import com.github.projektmagma.magmaquiz.app.game.presentation.GameLeaderboardViewModel
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuestionCard
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.toQuestionModel
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
-import magmaquiz.composeapp.generated.resources.Res
-import magmaquiz.composeapp.generated.resources.game_ended
-import magmaquiz.composeapp.generated.resources.leave_room
-import magmaquiz.composeapp.generated.resources.online
-import magmaquiz.composeapp.generated.resources.waiting_for_players
+import magmaquiz.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import java.util.*
 
 
 @Composable
@@ -55,10 +40,13 @@ fun GameLeaderboardScreen(
     val scores by viewModel.scores.collectAsStateWithLifecycle()
     val room by viewModel.room.collectAsStateWithLifecycle()
     val isGameEnded by viewModel.isGameEnded.collectAsStateWithLifecycle()
+    val currentQuestion by viewModel.currentQuestion.collectAsStateWithLifecycle()
+    val questionList by viewModel.questionList.collectAsStateWithLifecycle()
+
 
     val sortedEntries = remember(scores) {
         scores.entries
-            .sortedByDescending { it.value }
+            .sortedByDescending { it.value.count() }
             .filter { it.key.userId != room?.roomOwner?.userId }
     }
 
@@ -100,8 +88,8 @@ fun GameLeaderboardScreen(
                         MaterialTheme.colorScheme.primaryContainer
                 ) {
                     Text(
-                        text = if (isGameEnded) stringResource(Res.string.game_ended) 
-                                else stringResource(Res.string.online, room!!.connectedUsers - 1),
+                        text = if (isGameEnded) stringResource(Res.string.game_ended)
+                        else stringResource(Res.string.online, room!!.connectedUsers - 1),
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                         fontSize = 12.sp,
                         color = if (isGameEnded)
@@ -112,6 +100,21 @@ fun GameLeaderboardScreen(
                 }
             }
         }
+
+
+        if (currentQuestion != null)
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = stringResource(Res.string.current_question),
+                    style = MaterialTheme.typography.titleMedium
+                )
+                QuestionCard(currentQuestion!!.toQuestionModel(), lockClickable = true)
+            }
+
+
 
         if (sortedEntries.isEmpty()) {
             Box(
@@ -137,7 +140,19 @@ fun GameLeaderboardScreen(
             )
 
             if (isGameEnded) {
-                Spacer(modifier = Modifier.weight(1f))
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize().weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    items(questionList) { question ->
+                        QuestionCard(
+                            question.toQuestionModel(),
+                            userAnswers = sortedEntries,
+                            lockClickable = true
+                        )
+                    }
+                }
+
                 OutlinedButton(
                     onClick = navigateBack,
                     modifier = Modifier.fillMaxWidth(),
@@ -151,7 +166,7 @@ fun GameLeaderboardScreen(
 }
 
 @Composable
-private fun PodiumCard(entries: List<Map.Entry<ForeignUser, Int>>) {
+private fun PodiumCard(entries: List<Map.Entry<ForeignUser, List<UUID?>>>) {
     val ordered = listOf(entries[1], entries[0], entries[2])
     val heights = listOf(52.dp, 72.dp, 36.dp)
     val blockColors = listOf(
@@ -240,7 +255,7 @@ private fun PodiumCard(entries: List<Map.Entry<ForeignUser, Int>>) {
 
 @Composable
 fun PlayerListCard(
-    entries: List<Map.Entry<ForeignUser, Int>>,
+    entries: List<Map.Entry<ForeignUser, List<UUID?>>>,
     total: Int
 ) {
     val barColors = listOf(
@@ -270,9 +285,9 @@ fun PlayerListCard(
                         modifier = Modifier.width(20.dp),
                         textAlign = TextAlign.Center
                     )
-                    ContentImage(
+                    ProfilePictureIcon(
                         imageData = entry.key.userProfilePicture,
-                        imageSize = 32.dp
+                        size = 32.dp
                     )
                     Text(
                         text = entry.key.userName,
@@ -281,7 +296,7 @@ fun PlayerListCard(
                         modifier = Modifier.weight(1f)
                     )
 
-                    val fraction = if (total > 0) entry.value.toFloat() / total else 0f
+                    val fraction = if (total > 0) entry.value.count().toFloat() / total else 0f
                     Box(
                         modifier = Modifier
                             .width(70.dp)
@@ -298,7 +313,7 @@ fun PlayerListCard(
                         )
                     }
                     Text(
-                        text = "${entry.value} / $total",
+                        text = "${entry.value.count()} / $total",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,

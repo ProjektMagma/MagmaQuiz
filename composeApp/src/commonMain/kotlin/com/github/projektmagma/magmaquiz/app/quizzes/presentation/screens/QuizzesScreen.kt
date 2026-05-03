@@ -13,7 +13,7 @@ import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.Qui
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.skeleton.QuizCardSkeleton
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.list.QuizListCommand
 import org.koin.compose.viewmodel.koinViewModel
-import java.util.UUID
+import java.util.*
 
 @Composable
 fun QuizzesScreen(

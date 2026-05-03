@@ -195,4 +195,6 @@
     <string name="game_ended">Game ended</string>
     <string name="online">Online %1$d</string>
     <string name="waiting_for_players">Waiting for players…</string>
+    <string name="last_played">Last played</string>
+    <string name="current_question">Current question</string>
 </resources>

@@ -191,4 +191,6 @@
     <string name="game_ended">Gra zakończona</string>
     <string name="online">Online %1$d</string>
     <string name="waiting_for_players">Oczekiwanie na graczy…</string>
+    <string name="last_played">Ostatnia gra</string>
+    <string name="current_question">Aktualne pytanie</string>
 </resources>

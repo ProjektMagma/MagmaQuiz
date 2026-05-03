@@ -21,5 +21,6 @@ data class Quiz(
     val tagList: List<Tag>,
     val createdAt: Long,
     val modifiedAt: Long,
+    var lastPlayedAt: Long? = null,
     val questionList: List<Question>
 )

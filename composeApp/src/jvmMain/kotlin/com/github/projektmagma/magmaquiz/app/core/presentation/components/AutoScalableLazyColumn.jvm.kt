@@ -2,20 +2,8 @@ package com.github.projektmagma.magmaquiz.app.core.presentation.components
 
 import androidx.compose.foundation.ScrollbarStyle
 import androidx.compose.foundation.VerticalScrollbar
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -106,11 +94,16 @@ actual fun <T> AutoScalableLazyColumn(
                 }
 
                 is UiState.Error -> FullSizeErrorIndicator(message = uiState.errorMessage)
-                UiState.Loading -> if (skeletonContent == null){
+                UiState.Loading -> if (skeletonContent == null) {
                     FullSizeCircularProgressIndicator()
                 } else {
-                    Column(Modifier.fillMaxWidth()) {
-                        repeat(5){
+                    LazyVerticalGrid(
+                        modifier = Modifier.fillMaxWidth(),
+                        columns = GridCells.Adaptive(450.dp),
+                        contentPadding = PaddingValues(8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        items(5) {
                             skeletonContent()
                         }
                     }

@@ -137,14 +137,13 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
         }
     }
 
-    fun getLastPlayedQuizzes(caller: UserEntity, count: Int, offset: Int): List<QuizEntity> {
+    fun getLastPlayedQuizzes(caller: UserEntity, count: Int, offset: Int): List<UserGameHistoryEntity> {
         return transaction {
             playHistoryList
                 .offset(offset.toLong())
                 .take(count)
                 .sortedByDescending { it.createdAt }
-                .map { it.quiz }
-                .filter { it.isActive && it.isAccessibleByUser(caller) }
+                .filter { it.quiz.isActive && it.quiz.isAccessibleByUser(caller) }
         }
     }
 }
