@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.UUID
 
 class GameLeaderboardViewModel(
     private val gameRepository: GameRepository,
@@ -27,13 +27,10 @@ class GameLeaderboardViewModel(
 
     private val _currentQuestion = MutableStateFlow<Question?>(null)
     val currentQuestion = _currentQuestion.asStateFlow()
-
-    private val _questionList = MutableStateFlow<List<Question>>(emptyList())
-    val questionList = _questionList.asStateFlow()
-
-
+    
     init {
         _scores.value = _room.value?.userList?.associateWith { emptyList() } ?: emptyMap()
+        _currentQuestion.value = _room.value?.currentQuiz?.questionList?.firstOrNull()
         collectMessages()
     }
 
@@ -45,12 +42,7 @@ class GameLeaderboardViewModel(
                     is WsEvent.Closed -> {}
                     is WsEvent.OutGoing -> when (event.message) {
                         is WebSocketMessages.OutgoingMessage.NextQuestion -> {
-                            _questionList.update {
-                                mutableListOf<Question>().apply {
-                                    addAll(_questionList.value)
-                                    add(event.message.question)
-                                }
-                            }
+                            currentIndex += 1
                             _currentQuestion.update { event.message.question }
                         }
 
@@ -68,7 +60,6 @@ class GameLeaderboardViewModel(
                                     updated
                                 }
                             }
-                            currentIndex += 1
                         }
 
                         is WebSocketMessages.OutgoingMessage.UserJoined -> {

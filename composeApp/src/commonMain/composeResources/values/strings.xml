@@ -163,7 +163,7 @@
     <string name="join">Join</string>
     <string name="closed_room">Host has closed room</string>
     <string name="find_games">Find games</string>
-    <string name="available_rooms">Available rooms</string>
+    <string name="available_rooms">Available rooms %1$d</string>
     <string name="current_games">Current games</string>
     <string name="game_not_exist">Game doesn't exist</string>
     <string name="about_application">About application</string>

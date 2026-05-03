@@ -1,6 +1,10 @@
 package com.github.projektmagma.magmaquiz.app.quizzes.presentation.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -9,7 +13,7 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.components.Profil
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.UniversalCardContainer
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.QuestionModel
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
-import java.util.*
+import java.util.UUID
 
 @Composable
 fun QuestionCard(
@@ -19,7 +23,7 @@ fun QuestionCard(
     lockClickable: Boolean = false,
 ) {
     UniversalCardContainer(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp, horizontal = 64.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
         onClick = { navigateToQuestionCreate.invoke() },
         lockClickable = lockClickable
     ) {

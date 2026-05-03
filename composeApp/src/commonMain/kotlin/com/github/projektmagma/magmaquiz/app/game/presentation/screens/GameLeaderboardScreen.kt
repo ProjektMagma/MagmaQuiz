@@ -3,12 +3,27 @@ package com.github.projektmagma.magmaquiz.app.game.presentation.screens
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -26,10 +41,15 @@ import com.github.projektmagma.magmaquiz.app.game.presentation.GameLeaderboardVi
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuestionCard
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.toQuestionModel
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
-import magmaquiz.composeapp.generated.resources.*
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.current_question
+import magmaquiz.composeapp.generated.resources.game_ended
+import magmaquiz.composeapp.generated.resources.leave_room
+import magmaquiz.composeapp.generated.resources.online
+import magmaquiz.composeapp.generated.resources.waiting_for_players
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-import java.util.*
+import java.util.UUID
 
 
 @Composable
@@ -41,8 +61,6 @@ fun GameLeaderboardScreen(
     val room by viewModel.room.collectAsStateWithLifecycle()
     val isGameEnded by viewModel.isGameEnded.collectAsStateWithLifecycle()
     val currentQuestion by viewModel.currentQuestion.collectAsStateWithLifecycle()
-    val questionList by viewModel.questionList.collectAsStateWithLifecycle()
-
 
     val sortedEntries = remember(scores) {
         scores.entries
@@ -50,123 +68,125 @@ fun GameLeaderboardScreen(
             .filter { it.key.userId != room?.roomOwner?.userId }
     }
 
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Surface(
-            shape = MaterialTheme.shapes.large,
-            color = MaterialTheme.colorScheme.surface,
-            border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 14.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+        item {
+            Surface(
+                shape = MaterialTheme.shapes.large,
+                color = MaterialTheme.colorScheme.surface,
+                border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant)
             ) {
-                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text(
-                        text = room!!.roomName,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = room!!.currentQuiz.quizName,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                Surface(
-                    shape = RoundedCornerShape(99.dp),
-                    color = if (isGameEnded)
-                        MaterialTheme.colorScheme.tertiaryContainer
-                    else
-                        MaterialTheme.colorScheme.primaryContainer
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 14.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = if (isGameEnded) stringResource(Res.string.game_ended)
-                        else stringResource(Res.string.online, room!!.connectedUsers - 1),
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                        fontSize = 12.sp,
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Text(
+                            text = room!!.roomName,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = room!!.currentQuiz.quizName,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Surface(
+                        shape = RoundedCornerShape(99.dp),
                         color = if (isGameEnded)
-                            MaterialTheme.colorScheme.onTertiaryContainer
+                            MaterialTheme.colorScheme.tertiaryContainer
                         else
-                            MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
-            }
-        }
-
-
-        if (currentQuestion != null)
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = stringResource(Res.string.current_question),
-                    style = MaterialTheme.typography.titleMedium
-                )
-                QuestionCard(currentQuestion!!.toQuestionModel(), lockClickable = true)
-            }
-
-
-
-        if (sortedEntries.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(Res.string.waiting_for_players),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        } else {
-            if (isGameEnded && sortedEntries.size >= 3) {
-                PodiumCard(entries = sortedEntries.take(3))
-            }
-
-            PlayerListCard(
-                entries = sortedEntries,
-                total = room!!.currentQuiz.questionList.size
-            )
-
-            if (isGameEnded) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize().weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    items(questionList) { question ->
-                        QuestionCard(
-                            question.toQuestionModel(),
-                            userAnswers = sortedEntries,
-                            lockClickable = true
+                            MaterialTheme.colorScheme.primaryContainer
+                    ) {
+                        Text(
+                            text = if (isGameEnded) stringResource(Res.string.game_ended)
+                            else stringResource(Res.string.online, room!!.connectedUsers - 1),
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                            fontSize = 12.sp,
+                            color = if (isGameEnded)
+                                MaterialTheme.colorScheme.onTertiaryContainer
+                            else
+                                MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     }
                 }
+            }
 
-                OutlinedButton(
-                    onClick = navigateBack,
+
+            if (currentQuestion != null)
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.medium
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(text = stringResource(Res.string.leave_room))
+                    Text(
+                        text = stringResource(Res.string.current_question),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    QuestionCard(currentQuestion!!.toQuestionModel(), lockClickable = true)
                 }
+
+
+
+            if (sortedEntries.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(Res.string.waiting_for_players),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else {
+                if (isGameEnded && sortedEntries.size >= 3) {
+                    PodiumCard(
+                        entries = sortedEntries.take(3),
+                        total = room!!.currentQuiz.questionList.size
+                    )
+                }
+
+                PlayerListCard(
+                    entries = sortedEntries,
+                    total = room!!.currentQuiz.questionList.size
+                )
+            }
+        }
+        if (isGameEnded) {
+            items(room!!.currentQuiz.questionList) { question ->
+                QuestionCard(
+                    question.toQuestionModel(),
+                    userAnswers = sortedEntries,
+                    lockClickable = true
+                )
+            }
+        }
+        item {
+            OutlinedButton(
+                onClick = navigateBack,
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Text(text = stringResource(Res.string.leave_room))
             }
         }
     }
 }
 
 @Composable
-private fun PodiumCard(entries: List<Map.Entry<ForeignUser, List<UUID?>>>) {
+private fun PodiumCard(
+    entries: List<Map.Entry<ForeignUser, List<UUID?>>>,
+    total: Int
+) {
     val ordered = listOf(entries[1], entries[0], entries[2])
     val heights = listOf(52.dp, 72.dp, 36.dp)
     val blockColors = listOf(
@@ -180,7 +200,6 @@ private fun PodiumCard(entries: List<Map.Entry<ForeignUser, List<UUID?>>>) {
         MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
     )
     val ranks = listOf(2, 1, 3)
-    val totalQuestions = entries.size
 
     Surface(
         shape = RoundedCornerShape(16.dp),
@@ -207,16 +226,17 @@ private fun PodiumCard(entries: List<Map.Entry<ForeignUser, List<UUID?>>>) {
                             .background(avatarColors[i].first)
                             .then(
                                 if (ranks[i] == 1)
-                                    Modifier.border(2.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                                    Modifier.border(
+                                        2.dp,
+                                        MaterialTheme.colorScheme.primary,
+                                        CircleShape
+                                    )
                                 else Modifier
                             ),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = entry.key.userName.take(2).uppercase(),
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = avatarColors[i].second
+                        ProfilePictureIcon(
+                            imageData = entry.key.userProfilePicture
                         )
                     }
                     Text(
@@ -228,7 +248,7 @@ private fun PodiumCard(entries: List<Map.Entry<ForeignUser, List<UUID?>>>) {
                         modifier = Modifier.widthIn(max = 80.dp)
                     )
                     Text(
-                        text = "${entry.value} / $totalQuestions",
+                        text = "${entry.value.count()} / $total",
                         fontSize = 11.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                     )
