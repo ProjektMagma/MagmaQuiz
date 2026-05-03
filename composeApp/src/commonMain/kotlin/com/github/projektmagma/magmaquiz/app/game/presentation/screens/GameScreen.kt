@@ -17,10 +17,10 @@ import androidx.navigationevent.compose.rememberNavigationEventState
 import com.github.projektmagma.magmaquiz.app.core.presentation.navigation.CustomWindowDraggableArea
 import com.github.projektmagma.magmaquiz.app.game.presentation.GameQuizViewModel
 import com.github.projektmagma.magmaquiz.app.game.presentation.components.AnswersList
+import com.github.projektmagma.magmaquiz.app.game.presentation.components.FinishSection
 import com.github.projektmagma.magmaquiz.app.game.presentation.components.OpenAnswerField
 import com.github.projektmagma.magmaquiz.app.game.presentation.components.ProgressDots
 import com.github.projektmagma.magmaquiz.app.game.presentation.components.QuestionGameCard
-import com.github.projektmagma.magmaquiz.app.game.presentation.components.SingleFinishSection
 import com.github.projektmagma.magmaquiz.app.game.presentation.model.play.GameCommand
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -30,7 +30,8 @@ fun GameScreen(
     navigateOnGameFinish: () -> Unit
 ) {
     val gameState by gameQuizViewModel.gameState.collectAsStateWithLifecycle()
-
+    val answers by gameQuizViewModel.selectedAnswers.collectAsStateWithLifecycle()
+    val quiz by gameQuizViewModel.quiz.collectAsStateWithLifecycle()
     val backState = rememberNavigationEventState(currentInfo = NavigationEventInfo.None)
 
     NavigationEventHandler(
@@ -52,13 +53,15 @@ fun GameScreen(
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         if (gameState.isQuizFinished) {
-            SingleFinishSection(
-                score = gameState.score,
-                total = gameState.totalQuestions,
+            FinishSection(
+                answersMap = answers,
+                questions = quiz!!.questionList,
                 onBack = {
                     gameQuizViewModel.onCommand(GameCommand.FinishGame)
                     navigateOnGameFinish()
-                }
+                },
+                score = gameState.score,
+                total = gameState.totalQuestions,
             )
         } else {
             ProgressDots(
@@ -77,7 +80,6 @@ fun GameScreen(
                     onSubmit = { value ->
                         gameQuizViewModel.onCommand(
                             GameCommand.AnswerClicked(
-                                isCorrect = answer.isCorrect,
                                 content = value
                             )
                         )

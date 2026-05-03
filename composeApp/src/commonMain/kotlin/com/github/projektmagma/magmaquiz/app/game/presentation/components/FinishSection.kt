@@ -2,22 +2,20 @@ package com.github.projektmagma.magmaquiz.app.game.presentation.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -27,120 +25,233 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.projektmagma.magmaquiz.app.core.presentation.components.ContentImage
-import com.github.projektmagma.magmaquiz.app.game.presentation.model.play.GameState
-import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
+import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuestionNumber
+import com.github.projektmagma.magmaquiz.shared.data.domain.Question
 import magmaquiz.composeapp.generated.resources.Res
-import magmaquiz.composeapp.generated.resources.end_game
-import magmaquiz.composeapp.generated.resources.end_of_game
-import magmaquiz.composeapp.generated.resources.leave_room
+import magmaquiz.composeapp.generated.resources.all
+import magmaquiz.composeapp.generated.resources.back
+import magmaquiz.composeapp.generated.resources.correct
+import magmaquiz.composeapp.generated.resources.correct_answer
 import magmaquiz.composeapp.generated.resources.percent_correct
+import magmaquiz.composeapp.generated.resources.wrong
+import magmaquiz.composeapp.generated.resources.your_answer
 import org.jetbrains.compose.resources.stringResource
+import java.util.UUID
 import kotlin.math.roundToInt
 
 @Composable
 fun FinishSection(
-    gameState: GameState,
-    correctQuestions: Map<ForeignUser, Int>,
-    isHost: Boolean,
-    onEnd: () -> Unit,
-    onDisconnect: () -> Unit
+    answersMap: Map<UUID, String>,
+    questions: List<Question>,
+    score: Int,
+    total: Int,
+    onBack: () -> Unit
 ) {
-    val sorted = correctQuestions.entries
-        .sortedByDescending { it.value }
-        .toList()
-
+    val pct = if (total > 0) ((score.toDouble() / total) * 100).roundToInt() else 0
+    
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        ScoreCard(
-            score = gameState.score,
-            total = gameState.totalQuestions
-        )
-        
-        if (sorted.size >= 3) {
-            PodiumCard(entries = sorted.take(3))
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.surface,
+            border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(96.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primaryContainer),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "$score",
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        Text(
+                            text = "/ $total",
+                            fontSize = 13.sp,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                        )
+                    }
+                }
+                Surface(
+                    shape = RoundedCornerShape(99.dp),
+                    color = MaterialTheme.colorScheme.tertiaryContainer
+                ) {
+                    Text(
+                        text = stringResource(Res.string.percent_correct, pct),
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 5.dp),
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer
+                    )
+                }
+            }
+        }
+
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.surface,
+            border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 20.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                StatItem(
+                    value = "$score",
+                    label = stringResource(Res.string.correct),
+                    color = MaterialTheme.colorScheme.tertiary,
+                    bg = MaterialTheme.colorScheme.tertiaryContainer
+                )
+                Box(
+                    modifier = Modifier
+                        .width(0.5.dp)
+                        .height(40.dp)
+                        .background(MaterialTheme.colorScheme.outlineVariant)
+                )
+                StatItem(
+                    value = "${total - score}",
+                    label = stringResource(Res.string.wrong),
+                    color = MaterialTheme.colorScheme.error,
+                    bg = MaterialTheme.colorScheme.errorContainer
+                )
+                Box(
+                    modifier = Modifier
+                        .width(0.5.dp)
+                        .height(40.dp)
+                        .background(MaterialTheme.colorScheme.outlineVariant)
+                )
+                StatItem(
+                    value = "$total",
+                    label = stringResource(Res.string.all),
+                    color = MaterialTheme.colorScheme.primary,
+                    bg = MaterialTheme.colorScheme.primaryContainer
+                )
+            }
         }
         
-        PlayerListCard(
-            entries = sorted,
-            total = gameState.totalQuestions
-        )
+        questions.forEachIndexed { index, question ->
+            val selectedAnswer = answersMap[question.id] ?: "-"
+            val correctAnswer = question.answerList.find { it.isCorrect }
+            val isCorrect = question.answerList.find { it.answerContent.equals(selectedAnswer, ignoreCase = true) }?.isCorrect == true
 
-        Spacer(modifier = Modifier.weight(1f))
+            Surface(
+                shape = MaterialTheme.shapes.medium,
+                color = MaterialTheme.colorScheme.surface,
+                border = BorderStroke(
+                    0.5.dp,
+                    if (isCorrect) Color(0xFF1D9E75) else MaterialTheme.colorScheme.error
+                )
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(14.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        QuestionNumber(index + 1)
+                        Text(
+                            text = question.questionContent,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                        thickness = 0.5.dp
+                    )
+                    
+                    ReviewAnswerRow(
+                        label = stringResource(Res.string.your_answer),
+                        content = selectedAnswer,
+                        isCorrect = isCorrect,
+                        showIcon = true
+                    )
+                    
+                    if (!isCorrect) {
+                        ReviewAnswerRow(
+                            label = stringResource(Res.string.correct_answer),
+                            content = correctAnswer?.answerContent ?: "—",
+                            isCorrect = true,
+                            showIcon = false
+                        )
+                    }
+                }
+            }
+        }
 
         OutlinedButton(
-            onClick = if (isHost) onEnd else onDisconnect,
+            onClick = onBack,
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.medium
         ) {
-            Text(
-                text = if (isHost)
-                    stringResource(Res.string.end_game)
-                else
-                    stringResource(Res.string.leave_room)
-            )
+            Text(text = stringResource(Res.string.back))
         }
     }
 }
 
 @Composable
-private fun ScoreCard(score: Int, total: Int) {
-    val pct = if (total > 0) ((score.toDouble() / total) * 100).roundToInt() else 0
+private fun ReviewAnswerRow(
+    label: String,
+    content: String,
+    isCorrect: Boolean,
+    showIcon: Boolean
+) {
+    val color = if (isCorrect) Color(0xFF1D9E75) else MaterialTheme.colorScheme.error
+    val bg = if (isCorrect) Color(0xFFE1F5EE) else Color(0xFFFCEBEB)
+    val symbol = if (isCorrect) "✓" else "✕"
 
-    Surface(
-        shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant)
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+        Text(
+            text = label,
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.width(96.dp)
+        )
+        Surface(
+            shape = RoundedCornerShape(8.dp),
+            color = bg,
+            modifier = Modifier.weight(1f)
         ) {
-            Box(
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer)
-                    .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape),
-                contentAlignment = Alignment.Center
+            Row(
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "$score",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                    Text(
-                        text = "/ $total",
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
+                if (showIcon) {
+                    Text(text = symbol, fontSize = 12.sp, color = color)
                 }
-            }
-            Text(
-                text = stringResource(Res.string.end_of_game),
-                style = MaterialTheme.typography.titleMedium
-            )
-            Surface(
-                shape = RoundedCornerShape(99.dp),
-                color = MaterialTheme.colorScheme.tertiaryContainer
-            ) {
                 Text(
-                    text = stringResource(Res.string.percent_correct, pct),
-                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 4.dp),
-                    fontSize = 13.sp,
-                    color = MaterialTheme.colorScheme.onTertiaryContainer
+                    text = content,
+                    fontSize = 14.sp,
+                    color = color,
+                    modifier = Modifier.weight(1f)
                 )
             }
         }
@@ -148,169 +259,29 @@ private fun ScoreCard(score: Int, total: Int) {
 }
 
 @Composable
-private fun PodiumCard(entries: List<Map.Entry<ForeignUser, Int>>) {
-    val ordered = listOf(entries[1], entries[0], entries[2])
-    val heights = listOf(52.dp, 72.dp, 36.dp)
-    val blockColors = listOf(
-        MaterialTheme.colorScheme.surfaceVariant,
-        MaterialTheme.colorScheme.primaryContainer,
-        MaterialTheme.colorScheme.tertiaryContainer
-    )
-    val avatarColors = listOf(
-        MaterialTheme.colorScheme.tertiaryContainer to MaterialTheme.colorScheme.onTertiaryContainer,
-        MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer,
-        MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
-    )
-    val ranks = listOf(2, 1, 3)
-    val totalQuestions = entries.size
-
-    Surface(
-        shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant)
+private fun StatItem(value: String, label: String, color: Color, bg: Color) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        Row(
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-            verticalAlignment = Alignment.Bottom
+                .size(44.dp)
+                .clip(CircleShape)
+                .background(bg),
+            contentAlignment = Alignment.Center
         ) {
-            ordered.forEachIndexed { i, entry ->
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    val avatarSize = if (ranks[i] == 1) 42.dp else 32.dp
-                    Box(
-                        modifier = Modifier
-                            .size(avatarSize)
-                            .clip(CircleShape)
-                            .background(avatarColors[i].first)
-                            .then(
-                                if (ranks[i] == 1)
-                                    Modifier.border(2.dp, MaterialTheme.colorScheme.primary, CircleShape)
-                                else Modifier
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = entry.key.userName.take(2).uppercase(),
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = avatarColors[i].second
-                        )
-                    }
-                    Text(
-                        text = entry.key.userName,
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.widthIn(max = 80.dp)
-                    )
-                    Text(
-                        text = "${entry.value} / $totalQuestions",
-                        fontSize = 11.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                    )
-                    Box(
-                        modifier = Modifier
-                            .width(80.dp)
-                            .height(heights[i])
-                            .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
-                            .background(blockColors[i]),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "${ranks[i]}",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = avatarColors[i].second
-                        )
-                    }
-                }
-            }
+            Text(
+                text = value,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium,
+                color = color
+            )
         }
-    }
-}
-
-@Composable
-private fun PlayerListCard(
-    entries: List<Map.Entry<ForeignUser, Int>>,
-    total: Int
-) {
-    val avatarPairs = listOf(
-        MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer,
-        MaterialTheme.colorScheme.tertiaryContainer to MaterialTheme.colorScheme.onTertiaryContainer,
-        MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
-    )
-    val barColors = listOf(
-        MaterialTheme.colorScheme.primary,
-        MaterialTheme.colorScheme.tertiary,
-        MaterialTheme.colorScheme.secondary
-    )
-
-    Surface(
-        shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant)
-    ) {
-        Column(modifier = Modifier.padding(horizontal = 14.dp)) {
-            entries.forEachIndexed { index, entry ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 11.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    Text(
-                        text = "${index + 1}",
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.width(20.dp),
-                        textAlign = TextAlign.Center
-                    )
-                    ContentImage(
-                        imageData = entry.key.userProfilePicture,
-                        imageSize = 32.dp
-                    )
-                    Text(
-                        text = entry.key.userName,
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.weight(1f)
-                    )
-                    val fraction = if (total > 0) entry.value.toFloat() / total else 0f
-                    Box(
-                        modifier = Modifier
-                            .width(70.dp)
-                            .height(5.dp)
-                            .clip(RoundedCornerShape(99.dp))
-                            .background(MaterialTheme.colorScheme.outlineVariant)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .fillMaxWidth(fraction)
-                                .clip(RoundedCornerShape(99.dp))
-                                .background(barColors[index % barColors.size])
-                        )
-                    }
-                    Text(
-                        text = "${entry.value} / $total",
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.widthIn(min = 40.dp),
-                        textAlign = TextAlign.End
-                    )
-                }
-                if (index < entries.size - 1) {
-                    HorizontalDivider(thickness = 0.5.dp)
-                }
-            }
-        }
+        Text(
+            text = label,
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }

@@ -4,7 +4,6 @@ import com.github.projektmagma.magmaquiz.app.core.domain.NetworkError
 import com.github.projektmagma.magmaquiz.app.game.data.WsEvent
 import com.github.projektmagma.magmaquiz.app.game.data.service.GameService
 import com.github.projektmagma.magmaquiz.app.quizzes.data.service.QuizService
-import com.github.projektmagma.magmaquiz.shared.data.domain.Question
 import com.github.projektmagma.magmaquiz.shared.data.domain.RoomSettings
 import com.github.projektmagma.magmaquiz.shared.data.domain.WebSocketMessages
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.Resource
@@ -26,7 +25,6 @@ class GameRepository(
     private val quizService: QuizService
 ) {
     val roomSettings = MutableStateFlow<RoomSettings?>(null)
-    val questions = MutableStateFlow<List<Question>>(emptyList())
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
@@ -42,10 +40,6 @@ class GameRepository(
                 when (event) {
                     is WsEvent.OutGoing -> {
                         when (val msg = event.message) {
-                            is WebSocketMessages.OutgoingMessage.NextQuestion -> {
-                                questions.update { it + msg.question }
-                            }
-
                             is WebSocketMessages.OutgoingMessage.SettingsChanged -> {
                                 roomSettings.value = msg.roomSettings
                             }
@@ -107,7 +101,6 @@ class GameRepository(
     }
 
     suspend fun joinRoom(id: UUID): Resource<Unit, NetworkError> {
-        questions.value = emptyList()
         return gameService.joinRoom(id)
             .whenSuccess {
                 val room = it.data

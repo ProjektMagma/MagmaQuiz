@@ -36,7 +36,7 @@
     <string name="answer">Usuń odpowiedz</string>
     <string name="name">Nazwa</string>
     <string name="description">Opis</string>
-    <string name="correct_answer">Poprawna odpowiedz: %1$d</string>
+    <string name="correct_answer_content">Poprawna odpowiedz: %1$s</string>
     <string name="wrong_answer">Niepoprawna odpowiedz</string>
     <string name="content_empty">Pusta treść</string>
     <string name="answer_content_empty">Pusta treść odpowiedzi</string>
@@ -183,4 +183,12 @@
     <string name="private_room">Tylko dla znajomych</string>
     <string name="percent_correct">%1$d% poprawnych</string>
     <string name="enter_answer">Wprowadź odpowiedź…</string>
+    <string name="correct">Poprawnie</string>
+    <string name="correct_answer">Poprawna odpowiedź</string>
+    <string name="wrong">Błędnie</string>
+    <string name="all">Wszystkie</string>
+    <string name="your_answer">Twoja odpowiedź</string>
+    <string name="game_ended">Gra zakończona</string>
+    <string name="online">Online %1$d</string>
+    <string name="waiting_for_players">Oczekiwanie na graczy…</string>
 </resources>

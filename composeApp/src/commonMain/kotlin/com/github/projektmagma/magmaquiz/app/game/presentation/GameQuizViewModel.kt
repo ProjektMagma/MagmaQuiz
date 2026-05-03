@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.UUID
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -22,14 +23,19 @@ class GameQuizViewModel(
     
     private val _quiz = quizRepository.quiz
     val quiz = _quiz.asStateFlow()
+    
+    private val _selectedAnswers = MutableStateFlow<Map<UUID, String>>(emptyMap())
+    val selectedAnswers = _selectedAnswers.asStateFlow()
 
     fun onCommand(command: GameCommand) {
         when (command) {
             is GameCommand.AnswerClicked -> onAnswerSelected(command)
             GameCommand.FinishGame -> {
-                viewModelScope.launch { 
+                viewModelScope.launch {
                     delay(400.milliseconds)
+                    _selectedAnswers.update { emptyMap() }
                     _gameState.update { it.copy(score = 0, currentQuestionIndex = 0) }
+                    updateGameState()
                 }
             }
         }
@@ -44,8 +50,19 @@ class GameQuizViewModel(
 
         val isCorrect = cmd.isCorrect ?: _gameState.value.answers.find { it.content == cmd.content }?.isCorrect
         if (isCorrect == true) {
-            _gameState.update { gameState ->
-                gameState.copy(score = gameState.score + 1)
+            _gameState.update { it.copy(score = it.score + 1) }
+        }
+        
+        val currentQuestion = _quiz.value?.questionList?.getOrNull(_gameState.value.currentQuestionIndex)
+        if (currentQuestion != null) {
+            val isOpenAnswer = _gameState.value.answers.size == 1
+            val contentToSave = if (isOpenAnswer) {
+                cmd.content
+            } else {
+                _gameState.value.answers.find { it.content == cmd.content }?.content
+            }
+            if (contentToSave != null) {
+                _selectedAnswers.update { it + (currentQuestion.id!! to contentToSave) }
             }
         }
 
@@ -60,9 +77,7 @@ class GameQuizViewModel(
 
         viewModelScope.launch {
             delay(2.seconds)
-            _gameState.update { gameState ->
-                gameState.copy(currentQuestionIndex = gameState.currentQuestionIndex + 1)
-            }
+            _gameState.update { it.copy(currentQuestionIndex = it.currentQuestionIndex + 1) }
             updateGameState()
         }
     }

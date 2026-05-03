@@ -43,8 +43,9 @@ fun GameMultiplayerScreen(
     navigateOnGameFinish: () -> Unit
 ) {
     val gameState by gameQuizViewModel.gameState.collectAsStateWithLifecycle()
-    val correctQuestions by gameQuizViewModel.correctQuestions.collectAsStateWithLifecycle()
-
+    val answers by gameQuizViewModel.selectedAnswers.collectAsStateWithLifecycle()
+    val roomSettings by gameQuizViewModel.roomSettings.collectAsStateWithLifecycle()
+    
     val backState = rememberNavigationEventState(currentInfo = NavigationEventInfo.None)
 
     NavigationEventHandler(
@@ -65,11 +66,11 @@ fun GameMultiplayerScreen(
     ) {
         if (gameState.isQuizFinished) {
             FinishSection(
-                gameState = gameState,
-                correctQuestions = correctQuestions,
-                isHost = gameQuizViewModel.checkIsHost(),
-                onEnd = navigateOnGameFinish,
-                onDisconnect = {
+                answersMap = answers,
+                questions = roomSettings!!.currentQuiz.questionList,
+                score = gameState.score,
+                total = gameState.totalQuestions,
+                onBack = {
                     gameQuizViewModel.sendMessage(WebSocketMessages.IncomingMessage.Disconnect)
                     navigateOnGameFinish()
                 }
@@ -94,10 +95,7 @@ fun GameMultiplayerScreen(
                     correctAnswerContent = answer.content,
                     onSubmit = { value ->
                         gameQuizViewModel.onCommand(
-                            GameCommand.AnswerClicked(
-                                isCorrect = answer.isCorrect,
-                                content = value
-                            )
+                            GameCommand.AnswerClicked(content = value)
                         )
                     }
                 )

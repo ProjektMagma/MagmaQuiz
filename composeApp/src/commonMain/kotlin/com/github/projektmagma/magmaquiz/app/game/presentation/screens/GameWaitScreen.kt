@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material.icons.outlined.Schedule
-import androidx.compose.material.icons.outlined.SportsEsports
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
@@ -47,31 +46,31 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.RoomSettings
 import com.github.projektmagma.magmaquiz.shared.data.domain.WebSocketMessages
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.close_room
-import magmaquiz.composeapp.generated.resources.in_progress
 import magmaquiz.composeapp.generated.resources.leave_room
 import magmaquiz.composeapp.generated.resources.nobody_joined
 import magmaquiz.composeapp.generated.resources.players
 import magmaquiz.composeapp.generated.resources.players_count
 import magmaquiz.composeapp.generated.resources.seconds_per_question
 import magmaquiz.composeapp.generated.resources.start_game
-import magmaquiz.composeapp.generated.resources.waiting
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun GameWaitScreen(
     gameWaitViewModel: GameWaitViewModel = koinViewModel(),
-    onStartGame: () -> Unit,
+    onStartGamePlayer: () -> Unit,
+    onStartGameHost: () -> Unit,
     onLeaveRoom: () -> Unit,
 ) {
     val room by gameWaitViewModel.roomSettings.collectAsStateWithLifecycle()
     val state by gameWaitViewModel.state.collectAsStateWithLifecycle()
+    val isHost = gameWaitViewModel.checkIsHost()
 
     LaunchedEffect(Unit){
         gameWaitViewModel.event.collect { 
             when (it) {
                 is GameEvent.Closed -> onLeaveRoom()
-                GameEvent.Success -> onStartGame()
+                GameEvent.Success -> if (isHost) onStartGameHost() else onStartGamePlayer()
             }
         }
     }
@@ -81,7 +80,7 @@ fun GameWaitScreen(
         else -> GameHostContent(
             room = roomState,
             state = state,
-            isHost = gameWaitViewModel.checkIsHost(),
+            isHost = isHost,
             onLeaveRoom = { onLeaveRoom() },
             dialogVisibilityChanged = { gameWaitViewModel.onCommand(GameWaitCommand.DialogVisibilityChanged(it)) },
             sendMessage = { gameWaitViewModel.sendMessage(it) },
@@ -150,11 +149,6 @@ private fun GameHostContent(
                         onClick = {},
                         label = { Text(stringResource(Res.string.seconds_per_question, timeSeconds)) },
                         leadingIcon = { Icon(Icons.Outlined.Schedule, contentDescription = null) }
-                    )
-                    AssistChip(
-                        onClick = {},
-                        label = { Text(if (room.isInProgress) stringResource(Res.string.in_progress) else stringResource(Res.string.waiting)) },
-                        leadingIcon = { Icon(Icons.Outlined.SportsEsports, contentDescription = null) }
                     )
                 }
             }
@@ -254,7 +248,7 @@ private fun GameHostContent(
                     onClick = {
                         sendMessage(WebSocketMessages.IncomingMessage.StartGame)
                     },
-                    enabled = room.userList.isNotEmpty() && !room.isInProgress
+                    enabled = room.userList.size > 1
                 ) {
                     Text(stringResource(Res.string.start_game))
                 }

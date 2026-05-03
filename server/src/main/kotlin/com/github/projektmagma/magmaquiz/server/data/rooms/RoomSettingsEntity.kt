@@ -6,7 +6,7 @@ import com.github.projektmagma.magmaquiz.server.data.entities.QuizEntity
 import com.github.projektmagma.magmaquiz.server.data.entities.UserEntity
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import com.github.projektmagma.magmaquiz.shared.data.domain.RoomSettings
-import java.util.*
+import java.util.UUID
 
 data class RoomSettingsEntity(
     val roomId: UUID = UUID.randomUUID(),
@@ -23,7 +23,7 @@ data class RoomSettingsEntity(
         return RoomSettings(
             roomId = this.roomId,
             roomName = this.roomName,
-            currentQuiz = this.currentQuiz.toDomain(QuizConversionCommand.WithUserNoQuestions(caller)),
+            currentQuiz = this.currentQuiz.toDomain(QuizConversionCommand.WithUserAndQuestions(caller)),
             roomOwner = this.roomOwner.toDomain(UserConversionCommand.ForeignUser(caller)) as ForeignUser,
             questionTimeInMillis = this.questionTimeInMillis,
             isPublic = this.isPublic,

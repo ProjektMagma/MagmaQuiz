@@ -38,7 +38,7 @@
     <string name="delete_answer">Delete answer</string>
     <string name="name">Name</string>
     <string name="description">Description</string>
-    <string name="correct_answer">Correct answer %1$d</string>
+    <string name="correct_answer_content">Correct answer %1$s</string>
     <string name="wrong_answer">Incorrect answer</string>
     <string name="content_empty">Empty content</string>
     <string name="answer_content_empty">Empty answer's content</string>
@@ -187,4 +187,12 @@
     <string name="private_room">For friends only</string>
     <string name="percent_correct">%1$d% correct</string>
     <string name="enter_answer">Enter the answer…</string>
+    <string name="correct">Correct</string>
+    <string name="correct_answer">Correct answer</string>
+    <string name="wrong">Wrong</string>
+    <string name="all">All</string>
+    <string name="your_answer">Your answer</string>
+    <string name="game_ended">Game ended</string>
+    <string name="online">Online %1$d</string>
+    <string name="waiting_for_players">Waiting for players…</string>
 </resources>

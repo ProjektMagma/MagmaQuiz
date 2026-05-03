@@ -2,6 +2,7 @@ package com.github.projektmagma.magmaquiz.app.game.di
 
 import com.github.projektmagma.magmaquiz.app.game.data.repository.GameRepository
 import com.github.projektmagma.magmaquiz.app.game.data.service.GameService
+import com.github.projektmagma.magmaquiz.app.game.presentation.GameLeaderboardViewModel
 import com.github.projektmagma.magmaquiz.app.game.presentation.GameMultiplayerViewModel
 import com.github.projektmagma.magmaquiz.app.game.presentation.GameQuizViewModel
 import com.github.projektmagma.magmaquiz.app.game.presentation.GameSettingsViewModel
@@ -18,4 +19,5 @@ val gameModule = module {
     viewModelOf(::GameSettingsViewModel)
     viewModelOf(::GameWaitViewModel)
     viewModelOf(::GameMultiplayerViewModel)
+    viewModelOf(::GameLeaderboardViewModel)
 }

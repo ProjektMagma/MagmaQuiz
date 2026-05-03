@@ -28,7 +28,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import magmaquiz.composeapp.generated.resources.Res
-import magmaquiz.composeapp.generated.resources.correct_answer
+import magmaquiz.composeapp.generated.resources.correct_answer_content
 import magmaquiz.composeapp.generated.resources.enter_answer
 import org.jetbrains.compose.resources.stringResource
 
@@ -102,7 +102,7 @@ private fun CorrectAnswerHint(answer: String) {
         color = Color(0xFFE1F5EE)
     ) {
         Text(
-            text = stringResource(Res.string.correct_answer, answer),
+            text = stringResource(Res.string.correct_answer_content, answer),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp, vertical = 8.dp),
