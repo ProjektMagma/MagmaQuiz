@@ -101,7 +101,7 @@ kotlin {
 }
 
 val appPackageRoute = "com.github.projektmagma.magmaquiz"
-val appVersion = "0.9.0"
+val appVersion = "0.9.1"
 
 android {
     namespace = appPackageRoute
