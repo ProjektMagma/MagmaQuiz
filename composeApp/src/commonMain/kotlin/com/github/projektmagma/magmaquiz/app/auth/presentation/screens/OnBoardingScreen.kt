@@ -29,6 +29,7 @@ fun OnBoardingScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        Spacer(modifier = Modifier.height(64.dp))
         Text(
             text = stringResource(Res.string.welcome_in),
             style = MaterialTheme.typography.headlineMedium

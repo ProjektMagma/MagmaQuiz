@@ -1,10 +1,6 @@
 package com.github.projektmagma.magmaquiz.app.core.presentation.components
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -16,6 +12,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
@@ -29,7 +26,7 @@ actual fun <T> AutoScalableLazyRow(
 ) {
     val state = rememberLazyListState()
 
-    LaunchedEffect(itemList){
+    LaunchedEffect(itemList) {
         snapshotFlow { state.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
             .distinctUntilChanged()
             .collect { lastVisibleIndex ->
@@ -41,7 +38,10 @@ actual fun <T> AutoScalableLazyRow(
 
     if (itemList.isEmpty())
         Column(
-            modifier = Modifier.wrapContentHeight().fillMaxWidth(),
+            modifier = Modifier
+                .heightIn(min = 256.dp)
+                .wrapContentHeight()
+                .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -52,20 +52,18 @@ actual fun <T> AutoScalableLazyRow(
         }
     else
         LazyRow(
-            modifier =  Modifier.wrapContentHeight().fillMaxWidth(),
-            state = state
+            modifier = Modifier
+                .wrapContentHeight()
+                .fillMaxWidth(),
+            state = state,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             items(itemList, key = key) {
                 content(it)
             }
             item {
                 if (isLoadingMore) {
-                    Box(
-                        modifier = Modifier.fillParentMaxHeight(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
+                    CircularProgressIndicator(modifier = Modifier.padding(start = 16.dp))
                 }
             }
         }

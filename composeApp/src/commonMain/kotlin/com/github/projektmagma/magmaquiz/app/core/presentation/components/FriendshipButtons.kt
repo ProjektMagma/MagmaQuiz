@@ -1,9 +1,6 @@
 package com.github.projektmagma.magmaquiz.app.core.presentation.components
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -12,8 +9,6 @@ import com.github.projektmagma.magmaquiz.app.users.presentation.model.shared.Use
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import com.github.projektmagma.magmaquiz.shared.data.domain.FriendshipStatus
 import magmaquiz.composeapp.generated.resources.*
-import org.jetbrains.compose.resources.StringResource
-import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun FriendshipButtons(
@@ -64,7 +59,7 @@ fun FriendshipButtons(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     WideTonalButton(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.fillMaxWidth().weight(1f),
                         text = Res.string.accept,
                         action = {
                             usersSharedViewModel.onCommand(
@@ -73,7 +68,7 @@ fun FriendshipButtons(
                         }
                     )
                     WideTonalButton(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.fillMaxWidth().weight(1f),
                         text = Res.string.reject,
                         action = {
                             usersSharedViewModel.onCommand(
@@ -86,6 +81,7 @@ fun FriendshipButtons(
 
         FriendshipStatus.Outgoing -> {
             WideTonalButton(
+                modifier = Modifier.fillMaxWidth(),
                 text = Res.string.cancel,
                 action = {
                     usersSharedViewModel.onCommand(
@@ -97,6 +93,7 @@ fun FriendshipButtons(
 
         FriendshipStatus.Friends -> {
             WideTonalButton(
+                modifier = Modifier.fillMaxWidth(),
                 text = Res.string.delete_friend,
                 action = {
                     usersSharedViewModel.onCommand(
@@ -107,20 +104,5 @@ fun FriendshipButtons(
         }
 
         FriendshipStatus.Unknown -> {}// todo nie wiem co tu powinno byc 
-    }
-}
-
-@Composable
-fun WideTonalButton(
-    text: StringResource,
-    action: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    FilledTonalButton(
-        modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.medium,
-        onClick = { action() }
-    ) {
-        Text(stringResource(text))
     }
 }

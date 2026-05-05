@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
 import com.github.projektmagma.magmaquiz.app.core.util.Paginator
-import com.github.projektmagma.magmaquiz.app.game.data.repository.GameRepository
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.main.HomeScreenCommand
 import com.github.projektmagma.magmaquiz.app.home.presentation.model.main.HomeScreenState
 import com.github.projektmagma.magmaquiz.app.quizzes.data.repository.QuizRepository
@@ -21,7 +20,6 @@ import java.util.*
 class HomeViewModel(
     private val quizRepository: QuizRepository,
     private val usersRepository: UsersRepository,
-    private val gameRepository: GameRepository
 ) : ViewModel() {
 
     private val _recentQuizzesUiState = MutableStateFlow<UiState>(UiState.Loading)
