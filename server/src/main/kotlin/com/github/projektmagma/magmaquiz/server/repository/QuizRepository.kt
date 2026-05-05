@@ -47,11 +47,18 @@ class QuizRepository {
         return transaction { QuizEntity.find { QuizzesTable.id eq quizId and QuizzesTable.isActive }.firstOrNull() }
     }
 
-    fun getQuizzes(caller: UserEntity, count: Int, offset: Int, stringToSearch: String): List<QuizEntity> {
+    fun getQuizzes(
+        caller: UserEntity,
+        count: Int,
+        offset: Int,
+        stringToSearch: String,
+        order: Pair<Expression<*>, SortOrder>
+    ): List<QuizEntity> {
         return transaction {
             QuizEntity.find {
                 QuizzesTable.isActive eq true and (QuizzesTable.quizName.lowerCase() like "%${stringToSearch.lowercase()}%")
             }
+                .orderBy(order)
                 .offset(offset.toLong())
                 .limit(count)
                 .filter { it.isAccessibleByUser(caller) }

@@ -4,6 +4,7 @@ import com.github.projektmagma.magmaquiz.server.data.conversion.ConversionComman
 import com.github.projektmagma.magmaquiz.server.data.conversion.QuizConversionCommand
 import com.github.projektmagma.magmaquiz.server.data.entities.QuizEntity
 import com.github.projektmagma.magmaquiz.server.data.entities.QuizReviewEntity
+import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesTable
 import com.github.projektmagma.magmaquiz.server.data.util.UserSession
 import com.github.projektmagma.magmaquiz.server.repository.FriendshipRepository
 import com.github.projektmagma.magmaquiz.server.repository.QuizRepository
@@ -14,6 +15,7 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.Tag
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.NetworkResource
 import com.github.projektmagma.magmaquiz.shared.data.rest.values.CreateOrModifyQuizValue
 import io.ktor.http.*
+import org.jetbrains.exposed.v1.core.SortOrder
 import java.util.*
 
 
@@ -67,8 +69,10 @@ class QuizDataController(
         val thisUser = userRepository.getUserData(session)
 
         val quizzesList = quizRepository
-            .getQuizzes(thisUser, count, offset, stringToSearch)
-            .sortedByDescending { it.createdAt }
+            .getQuizzes(
+                thisUser, count, offset, stringToSearch,
+                QuizzesTable.quizName to SortOrder.ASC
+            )
             .map {
                 it.toDomain(QuizConversionCommand.WithUserNoQuestions(thisUser))
             }
@@ -159,9 +163,12 @@ class QuizDataController(
 
         val thisUser = userRepository.getUserData(session)
 
-        val quizList = quizRepository.getQuizzes(thisUser, count, offset, stringToSearch)
-            .sortedByDescending { it.createdAt }
-            .map { it.toDomain(QuizConversionCommand.WithUserNoQuestions(thisUser)) }
+        val quizList =
+            quizRepository.getQuizzes(
+                thisUser, count, offset, stringToSearch,
+                QuizzesTable.createdAt to SortOrder.DESC
+            )
+                .map { it.toDomain(QuizConversionCommand.WithUserNoQuestions(thisUser)) }
 
         return NetworkResource.Success(quizList, HttpStatusCode.PartialContent)
     }
@@ -174,8 +181,10 @@ class QuizDataController(
     ): NetworkResource<List<Quiz>> {
         val thisUser = userRepository.getUserData(session)
 
-        val quizList = quizRepository.getQuizzes(thisUser, count, offset, stringToSearch)
-            .sortedByDescending { it.likesCount }
+        val quizList = quizRepository.getQuizzes(
+            thisUser, count, offset, stringToSearch,
+            QuizzesTable.likesCount to SortOrder.DESC
+        )
             .map { it.toDomain(QuizConversionCommand.WithUserNoQuestions(thisUser)) }
 
         return NetworkResource.Success(quizList, HttpStatusCode.PartialContent)
