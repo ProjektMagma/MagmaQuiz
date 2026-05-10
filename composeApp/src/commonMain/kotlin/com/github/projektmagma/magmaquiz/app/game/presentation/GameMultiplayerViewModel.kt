@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.github.projektmagma.magmaquiz.app.auth.data.AuthRepository
 import com.github.projektmagma.magmaquiz.app.core.util.TimeConverter.toSeconds
 import com.github.projektmagma.magmaquiz.app.core.util.Timer
+import com.github.projektmagma.magmaquiz.app.core.util.normalizedEquals
 import com.github.projektmagma.magmaquiz.app.game.data.WsEvent
 import com.github.projektmagma.magmaquiz.app.game.data.repository.GameRepository
 import com.github.projektmagma.magmaquiz.app.game.presentation.model.GameEvent
@@ -103,7 +104,7 @@ class GameMultiplayerViewModel(
     private fun onAnswerSelected(cmd: GameCommand.AnswerClicked) {
         if (_gameState.value.isAnswered) return
         
-        val correctAnswer = _gameState.value.answers.find { it.content == cmd.content }
+        val correctAnswer = _gameState.value.answers.find { it.content.normalizedEquals(cmd.content) }
         val isCorrect = cmd.isCorrect ?: correctAnswer?.isCorrect
         
         val currentQuestion = _questions.getOrNull(_gameState.value.currentQuestionIndex - 1)
@@ -116,7 +117,7 @@ class GameMultiplayerViewModel(
                 score = if (isCorrect == true) gameState.score + 1 else gameState.score,
                 isAnswered = true,
                 answers = gameState.answers.map {
-                    it.copy(isSelected = it.content == cmd.content)
+                    it.copy(isSelected = it.content.normalizedEquals(cmd.content))
                 }
             )
         }

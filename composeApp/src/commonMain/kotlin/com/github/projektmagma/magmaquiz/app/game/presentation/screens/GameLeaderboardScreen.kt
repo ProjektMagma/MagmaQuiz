@@ -41,6 +41,7 @@ import com.github.projektmagma.magmaquiz.app.game.presentation.GameLeaderboardVi
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuestionCard
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.toQuestionModel
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
+import com.github.projektmagma.magmaquiz.shared.data.domain.WebSocketMessages
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.current_question
 import magmaquiz.composeapp.generated.resources.game_ended
@@ -76,6 +77,7 @@ fun GameLeaderboardScreen(
     ) {
         item {
             Surface(
+                modifier = Modifier.padding(vertical = 8.dp),
                 shape = MaterialTheme.shapes.large,
                 color = MaterialTheme.colorScheme.surface,
                 border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant)
@@ -133,8 +135,6 @@ fun GameLeaderboardScreen(
                     QuestionCard(currentQuestion!!.toQuestionModel(), lockClickable = true)
                 }
 
-
-
             if (sortedEntries.isEmpty()) {
                 Box(
                     modifier = Modifier
@@ -172,7 +172,10 @@ fun GameLeaderboardScreen(
         }
         item {
             OutlinedButton(
-                onClick = navigateBack,
+                onClick = {
+                    viewModel.sendMessage(WebSocketMessages.IncomingMessage.CloseRoom)
+                    navigateBack()
+                },
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.medium
             ) {

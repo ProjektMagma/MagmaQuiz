@@ -31,3 +31,7 @@ suspend fun ByteArray?.compressImage(quality: Int, size: Int = 1024): ByteArray?
         )
     } else null
 }
+
+fun String.normalizedEquals(text: String): Boolean{
+    return this.trim().equals(text.trim(), ignoreCase = true)
+}

@@ -8,10 +8,10 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.Netw
 import com.github.projektmagma.magmaquiz.app.core.util.compressImage
 import com.github.projektmagma.magmaquiz.app.core.util.withSearchDelay
 import com.github.projektmagma.magmaquiz.app.quizzes.data.repository.QuizRepository
+import com.github.projektmagma.magmaquiz.app.quizzes.domain.validators.TagValidator
 import com.github.projektmagma.magmaquiz.app.quizzes.domain.validators.toResId
 import com.github.projektmagma.magmaquiz.app.quizzes.domain.validators.validateQuestion
 import com.github.projektmagma.magmaquiz.app.quizzes.domain.validators.validateQuiz
-import com.github.projektmagma.magmaquiz.app.quizzes.domain.validators.validateTag
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.AnswerModel
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.CreateQuizState
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.QuestionModel
@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
+import kotlin.time.Duration.Companion.milliseconds
 
 class CreateQuizViewModel(
     private val quizRepository: QuizRepository
@@ -176,7 +177,7 @@ class CreateQuizViewModel(
     private fun addNewTag(tagName: String){
         if (tagName.isNotEmpty()) {
             _createQuizState.update {
-                it.copy(tagError = validateTag(
+                it.copy(tagError = TagValidator.validateTag(
                     tagName,
                     _createQuizState.value.quizModel.tagList)
                 )
@@ -262,7 +263,7 @@ class CreateQuizViewModel(
                 is Resource.Success -> {
                     _quizChannel.send(NetworkEvent.Success)
                     _uiChannel.send(UiEvent.NavigateBack)
-                    delay(400)
+                    delay(400.milliseconds)
                     resetState()
                 }
             }

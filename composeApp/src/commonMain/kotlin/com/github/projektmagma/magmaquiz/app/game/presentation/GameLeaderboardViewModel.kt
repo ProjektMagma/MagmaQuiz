@@ -33,6 +33,12 @@ class GameLeaderboardViewModel(
         _currentQuestion.value = _room.value?.currentQuiz?.questionList?.firstOrNull()
         collectMessages()
     }
+    
+    fun sendMessage(message: WebSocketMessages.IncomingMessage){
+        viewModelScope.launch { 
+            gameRepository.sendMessage(message)
+        }
+    }
 
     private fun collectMessages() {
         var currentIndex = 0

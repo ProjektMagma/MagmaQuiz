@@ -5,7 +5,11 @@ import com.github.projektmagma.magmaquiz.server.data.abstraction.ExtUUIDEntity
 import com.github.projektmagma.magmaquiz.server.data.conversion.ConversionCommand
 import com.github.projektmagma.magmaquiz.server.data.conversion.QuizConversionCommand
 import com.github.projektmagma.magmaquiz.server.data.conversion.UserConversionCommand
-import com.github.projektmagma.magmaquiz.server.data.tables.*
+import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesQuestionsTable
+import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesReviewsTable
+import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesTable
+import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesTagsMapTable
+import com.github.projektmagma.magmaquiz.server.data.tables.QuizzesTagsTable
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import com.github.projektmagma.magmaquiz.shared.data.domain.FriendshipStatus
 import com.github.projektmagma.magmaquiz.shared.data.domain.Quiz
@@ -15,7 +19,7 @@ import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.dao.java.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import java.util.*
+import java.util.UUID
 
 class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable),
     DomainCapable<Quiz, QuizConversionCommand> {
@@ -142,26 +146,29 @@ class QuizEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, QuizzesTable),
 
     fun addTags(tagsStr: List<String>) {
         transaction {
-            tagsStr.forEach { tagStr ->
-                val tagEntity = QuizTagEntity.find {
-                    QuizzesTagsTable.tagName eq tagStr
-                }.firstOrNull()
-
-                if (tagEntity != null) {
-                    QuizTagMapEntity.new {
-                        tag = tagEntity
-                        quiz = this@QuizEntity
-                    }
-                } else {
-                    val tagEntity = QuizTagEntity.new {
+            tagsStr
+                .map { it.trim() }
+                .filter { it.isNotEmpty() }
+                .distinct()
+                .forEach { tagStr ->
+                    val tagEntity = QuizTagEntity.find {
+                        QuizzesTagsTable.tagName eq tagStr
+                    }.firstOrNull() ?: QuizTagEntity.new {
                         tagName = tagStr
                     }
-                    QuizTagMapEntity.new {
-                        tag = tagEntity
-                        quiz = this@QuizEntity
+
+                    val exists = QuizTagMapEntity.find {
+                        (QuizzesTagsMapTable.quiz eq this@QuizEntity.id) and
+                                (QuizzesTagsMapTable.tag eq tagEntity.id)
+                    }.firstOrNull() != null
+
+                    if (!exists) {
+                        QuizTagMapEntity.new {
+                            tag = tagEntity
+                            quiz = this@QuizEntity
+                        }
                     }
                 }
-            }
         }
     }
 

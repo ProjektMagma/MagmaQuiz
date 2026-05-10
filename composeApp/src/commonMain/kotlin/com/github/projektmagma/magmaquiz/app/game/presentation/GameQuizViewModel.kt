@@ -2,6 +2,7 @@ package com.github.projektmagma.magmaquiz.app.game.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.projektmagma.magmaquiz.app.core.util.normalizedEquals
 import com.github.projektmagma.magmaquiz.app.game.presentation.model.play.AnswerState
 import com.github.projektmagma.magmaquiz.app.game.presentation.model.play.GameCommand
 import com.github.projektmagma.magmaquiz.app.game.presentation.model.play.GameState
@@ -48,7 +49,7 @@ class GameQuizViewModel(
     private fun onAnswerSelected(cmd: GameCommand.AnswerClicked) {
         if (_gameState.value.isAnswered) return
 
-        val isCorrect = cmd.isCorrect ?: _gameState.value.answers.find { it.content == cmd.content }?.isCorrect
+        val isCorrect = cmd.isCorrect ?: _gameState.value.answers.find { it.content.normalizedEquals(cmd.content) }?.isCorrect
         if (isCorrect == true) {
             _gameState.update { it.copy(score = it.score + 1) }
         }
@@ -59,7 +60,7 @@ class GameQuizViewModel(
             val contentToSave = if (isOpenAnswer) {
                 cmd.content
             } else {
-                _gameState.value.answers.find { it.content == cmd.content }?.content
+                _gameState.value.answers.find { it.content.normalizedEquals(cmd.content) }?.content
             }
             if (contentToSave != null) {
                 _selectedAnswers.update { it + (currentQuestion.id!! to contentToSave) }

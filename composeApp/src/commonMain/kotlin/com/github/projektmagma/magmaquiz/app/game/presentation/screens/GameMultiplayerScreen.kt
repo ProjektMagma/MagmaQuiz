@@ -42,6 +42,9 @@ import com.github.projektmagma.magmaquiz.app.game.presentation.components.Questi
 import com.github.projektmagma.magmaquiz.app.game.presentation.model.GameEvent
 import com.github.projektmagma.magmaquiz.app.game.presentation.model.play.GameCommand
 import com.github.projektmagma.magmaquiz.shared.data.domain.WebSocketMessages
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.host_left_room
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -58,27 +61,22 @@ fun GameMultiplayerScreen(
 
     ObserveAsEvents(gameQuizViewModel.event) { event -> 
         when (event) {
-            is GameEvent.Closed -> if (!gameState.isQuizFinished) {
-                navigateOnGameFinish()
-                showCloseDialog = true
-            }
+            is GameEvent.Closed -> showCloseDialog = true
             GameEvent.Success -> Unit
         }
     }
 
-    if (showCloseDialog){
+    if (showCloseDialog && !gameState.isQuizFinished){
         AlertDialog(
             confirmButton = {
                 Button(
-                    onClick = {
-                        navigateOnGameFinish()
-                    }
+                    onClick = { navigateOnGameFinish() }
                 ) {
                     Text("OK")
                 }
             },
             onDismissRequest = { showCloseDialog = false },
-            text = { Text("Host opuscil pokoj, gra zakonczona") }
+            text = { Text(stringResource(Res.string.host_left_room)) }
         )
     }
 
@@ -118,31 +116,37 @@ fun GameMultiplayerScreen(
                 total = gameState.totalQuestions,
                 current = gameState.currentQuestionIndex
             )
-            QuestionGameCard(
-                imageData = gameState.questionImage,
-                content = gameState.questionContent
-            )
-            if (gameState.answers.size == 1) {
-                val answer = gameState.answers.first()
-                OpenAnswerField(
-                    isAnswered = gameState.isAnswered,
-                    correctAnswerContent = answer.content,
-                    onSubmit = { value ->
-                        gameQuizViewModel.onCommand(
-                            GameCommand.AnswerClicked(content = value)
-                        )
-                    }
+            
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center
+            ) {
+                QuestionGameCard(
+                    imageData = gameState.questionImage,
+                    content = gameState.questionContent
                 )
-            } else {
-                AnswersList(
-                    answers = gameState.answers,
-                    isAnswered = gameState.isAnswered,
-                    onAnswerClick = { answer ->
-                        gameQuizViewModel.onCommand(
-                            GameCommand.AnswerClicked(answer.isCorrect, answer.content)
-                        )
-                    }
-                )
+                if (gameState.answers.size == 1) {
+                    val answer = gameState.answers.first()
+                    OpenAnswerField(
+                        isAnswered = gameState.isAnswered,
+                        correctAnswerContent = answer.content,
+                        onSubmit = { value ->
+                            gameQuizViewModel.onCommand(
+                                GameCommand.AnswerClicked(content = value)
+                            )
+                        }
+                    )
+                } else {
+                    AnswersList(
+                        answers = gameState.answers,
+                        isAnswered = gameState.isAnswered,
+                        onAnswerClick = { answer ->
+                            gameQuizViewModel.onCommand(
+                                GameCommand.AnswerClicked(answer.isCorrect, answer.content)
+                            )
+                        }
+                    )
+                }   
             }
         }
     }

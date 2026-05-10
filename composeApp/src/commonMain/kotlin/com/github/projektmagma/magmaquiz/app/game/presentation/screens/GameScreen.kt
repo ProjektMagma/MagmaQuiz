@@ -68,33 +68,38 @@ fun GameScreen(
                 total = gameState.totalQuestions,
                 current = gameState.currentQuestionIndex
             )
-            QuestionGameCard(
-                imageData = gameState.questionImage,
-                content = gameState.questionContent
-            )
-            if (gameState.answers.size == 1) {
-                val answer = gameState.answers.first()
-                OpenAnswerField(
-                    isAnswered = gameState.isAnswered,
-                    correctAnswerContent = answer.content,
-                    onSubmit = { value ->
-                        gameQuizViewModel.onCommand(
-                            GameCommand.AnswerClicked(
-                                content = value
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center
+            ) {
+                QuestionGameCard(
+                    imageData = gameState.questionImage,
+                    content = gameState.questionContent
+                )
+                if (gameState.answers.size == 1) {
+                    val answer = gameState.answers.first()
+                    OpenAnswerField(
+                        isAnswered = gameState.isAnswered,
+                        correctAnswerContent = answer.content,
+                        onSubmit = { value ->
+                            gameQuizViewModel.onCommand(
+                                GameCommand.AnswerClicked(
+                                    content = value
+                                )
                             )
-                        )
-                    }
-                )
-            } else {
-                AnswersList(
-                    answers = gameState.answers,
-                    isAnswered = gameState.isAnswered,
-                    onAnswerClick = { answer ->
-                        gameQuizViewModel.onCommand(
-                            GameCommand.AnswerClicked(answer.isCorrect, answer.content)
-                        )
-                    }
-                )
+                        }
+                    )
+                } else {
+                    AnswersList(
+                        answers = gameState.answers,
+                        isAnswered = gameState.isAnswered,
+                        onAnswerClick = { answer ->
+                            gameQuizViewModel.onCommand(
+                                GameCommand.AnswerClicked(answer.isCorrect, answer.content)
+                            )
+                        }
+                    )
+                }
             }
         }
     }
