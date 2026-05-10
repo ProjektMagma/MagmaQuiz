@@ -1,48 +1,19 @@
 package com.github.projektmagma.magmaquiz.app.quizzes.presentation.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Save
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuAnchorType
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.InputChip
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
@@ -66,23 +37,7 @@ import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.Qui
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuizDataTextField
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.QuizCommand
 import com.github.projektmagma.magmaquiz.shared.data.domain.QuizVisibility
-import magmaquiz.composeapp.generated.resources.Res
-import magmaquiz.composeapp.generated.resources.add_question
-import magmaquiz.composeapp.generated.resources.add_tag
-import magmaquiz.composeapp.generated.resources.all_changes_remove
-import magmaquiz.composeapp.generated.resources.are_you_sure
-import magmaquiz.composeapp.generated.resources.description
-import magmaquiz.composeapp.generated.resources.friend_only
-import magmaquiz.composeapp.generated.resources.name
-import magmaquiz.composeapp.generated.resources.no
-import magmaquiz.composeapp.generated.resources.private
-import magmaquiz.composeapp.generated.resources.public
-import magmaquiz.composeapp.generated.resources.save_icon
-import magmaquiz.composeapp.generated.resources.save_quiz
-import magmaquiz.composeapp.generated.resources.success_quiz_add
-import magmaquiz.composeapp.generated.resources.tags
-import magmaquiz.composeapp.generated.resources.visibility
-import magmaquiz.composeapp.generated.resources.yes
+import magmaquiz.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -96,7 +51,7 @@ fun CreateQuizScreen(
 ) {
     var expanded by remember { mutableStateOf(false) }
     var tagListExpanded by remember { mutableStateOf(false) }
-    
+
     var showQuestionDialog by remember { mutableStateOf(false) }
     var showAlertDialog by remember { mutableStateOf(false) }
     val state by createQuizViewModel.state.collectAsStateWithLifecycle()
@@ -158,7 +113,18 @@ fun CreateQuizScreen(
             }
         )
     }
-    
+
+    if (showQuestionDialog) {
+        QuestionTypeDialog(
+            onClick = {
+                showQuestionDialog = false
+                createQuizViewModel.onCommand(QuizCommand.QuestionEditor.Init(it))
+                navigateToQuestionCreate(it)
+            },
+            changeDialogVisibility = { showQuestionDialog = false }
+        )
+    }
+
     if (state.isLoading) {
         FullSizeCircularProgressIndicator()
     } else {
@@ -168,31 +134,63 @@ fun CreateQuizScreen(
             contentPadding = PaddingValues(bottom = WindowInsets.ime.asPaddingValues().calculateBottomPadding()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            item {
+            stickyHeader {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.shapes.medium)
+                        .padding(vertical = 4.dp, horizontal = 8.dp),
                     horizontalArrangement = Arrangement.End
                 ) {
                     Button(
+                        modifier = Modifier.width(170.dp),
+                        shape = MaterialTheme.shapes.medium,
+                        onClick = {
+                            showQuestionDialog = true
+                        }) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+
+                        ) {
+                            Text(text = stringResource(Res.string.add_question))
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = stringResource(Res.string.add_question)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Button(
+                        modifier = Modifier.width(170.dp),
+                        shape = MaterialTheme.shapes.medium,
                         onClick = {
                             createQuizViewModel.onCommand(QuizCommand.CreateQuiz)
                         }
                     ) {
                         Row(
-                            verticalAlignment = Alignment.CenterVertically
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
+                            Text(text = stringResource(Res.string.save_quiz))
                             Icon(
                                 imageVector = Icons.Default.Save,
                                 contentDescription = stringResource(Res.string.save_icon)
                             )
-                            Text(text = stringResource(Res.string.save_quiz))
                         }
                     }
                 }
+            }
+            item {
 
                 QuizCoverImage(
-                    modifier = Modifier.padding(vertical = 8.dp),
-                    height = 128.dp,
+                    modifier = Modifier
+                        .heightIn(min = 128.dp, max = 256.dp)
+                        .widthIn(min = 128.dp, max = 512.dp)
+                        .padding(vertical = 8.dp),
                     model = quiz.image,
                     onImageClick = {
                         createQuizViewModel.onCommand(QuizCommand.QuizProperties.ImageChanged(it))
@@ -237,21 +235,33 @@ fun CreateQuizScreen(
                             DropdownMenuItem(
                                 text = { Text(text = stringResource(Res.string.public)) },
                                 onClick = {
-                                    createQuizViewModel.onCommand(QuizCommand.QuizProperties.VisibilityChanged(QuizVisibility.Public))
+                                    createQuizViewModel.onCommand(
+                                        QuizCommand.QuizProperties.VisibilityChanged(
+                                            QuizVisibility.Public
+                                        )
+                                    )
                                     expanded = false
                                 }
                             )
                             DropdownMenuItem(
                                 text = { Text(text = stringResource(Res.string.friend_only)) },
                                 onClick = {
-                                    createQuizViewModel.onCommand(QuizCommand.QuizProperties.VisibilityChanged(QuizVisibility.FriendsOnly))
+                                    createQuizViewModel.onCommand(
+                                        QuizCommand.QuizProperties.VisibilityChanged(
+                                            QuizVisibility.FriendsOnly
+                                        )
+                                    )
                                     expanded = false
                                 }
                             )
                             DropdownMenuItem(
                                 text = { Text(text = stringResource(Res.string.private)) },
                                 onClick = {
-                                    createQuizViewModel.onCommand(QuizCommand.QuizProperties.VisibilityChanged(QuizVisibility.Private))
+                                    createQuizViewModel.onCommand(
+                                        QuizCommand.QuizProperties.VisibilityChanged(
+                                            QuizVisibility.Private
+                                        )
+                                    )
                                     expanded = false
                                 }
                             )
@@ -322,7 +332,10 @@ fun CreateQuizScreen(
                                         ),
                                         singleLine = true,
                                         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, autoCorrectEnabled = false),
+                                        keyboardOptions = KeyboardOptions(
+                                            imeAction = ImeAction.Done,
+                                            autoCorrectEnabled = false
+                                        ),
                                         keyboardActions = KeyboardActions(
                                             onDone = {
                                                 createQuizViewModel.onCommand(
@@ -344,10 +357,10 @@ fun CreateQuizScreen(
                                         }
                                     )
                                 }
-                                
+
                                 Text(
                                     modifier = Modifier.align(Alignment.End),
-                                    text="${state.quizModel.tagList.size} / 20"
+                                    text = "${state.quizModel.tagList.size} / 20"
                                 )
                             }
                         }
@@ -367,7 +380,7 @@ fun CreateQuizScreen(
                             }
                         }
                     }
-                    
+
                     Text(
                         text = if (state.tagError != null) stringResource(state.tagError!!.toResId()) else "",
                         color = MaterialTheme.colorScheme.error
@@ -383,25 +396,6 @@ fun CreateQuizScreen(
                         navigateToQuestionCreate(question.answerList.size > 1)
                     }
                 )
-            }
-
-            item {
-                Button(onClick = {
-                    showQuestionDialog = true
-                }) {
-                    Text(text = stringResource(Res.string.add_question))
-                }
-                
-                if (showQuestionDialog) {
-                    QuestionTypeDialog(
-                        onClick = {
-                            showQuestionDialog = false
-                            createQuizViewModel.onCommand(QuizCommand.QuestionEditor.Init(it))
-                            navigateToQuestionCreate(it)
-                        },
-                        changeDialogVisibility = { showQuestionDialog = false }
-                    )
-                }
             }
         }
     }

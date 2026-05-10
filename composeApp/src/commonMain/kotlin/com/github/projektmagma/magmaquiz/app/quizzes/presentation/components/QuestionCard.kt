@@ -1,10 +1,6 @@
 package com.github.projektmagma.magmaquiz.app.quizzes.presentation.components
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -13,7 +9,7 @@ import com.github.projektmagma.magmaquiz.app.core.presentation.components.Profil
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.UniversalCardContainer
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.QuestionModel
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
-import java.util.UUID
+import java.util.*
 
 @Composable
 fun QuestionCard(
@@ -30,7 +26,7 @@ fun QuestionCard(
         Column(modifier = Modifier.padding(8.dp)) {
             if (question.image != null) {
                 QuizCoverImage(
-                    height = 312.dp,
+                    modifier = Modifier.fillMaxWidth().height(312.dp),
                     model = question.image
                 )
             }

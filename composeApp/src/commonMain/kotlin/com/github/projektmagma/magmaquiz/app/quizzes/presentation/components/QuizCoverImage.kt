@@ -2,8 +2,6 @@ package com.github.projektmagma.magmaquiz.app.quizzes.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ImageNotSupported
 import androidx.compose.material3.Icon
@@ -13,7 +11,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.Dp
 import coil3.compose.SubcomposeAsyncImage
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.dialogs.FileKitMode
@@ -24,7 +21,6 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun QuizCoverImage(
-    height: Dp,
     model: ByteArray?,
     modifier: Modifier = Modifier,
     onImageClick: ((ByteArray?) -> Unit)? = null
@@ -32,8 +28,6 @@ fun QuizCoverImage(
     val scope = rememberCoroutineScope()
     SubcomposeAsyncImage(
         modifier = modifier
-            .fillMaxWidth()
-            .height(height)
             .clip(MaterialTheme.shapes.medium)
             .then(
                 if (onImageClick != null) {
@@ -58,7 +52,7 @@ fun QuizCoverImage(
                 contentDescription = "Nie ma zdjecia"
             )
         },
-        contentScale = ContentScale.Crop,
+        contentScale = ContentScale.Inside,
         contentDescription = "Ikona quizu"
     )
 }

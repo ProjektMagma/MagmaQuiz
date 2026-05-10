@@ -8,11 +8,8 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import com.github.projektmagma.magmaquiz.shared.data.domain.FriendshipStatus
 import com.github.projektmagma.magmaquiz.shared.data.domain.ThisUser
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.User
-import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
-import org.jetbrains.exposed.v1.core.eq
-import org.jetbrains.exposed.v1.core.lowerCase
-import org.jetbrains.exposed.v1.core.or
 import org.jetbrains.exposed.v1.dao.java.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
@@ -129,10 +126,10 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
     fun getUserQuizzes(caller: UserEntity, count: Int, offset: Int): List<QuizEntity> {
         return transaction {
             quizList
+                .orderBy(QuizzesTable.likesCount to SortOrder.DESC)
                 .offset(offset.toLong())
                 .take(count)
                 .filter { it.isActive && it.isAccessibleByUser(caller) }
-                .sortedByDescending { it.likesCount }
                 .toList()
         }
     }
@@ -140,9 +137,10 @@ class UserEntity(id: EntityID<UUID>) : ExtUUIDEntity(id, UsersTable), DomainCapa
     fun getLastPlayedQuizzes(caller: UserEntity, count: Int, offset: Int): List<UserGameHistoryEntity> {
         return transaction {
             playHistoryList
-                .offset(offset.toLong())
+                .orderBy(UsersGameHistoryTable.createdAt to SortOrder.DESC)
+                .distinctBy { UsersGameHistoryTable.quiz }
+                .drop(offset)
                 .take(count)
-                .sortedByDescending { it.createdAt }
                 .filter { it.quiz.isActive && it.quiz.isAccessibleByUser(caller) }
         }
     }

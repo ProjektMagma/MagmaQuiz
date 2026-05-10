@@ -1,13 +1,6 @@
 package com.github.projektmagma.magmaquiz.app.auth.presentation.screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -15,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -44,8 +38,10 @@ fun RegisterScreen(
 ) {
     val viewModel = koinViewModel<AuthViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val kbController = LocalSoftwareKeyboardController.current
 
-    ObserveAsEvents(viewModel.authChannel){ event ->
+    ObserveAsEvents(viewModel.authChannel) { event ->
+        kbController?.hide()
         when (event) {
             is NetworkEvent.Failure -> {
                 SnackbarController.onEvent(getString(event.networkError.toResId(ErrorMessageContext.Auth)))

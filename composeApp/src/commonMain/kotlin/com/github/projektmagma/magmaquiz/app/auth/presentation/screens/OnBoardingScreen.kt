@@ -2,7 +2,12 @@ package com.github.projektmagma.magmaquiz.app.auth.presentation.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Login
+import androidx.compose.material.icons.filled.Dns
+import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -49,22 +54,57 @@ fun OnBoardingScreen(
 
         Spacer(modifier = Modifier.height(64.dp))
 
-        Button(
-            onClick = { navigateToLogin() }
-        ) {
-            Text(text = stringResource(Res.string.log_in))
-        }
+        Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            Button(
+                modifier = Modifier.width(200.dp),
+                shape = MaterialTheme.shapes.medium,
+                onClick = { navigateToLogin() }
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = stringResource(Res.string.log_in))
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Login,
+                        contentDescription = stringResource(Res.string.log_in)
+                    )
+                }
+            }
 
-        Button(
-            onClick = { navigateToRegister() }
-        ) {
-            Text(text = stringResource(Res.string.register))
-        }
+            Button(
+                modifier = Modifier.width(200.dp),
+                shape = MaterialTheme.shapes.medium,
+                onClick = { navigateToRegister() }
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = stringResource(Res.string.register))
+                    Icon(
+                        imageVector = Icons.Default.PersonAdd,
+                        contentDescription = stringResource(Res.string.register)
+                    )
+                }
+            }
 
-        Button(
-            onClick = { navigateToServerConfig() }
-        ) {
-            Text(text = stringResource(Res.string.change_server))
+            Button(
+                modifier = Modifier.width(200.dp),
+                shape = MaterialTheme.shapes.medium,
+                onClick = { navigateToServerConfig() }
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = stringResource(Res.string.change_server))
+                    Icon(
+                        imageVector = Icons.Default.Dns,
+                        contentDescription = stringResource(Res.string.change_server)
+                    )
+                }
+            }
         }
 
 
