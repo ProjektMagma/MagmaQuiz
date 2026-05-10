@@ -50,7 +50,6 @@ import magmaquiz.composeapp.generated.resources.online
 import magmaquiz.composeapp.generated.resources.waiting_for_players
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-import java.util.UUID
 
 
 @Composable
@@ -58,14 +57,20 @@ fun GameLeaderboardScreen(
     viewModel: GameLeaderboardViewModel = koinViewModel(),
     navigateBack: () -> Unit,
 ) {
-    val scores by viewModel.scores.collectAsStateWithLifecycle()
+    val usersAnswersList by viewModel.usersAnswersList.collectAsStateWithLifecycle()
     val room by viewModel.room.collectAsStateWithLifecycle()
     val isGameEnded by viewModel.isGameEnded.collectAsStateWithLifecycle()
     val currentQuestion by viewModel.currentQuestion.collectAsStateWithLifecycle()
+    val scores by viewModel.scores.collectAsStateWithLifecycle()
 
-    val sortedEntries = remember(scores) {
+    val sortedEntries = remember(usersAnswersList) {
+        usersAnswersList.entries
+            .filter { it.key.userId != room?.roomOwner?.userId }
+    }
+    
+    val sortedScores = remember(scores) {
         scores.entries
-            .sortedByDescending { it.value.count() }
+            .sortedByDescending { it.value }
             .filter { it.key.userId != room?.roomOwner?.userId }
     }
 
@@ -150,13 +155,13 @@ fun GameLeaderboardScreen(
             } else {
                 if (isGameEnded && sortedEntries.size >= 3) {
                     PodiumCard(
-                        entries = sortedEntries.take(3),
+                        entries = sortedScores,
                         total = room!!.currentQuiz.questionList.size
                     )
                 }
 
                 PlayerListCard(
-                    entries = sortedEntries,
+                    entries = sortedScores,
                     total = room!!.currentQuiz.questionList.size
                 )
             }
@@ -187,7 +192,7 @@ fun GameLeaderboardScreen(
 
 @Composable
 private fun PodiumCard(
-    entries: List<Map.Entry<ForeignUser, List<UUID?>>>,
+    entries: List<Map.Entry<ForeignUser, Int>>,
     total: Int
 ) {
     val ordered = listOf(entries[1], entries[0], entries[2])
@@ -251,7 +256,7 @@ private fun PodiumCard(
                         modifier = Modifier.widthIn(max = 80.dp)
                     )
                     Text(
-                        text = "${entry.value.count()} / $total",
+                        text = "${entry.value} / $total",
                         fontSize = 11.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                     )
@@ -277,8 +282,8 @@ private fun PodiumCard(
 }
 
 @Composable
-fun PlayerListCard(
-    entries: List<Map.Entry<ForeignUser, List<UUID?>>>,
+private fun PlayerListCard(
+    entries: List<Map.Entry<ForeignUser, Int>>,
     total: Int
 ) {
     val barColors = listOf(
@@ -310,7 +315,6 @@ fun PlayerListCard(
                     )
                     ProfilePictureIcon(
                         imageData = entry.key.userProfilePicture,
-                        size = 32.dp
                     )
                     Text(
                         text = entry.key.userName,
@@ -319,7 +323,7 @@ fun PlayerListCard(
                         modifier = Modifier.weight(1f)
                     )
 
-                    val fraction = if (total > 0) entry.value.count().toFloat() / total else 0f
+                    val fraction = if (total > 0) entry.value.toFloat() / total else 0f
                     Box(
                         modifier = Modifier
                             .width(70.dp)
@@ -336,7 +340,7 @@ fun PlayerListCard(
                         )
                     }
                     Text(
-                        text = "${entry.value.count()} / $total",
+                        text = "${entry.value} / $total",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,

@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.projektmagma.magmaquiz.app.auth.data.AuthRepository
 import com.github.projektmagma.magmaquiz.app.core.presentation.mappers.toResId
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.UiEvent
 import com.github.projektmagma.magmaquiz.app.core.util.compressImage
@@ -15,6 +16,7 @@ import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenErro
 import com.github.projektmagma.magmaquiz.shared.data.domain.abstraction.whenSuccess
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.no_image_provided_error
@@ -22,6 +24,7 @@ import magmaquiz.composeapp.generated.resources.profile_picture_changed_success
 
 class SettingsViewModel(
     private val settingsRepository: SettingsRepository,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiChannel = Channel<UiEvent>()
@@ -49,6 +52,7 @@ class SettingsViewModel(
                 profilePictureSmall = profilePicture.compressImage(75, 128)!!
             )
                 .whenSuccess {
+                    authRepository.thisUser.update { it?.copy(userProfilePicture = profilePicture) }
                     _uiChannel.trySend(UiEvent.ShowSnackbar(Res.string.profile_picture_changed_success))
                 }
                 .whenError {

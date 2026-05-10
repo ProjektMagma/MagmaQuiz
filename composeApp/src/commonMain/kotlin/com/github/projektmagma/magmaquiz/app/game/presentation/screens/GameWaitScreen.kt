@@ -1,12 +1,31 @@
 package com.github.projektmagma.magmaquiz.app.game.presentation.screens
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material.icons.outlined.Schedule
-import androidx.compose.material3.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -28,7 +47,14 @@ import com.github.projektmagma.magmaquiz.app.game.presentation.model.wait.GameWa
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import com.github.projektmagma.magmaquiz.shared.data.domain.RoomSettings
 import com.github.projektmagma.magmaquiz.shared.data.domain.WebSocketMessages
-import magmaquiz.composeapp.generated.resources.*
+import magmaquiz.composeapp.generated.resources.Res
+import magmaquiz.composeapp.generated.resources.close_room
+import magmaquiz.composeapp.generated.resources.leave_room
+import magmaquiz.composeapp.generated.resources.nobody_joined
+import magmaquiz.composeapp.generated.resources.players
+import magmaquiz.composeapp.generated.resources.players_count
+import magmaquiz.composeapp.generated.resources.seconds_per_question
+import magmaquiz.composeapp.generated.resources.start_game
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -273,7 +299,7 @@ private fun UserRow(
         ) {
             ProfilePictureIcon(
                 imageData = user.userProfilePicture,
-                size = 36.dp
+                modifier = Modifier.size(36.dp)
             )
             Column(
                 modifier = Modifier.weight(1f)

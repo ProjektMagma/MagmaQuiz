@@ -70,7 +70,7 @@ fun CommentCard(
             ) {
                 ProfilePictureIcon(
                     imageData = review.author?.userProfilePicture,
-                    size = 40.dp
+                    modifier = Modifier.size(40.dp)
                 )
 
                 Column(

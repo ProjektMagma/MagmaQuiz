@@ -1,12 +1,24 @@
 package com.github.projektmagma.magmaquiz.app.users.presentation.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.*
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SecondaryTabRow
+import androidx.compose.material3.Tab
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -15,7 +27,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.projektmagma.magmaquiz.app.core.presentation.components.*
+import com.github.projektmagma.magmaquiz.app.core.presentation.components.AutoScalableLazyColumn
+import com.github.projektmagma.magmaquiz.app.core.presentation.components.FriendshipButtons
+import com.github.projektmagma.magmaquiz.app.core.presentation.components.FullSizeCircularProgressIndicator
+import com.github.projektmagma.magmaquiz.app.core.presentation.components.FullSizeErrorIndicator
+import com.github.projektmagma.magmaquiz.app.core.presentation.components.ProfilePictureIcon
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.root.UiState
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.CreateQuizViewModel
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.QuizCardSmall
@@ -23,7 +39,6 @@ import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.Q
 import com.github.projektmagma.magmaquiz.app.users.presentation.UserDetailsViewModel
 import com.github.projektmagma.magmaquiz.app.users.presentation.UsersSharedViewModel
 import com.github.projektmagma.magmaquiz.app.users.presentation.model.details.UserDetailsCommand
-import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import kotlinx.coroutines.flow.distinctUntilChanged
 import magmaquiz.composeapp.generated.resources.Res
 import magmaquiz.composeapp.generated.resources.game_history
@@ -31,7 +46,7 @@ import magmaquiz.composeapp.generated.resources.quizzes
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
-import java.util.*
+import java.util.UUID
 
 @Composable
 fun UserDetailsScreen(
@@ -49,6 +64,7 @@ fun UserDetailsScreen(
     val userUiState by userDetailsViewModel.userUiState.collectAsStateWithLifecycle()
 
     val state by userDetailsViewModel.state.collectAsStateWithLifecycle()
+    val sharedState by usersSharedViewModel.state.collectAsStateWithLifecycle()
 
     val lazyListState = rememberLazyListState()
     LaunchedEffect(state.quizzes) {
@@ -98,7 +114,7 @@ fun UserDetailsScreen(
                                 ) {
                                     ProfilePictureIcon(
                                         imageData = state.user?.userProfilePicture,
-                                        size = 64.dp
+                                        modifier = Modifier.size(64.dp)
                                     )
                                     Column {
                                         Text(
@@ -144,7 +160,7 @@ fun UserDetailsScreen(
                                 style = MaterialTheme.typography.bodyMedium
                             )
 
-                            val foreignUser = state.user as? ForeignUser
+                            val foreignUser = sharedState.usersList.firstOrNull { it.userId == id && !userDetailsViewModel.checkOwnership(id) }
 
                             if (foreignUser != null) {
                                 FriendshipButtons(

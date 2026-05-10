@@ -31,6 +31,7 @@ class GameMultiplayerViewModel(
 ) : ViewModel() {
     private val _room = gameRepository.roomSettings
     val roomSettings = _room.asStateFlow()
+    private val _roomList = gameRepository.roomsList
 
     private val _gameState = MutableStateFlow(GameState(
         secondsForQuestion = _room.value!!.questionTimeInMillis.toSeconds()
@@ -61,6 +62,7 @@ class GameMultiplayerViewModel(
                                         totalQuestions = _questions.size
                                     )
                                 }
+                                _roomList.value = _roomList.value.filter { it.roomId != _room.value?.roomId }
                             }
                             is WebSocketMessages.OutgoingMessage.NextQuestion -> {
                                 updateGameState()

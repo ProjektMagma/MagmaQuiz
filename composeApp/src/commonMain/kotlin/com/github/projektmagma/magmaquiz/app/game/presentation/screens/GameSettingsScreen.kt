@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AssistChip
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -26,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.github.projektmagma.magmaquiz.app.core.presentation.components.LoadingButton
 import com.github.projektmagma.magmaquiz.app.core.presentation.model.events.NetworkEvent
 import com.github.projektmagma.magmaquiz.app.core.util.SnackbarController
 import com.github.projektmagma.magmaquiz.app.game.presentation.GameSettingsViewModel
@@ -187,13 +187,12 @@ fun GameSettingsScreen(
                     }
                 }
 
-                Button(
+                LoadingButton(
+                    text = stringResource(Res.string.create_room),
+                    onClick = { gameSettingsViewModel.onCommand(GameSettingsCommand.Submit) },
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = canSubmit,
-                    onClick = { gameSettingsViewModel.onCommand(GameSettingsCommand.Submit) }
-                ) {
-                    Text(stringResource(Res.string.create_room))
-                }
+                    enabled = canSubmit
+                )
             }
         }
     }

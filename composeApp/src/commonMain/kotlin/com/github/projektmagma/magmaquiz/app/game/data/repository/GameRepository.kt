@@ -25,6 +25,7 @@ class GameRepository(
     private val quizService: QuizService
 ) {
     val roomSettings = MutableStateFlow<RoomSettings?>(null)
+    val roomsList = MutableStateFlow<List<RoomSettings>>(emptyList())
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 

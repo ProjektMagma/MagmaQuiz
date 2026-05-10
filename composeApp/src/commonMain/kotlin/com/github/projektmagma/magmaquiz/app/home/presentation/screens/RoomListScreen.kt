@@ -45,6 +45,7 @@ fun RoomListScreen(
     onJoinClick: () -> Unit
 ) {
     val state by roomListViewModel.state.collectAsStateWithLifecycle()
+    val rooms by roomListViewModel.roomList.collectAsStateWithLifecycle()
     val uiState by roomListViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
@@ -81,7 +82,7 @@ fun RoomListScreen(
                             fontWeight = FontWeight.SemiBold
                         )
                         Text(
-                            text = stringResource(Res.string.available_rooms, state.roomList.size),
+                            text = stringResource(Res.string.available_rooms, rooms.size),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -102,7 +103,7 @@ fun RoomListScreen(
 
             Box(modifier = Modifier.weight(1f)) {
                 AutoScalableLazyColumn(
-                    itemList = state.roomList,
+                    itemList = rooms,
                     key = { it.roomId },
                     uiState = uiState,
                     isLoadingMore = state.isLoadingMoreRooms,

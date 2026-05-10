@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Group
@@ -14,7 +15,6 @@ import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.SportsEsports
 import androidx.compose.material3.AssistChip
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.ContentImage
+import com.github.projektmagma.magmaquiz.app.core.presentation.components.LoadingButton
 import com.github.projektmagma.magmaquiz.app.core.presentation.components.ProfilePictureIcon
 import com.github.projektmagma.magmaquiz.app.core.util.TimeConverter.toSeconds
 import com.github.projektmagma.magmaquiz.shared.data.domain.RoomSettings
@@ -88,7 +89,7 @@ fun RoomCardSmall(
                     ) {
                         ProfilePictureIcon(
                             imageData = room.roomOwner.userProfilePicture,
-                            size = 22.dp
+                            modifier = Modifier.size(22.dp)
                         )
                         Text(
                             text = room.roomOwner.userName,
@@ -133,12 +134,11 @@ fun RoomCardSmall(
             }
 
             if (!room.isInProgress){
-                Button(
+                LoadingButton(
+                    text = stringResource(Res.string.join),
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { onJoinClick(room.roomId) }
-                ) {
-                    Text(stringResource(Res.string.join))
-                }
+                    onClick = { onJoinClick(room.roomId) },
+                )
             }
         }
     }

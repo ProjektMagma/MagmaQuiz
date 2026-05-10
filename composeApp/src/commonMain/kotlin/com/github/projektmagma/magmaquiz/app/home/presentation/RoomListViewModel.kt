@@ -26,6 +26,9 @@ class RoomListViewModel(
     private val _state = MutableStateFlow(RoomListState())
     val state = _state.asStateFlow()
     
+    private val _roomList = gameRepository.roomsList
+    val roomList = _roomList.asStateFlow()
+    
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState = _uiState.asStateFlow()
     
@@ -41,7 +44,7 @@ class RoomListViewModel(
         getNextKey = { currentKey, _ -> currentKey + 1 },
         onError = { networkError -> _uiState.value = UiState.Error(networkError.toResId()) },
         onSuccess = { result, _ ->
-            _state.update { it.copy(roomList = it.roomList + result) }
+            _roomList.value = _roomList.value.plus(result)
             _uiState.value = UiState.Success
         },
         endReached = { _, items -> items.isEmpty() }
@@ -66,11 +69,7 @@ class RoomListViewModel(
             gameRepository.joinRoom(id)
                 .whenSuccess { _event.send(NetworkEvent.Success) }
                 .whenError { result ->
-                    _state.update { 
-                        it.copy(
-                            roomList = it.roomList.filter { room -> room.roomId != id }
-                        )
-                    }
+                    _roomList.value = _roomList.value.filter { it.roomId != id }
                     _event.send(NetworkEvent.Failure(result.error)) 
                 }
         }
@@ -84,7 +83,7 @@ class RoomListViewModel(
             _uiState.value = UiState.Loading
             withSearchDelay(withDelay) {
                 paginator.reset()
-                _state.update { it.copy(roomList = emptyList()) }
+                _roomList.value = emptyList()
                 paginator.loadNextItems()
                 searchLock = false
             }
@@ -99,7 +98,7 @@ class RoomListViewModel(
             try {
                 _uiState.value = UiState.Loading
                 paginator.reset()
-                _state.update { it.copy(roomList = emptyList()) }
+                _roomList.value = emptyList()
                 paginator.loadNextItems()
             } finally {
                 _state.update { it.copy(isRefreshing = false) }

@@ -114,7 +114,6 @@ fun QuizDetailsScreen(
                                 ) {
                                     ProfilePictureIcon(
                                         imageData = state.quiz!!.quizCreator!!.userProfilePicture,
-                                        size = 32.dp
                                     )
                                     Text(
                                         text = state.quiz!!.quizCreator!!.userName,
