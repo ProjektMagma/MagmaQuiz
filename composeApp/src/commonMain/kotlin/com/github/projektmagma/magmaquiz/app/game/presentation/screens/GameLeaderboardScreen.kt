@@ -3,27 +3,12 @@ package com.github.projektmagma.magmaquiz.app.game.presentation.screens
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -42,12 +27,7 @@ import com.github.projektmagma.magmaquiz.app.quizzes.presentation.components.Que
 import com.github.projektmagma.magmaquiz.app.quizzes.presentation.model.create.toQuestionModel
 import com.github.projektmagma.magmaquiz.shared.data.domain.ForeignUser
 import com.github.projektmagma.magmaquiz.shared.data.domain.WebSocketMessages
-import magmaquiz.composeapp.generated.resources.Res
-import magmaquiz.composeapp.generated.resources.current_question
-import magmaquiz.composeapp.generated.resources.game_ended
-import magmaquiz.composeapp.generated.resources.leave_room
-import magmaquiz.composeapp.generated.resources.online
-import magmaquiz.composeapp.generated.resources.waiting_for_players
+import magmaquiz.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -67,7 +47,7 @@ fun GameLeaderboardScreen(
         usersAnswersList.entries
             .filter { it.key.userId != room?.roomOwner?.userId }
     }
-    
+
     val sortedScores = remember(scores) {
         scores.entries
             .sortedByDescending { it.value }
@@ -166,6 +146,20 @@ fun GameLeaderboardScreen(
                 )
             }
         }
+        stickyHeader {
+            OutlinedButton(
+                onClick = {
+                    viewModel.sendMessage(WebSocketMessages.IncomingMessage.CloseRoom)
+                    navigateBack()
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium,
+                colors = ButtonDefaults.buttonColors()
+            ) {
+                Text(text = stringResource(Res.string.leave_room))
+            }
+        }
+
         if (isGameEnded) {
             items(room!!.currentQuiz.questionList) { question ->
                 QuestionCard(
@@ -175,18 +169,7 @@ fun GameLeaderboardScreen(
                 )
             }
         }
-        item {
-            OutlinedButton(
-                onClick = {
-                    viewModel.sendMessage(WebSocketMessages.IncomingMessage.CloseRoom)
-                    navigateBack()
-                },
-                modifier = Modifier.fillMaxWidth(),
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Text(text = stringResource(Res.string.leave_room))
-            }
-        }
+
     }
 }
 
