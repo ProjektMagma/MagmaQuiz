@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.github.projektmagma.magmaquiz"
-version = "0.9.2"
+version = "0.9.3"
 application {
     mainClass.set("com.github.projektmagma.magmaquiz.server.ApplicationKt")
 
